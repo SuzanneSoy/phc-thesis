@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 set -x
-if test "$(git config remote.origin.url)" != "https://github.com/jsmaniac/phc-thesis.git"
+if test "$(git config remote.origin.url)" != "https://github.com/jsmaniac/phc-thesis.git"; then
   echo "Not on official repo, will not deploy gh-pages."
 elif test "$TRAVIS_PULL_REQUEST" != "false"; then
   echo "This is a Pull Request, will not deploy gh-pages."
