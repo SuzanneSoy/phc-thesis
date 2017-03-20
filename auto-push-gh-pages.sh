@@ -7,7 +7,7 @@ elif test "$TRAVIS_PULL_REQUEST" != "false"; then
   echo "This is a Pull Request, will not deploy gh-pages."
 elif test "$TRAVIS_BRANCH" != "master"; then
   echo "Not on master branch (TRAVIS_BRANCH = $TRAVIS_BRANCH), will not deploy gh-pages."
-elif test -z "${encrypted_1b66487e02e5_key:-}" -o -z "${encrypted_1b66487e02e5_iv:-}"; then
+elif test -z "${encrypted_8fdb34b09f5e_key:-}" -o -z "${encrypted_8fdb34b09f5e_iv:-}"; then
   echo "Travis CI secure environment variables are unavailable, will not deploy gh-pages."
 else
   set -x
