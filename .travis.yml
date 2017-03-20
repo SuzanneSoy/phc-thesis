@@ -51,8 +51,8 @@ before_script:
 # `raco pkg install --deps search-auto` to install any required
 # packages without it getting stuck on a confirmation prompt.
 script:
- - raco test -x -p thesis
- - raco setup --check-pkg-deps --pkgs thesis
+ - raco test -x -p phc-thesis
+ - raco setup --check-pkg-deps --pkgs phc-thesis
  - make
 
 #after_success:
