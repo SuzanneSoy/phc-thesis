@@ -29,6 +29,7 @@ else
   eval `ssh-agent -s`
   ssh-add travis-deploy-key-id_rsa
 
+  TRAVIS_GH_PAGES_DIR="$HOME/travis-gh-pages-$(date +%s)"
   if test -e $TRAVIS_GH_PAGES_DIR; then rm -rf $TRAVIS_GH_PAGES_DIR; fi
   mv -i doc $TRAVIS_GH_PAGES_DIR
   git init $TRAVIS_GH_PAGES_DIR
