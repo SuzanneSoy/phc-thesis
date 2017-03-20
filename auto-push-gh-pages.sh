@@ -18,16 +18,20 @@ else
   git config --global user.email "$(git log --format="%aE" HEAD -1)"
 
   # SSH configuration
+  mkdir ~/.ssh
+  chmod 700 ~/.ssh
   set +x
-  if openssl aes-256-cbc -K $encrypted_8fdb34b09f5e_key -iv $encrypted_8fdb34b09f5e_iv -in travis-deploy-key-id_rsa.enc -out travis-deploy-key-id_rsa -d >/dev/null 2>&1; then
+  if openssl aes-256-cbc -K $encrypted_8fdb34b09f5e_key -iv $encrypted_8fdb34b09f5e_iv -in travis-deploy-key-id_rsa.enc -out ~/.ssh/travis-deploy-key-id_rsa -d >/dev/null 2>&1; then
     echo "Decrypted key successfully."
   else
     echo "Error while decrypting key."
   fi
   set -x
   chmod 600 travis-deploy-key-id_rsa
+  set +x
   eval `ssh-agent -s`
-  ssh-add travis-deploy-key-id_rsa
+  set -x
+  ssh-add ~/.ssh/travis-deploy-key-id_rsa
 
   TRAVIS_GH_PAGES_DIR="$HOME/travis-gh-pages-$(date +%s)"
   if test -e $TRAVIS_GH_PAGES_DIR; then rm -rf $TRAVIS_GH_PAGES_DIR; fi
