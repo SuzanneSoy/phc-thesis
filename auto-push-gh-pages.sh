@@ -15,7 +15,7 @@ else
 
   # Git configuration:
   git config --global user.name "$(git log --format="%aN" HEAD -1) (Travis CI automatic commit)"
-  git config --global user.email "(git log --format="%aE" HEAD -1)"
+  git config --global user.email "$(git log --format="%aE" HEAD -1)"
 
   # SSH configuration
   set +x
