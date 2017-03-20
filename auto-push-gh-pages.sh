@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-set -x
+set +x
 if test "$(git config remote.origin.url)" != "https://github.com/jsmaniac/phc-thesis.git"; then
   echo "Not on official repo, will not deploy gh-pages."
 elif test "$TRAVIS_PULL_REQUEST" != "false"; then
@@ -10,6 +10,7 @@ elif test "$TRAVIS_BRANCH" != "master"; then
 elif test -z "${encrypted_1b66487e02e5_key:-}" -o -z "${encrypted_1b66487e02e5_iv:-}"; then
   echo "Travis CI secure environment variables are unavailable, will not deploy gh-pages."
 else
+  set -x
   echo "Automatic push to gh-pages"
 
   # Git configuration:
@@ -18,7 +19,7 @@ else
 
   # SSH configuration
   set +x
-  if openssl aes-256-cbc -K $encrypted_1b66487e02e5_key -iv $encrypted_1b66487e02e5_iv -in travis-deploy-key-id_rsa.enc -out travis-deploy-key-id_rsa -d >/dev/null 2>&1; then
+  if openssl aes-256-cbc -K $encrypted_8fdb34b09f5e_key -iv $encrypted_8fdb34b09f5e_iv -in travis-deploy-key-id_rsa.enc -out travis-deploy-key-id_rsa -d >/dev/null 2>&1; then
     echo "Decrypted key successfully."
   else
     echo "Error while decrypting key."
