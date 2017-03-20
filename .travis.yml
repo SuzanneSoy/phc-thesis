@@ -51,6 +51,13 @@ before_install:
 - git clone https://github.com/greghendershott/travis-racket.git ~/travis-racket
 - cat ~/travis-racket/install-racket.sh | bash # pipe to bash not sh!
 - export PATH="${RACKET_DIR}/bin:${PATH}" #install-racket.sh can't set for us
+- echo "LaTeX extra packages:"
+- latex_home=$(kpsewhich -var-value=TEXMFHOME)
+- curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
+- curl -L -o newunicodechar.dtx http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.dtx
+- latex newunicodechar.ins
+- mkdir -p "$latex_home/tex/latex/newunicodechar"
+- mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
 
 install:
  - raco pkg install --deps search-auto
