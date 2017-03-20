@@ -17,7 +17,9 @@ else
   git config --global user.email "(git log --format="%aE" HEAD -1)"
 
   # SSH configuration
-  if test openssl aes-256-cbc -K $encrypted_1b66487e02e5_key -iv $encrypted_1b66487e02e5_iv -in travis-deploy-key-id_rsa.enc -out travis-deploy-key-id_rsa -d >/dev/null 2>&1; then
+  if openssl aes-256-cbc -K $encrypted_1b66487e02e5_key -iv $encrypted_1b66487e02e5_iv -in travis-deploy-key-id_rsa.enc -out travis-deploy-key-id_rsa -d >/dev/null 2>&1; then
+    echo "Decrypted key successfully."
+  else
     echo "Error while decrypting key."
   fi
   chmod 600 travis-deploy-key-id_rsa
@@ -32,5 +34,5 @@ else
   #echo 'document.write("<script src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default\"></script>");' > $TRAVIS_GH_PAGES_DIR/MathJax/MathJax.js
   touch $TRAVIS_GH_PAGES_DIR/.nojekyll
   (cd $TRAVIS_GH_PAGES_DIR && git add -A . && git commit -m "Auto-publish to gh-pages")
-  (cd $TRAVIS_GH_PAGES_DIR; git push --force --quiet "https://${GH_TOKEN}@github.com/jsmaniac/phc-thesis.git" master:gh-pages >/dev/null 2>&1 || true) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
+  (cd $TRAVIS_GH_PAGES_DIR; git push --force --quiet "https://git@github.com/jsmaniac/phc-thesis.git" master:gh-pages >/dev/null 2>&1 || true) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
 fi
