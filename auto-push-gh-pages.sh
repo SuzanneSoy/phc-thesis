@@ -44,5 +44,5 @@ else
   (cd $TRAVIS_GH_PAGES_DIR && git add -A . && git commit -m "Auto-publish to gh-pages")
   (cd $TRAVIS_GH_PAGES_DIR && git log --oneline --decorate --graph -10)
   echo '(cd '"$TRAVIS_GH_PAGES_DIR"'; git push --force --quiet "https://git@github.com/jsmaniac/phc-thesis.git" master:gh-pages)'
-  (cd $TRAVIS_GH_PAGES_DIR; git push --force --quiet "https://github.com/jsmaniac/phc-thesis.git" master:gh-pages >/dev/null 2>&1) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
+  (cd $TRAVIS_GH_PAGES_DIR; git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" master:gh-pages >/dev/null 2>&1) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
 fi
