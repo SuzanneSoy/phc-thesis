@@ -36,7 +36,7 @@ else
   # Push to the auto-git branch, which can then auto-push to master, after this build finished
   repo_url="$(git config remote.origin.url)"
   ssh_repo_url="$(echo "$repo_url" | sed -e 's|^https://github.com/|git@github.com:|')"
-  commit_hash="$(git rev-parse --short HEAD)"
+  commit_hash="$(git rev-parse HEAD)"
   git log --oneline --decorate --graph -10
   git fetch origin auto-push
   git checkout FETCH_HEAD
