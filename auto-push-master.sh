@@ -38,7 +38,7 @@ else
   ssh_repo_url="$(echo "$repo_url" | sed -e 's|^https://github.com/|git@github.com:|')"
   commit_hash="$(git rev-parse --short HEAD)"
   git log --oneline --decorate --graph -10
-  git fetch auto-push
+  git fetch origin auto-push
   git checkout auto-push
   echo "$commit_hash" > commit_hash
   git add commit_hash
