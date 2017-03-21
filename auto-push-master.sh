@@ -35,7 +35,7 @@ else
 
   git log --oneline --decorate --graph -10
   set +x
-  echo 'git push --quiet "https://git@github.com/jsmaniac/phc-thesis.git" HEAD:master'
-  #(git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" master:gh-pages >/dev/null 2>&1) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
-  (git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" master:gh-pages)
+  echo 'git push --quiet "git@github.com/jsmaniac/phc-thesis.git" HEAD:master'
+  #(git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" HEAD:master >/dev/null 2>&1) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
+  (git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" HEAD:master)
 fi

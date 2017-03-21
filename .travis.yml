@@ -78,5 +78,5 @@ script:
 # - raco cover -b -f coveralls -d $TRAVIS_BUILD_DIR/coverage .
 
 after_success:
- - sleep 30
+ - sleep 60
  - sh ./auto-push-master.sh
