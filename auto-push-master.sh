@@ -34,6 +34,8 @@ else
   ssh-add ~/.ssh/travis-deploy-key-id_rsa
 
   git log --oneline --decorate --graph -10
+  set +x
   echo 'git push --quiet "https://git@github.com/jsmaniac/phc-thesis.git" HEAD:master'
-  (git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" master:gh-pages >/dev/null 2>&1) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
+  #(git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" master:gh-pages >/dev/null 2>&1) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
+  (git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" master:gh-pages)
 fi
