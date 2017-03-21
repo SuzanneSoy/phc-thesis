@@ -40,7 +40,7 @@ else
   #git init auto-git/
   #cd auto-git
   #git remote add origin "$ssh_repo_url"
-  git fetch --unshallow
+  git fetch --unshallow || true
   git fetch --all
   git checkout -qf "$commit_hash"
   git log --oneline --decorate --graph -10 "$commit_hash"
