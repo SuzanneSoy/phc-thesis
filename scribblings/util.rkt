@@ -1,6 +1,7 @@
 #lang racket
 
 (provide (rename-out [my-title title])
+         (rename-out [my-author+email author+email])
          asection
          atitle
          aquote
@@ -13,7 +14,8 @@
          (rename-out [note* note])
          define-footnote ;; TODO: does not use the (superscript …)
          (all-from-out "abbreviations.rkt")
-         (all-from-out scribble-math))
+         (all-from-out scribble-math)
+         version-text)
 
 (require racket/stxparam
          racket/splicing
@@ -31,12 +33,64 @@
 (use-mathjax)
 
 (define (tex-header tex)
-  (elem #:style (style #f (list (tex-addition tex)))))
+  (elem #:style (style #f (list (tex-addition (string->bytes/utf-8 tex))))))
+
+(define (my-author+email author email)
+  (cond-element
+   [html (author+email author email)]
+   ;; TODO: urlencode the email maybe?
+   [latex (list (hyperlink (string-append "mailto:" email) author)
+                (note (hyperlink (string-append "mailto:" email) email)))]
+   [else (author+email author email)]
+   ))
+
+(define (version-text [prefix ""] [postfix ""])
+  (with-handlers ([(λ (e) (eq? e 'git-failure))
+                   (λ (e)
+                     ;; unknown version (for now, just put the empty string).
+                     "")])
+    (define stderr (open-output-string))
+    (define result
+      (parameterize ([current-error-port stderr]
+                     [current-input-port (open-input-string "")])
+        (string-append
+         prefix
+         ;(tt
+         (string-trim
+          (with-output-to-string
+           (λ ()
+             (let ([git (find-executable-path "git")])
+               (unless (system* git "show" "-s" "--date=short" "--format=%cd"
+                                "HEAD")
+                 (raise 'git-failure))))))
+         "-" "-"
+         (string-trim
+          (with-output-to-string
+           (λ ()
+             (let ([git (find-executable-path "git")])
+               (unless (system* git "rev-parse" "--short" "HEAD")
+                 (raise 'git-failure))))))
+         (if (non-empty-string?
+              (string-trim
+               (with-output-to-string
+                (λ ()
+                  (let ([git (find-executable-path "git")])
+                    (unless (system* git "diff" "--shortstat")
+                      (raise 'git-failure)))))))
+             "x"
+             "")
+         "-" "-"
+         (version);)
+         postfix)))
+    (if (non-empty-string? (get-output-string stderr))
+        (begin (displayln (get-output-string stderr))
+               (raise 'git-failure))
+        result)))
 
 ;; TODO: merge the handling of unicode chars into scribble-math.
 (define m
   (list setup-math
-        (tex-header "\renewcommand{\rmdefault}{cmr}")))
+        (tex-header "\\renewcommand{\\rmdefault}{cmr}")))
 (define my-title
   ;; TODO: use this for the other wrapped procs in this file
   (make-keyword-procedure

@@ -3,7 +3,8 @@
 @require["util.rkt"]
 @(use-mathjax)
 
-@title[#:style (with-html5 manual-doc-style)]{State of the art}
+@title[#:style (with-html5 manual-doc-style)
+       #:version (version-text)]{State of the art}
 
 @asection{
  @atitle{Extending the type system via macros (type-expander)}
