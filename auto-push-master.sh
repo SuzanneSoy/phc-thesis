@@ -37,11 +37,9 @@ else
   repo_url="$(git config remote.origin.url)"
   commit_hash="$(cat commit_hash)"
   ssh_repo_url="$(echo "$repo_url" | sed -e 's|^https://github.com/|git@github.com:|')"
-  #git init auto-git/
-  #cd auto-git
-  #git remote add origin "$ssh_repo_url"
-  git fetch --unshallow || true
-  git fetch --all
+  git clone "$repo_url" auto-git/
+  cd auto-git/
+  echo "[$commit_hash]"
   git checkout -qf "$commit_hash"
   git log --oneline --decorate --graph -10 "$commit_hash"
   git push --quiet "$ssh_repo_url" "$commit_hash:master" || true # Do not make a tantrum in case of race conditions
