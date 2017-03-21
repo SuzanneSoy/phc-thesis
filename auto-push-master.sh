@@ -40,7 +40,7 @@ else
   #git init auto-git/
   #cd auto-git
   #git remote add origin "$ssh_repo_url"
-  git fetch "$commit_hash"
+  git fetch origin "$commit_hash"
   git log --oneline --decorate --graph -10 "$commit_hash"
   git push --quiet "$ssh_repo_url" "$commit_hash:master" || true # Do not make a tantrum in case of race conditions
 fi
