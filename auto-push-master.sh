@@ -42,7 +42,7 @@ else
   git checkout auto-push
   echo "$commit_hash" > commit_hash
   git add commit_hash
-  git commit -m "Request to auto-push $commit_hash to master"
+  git commit -m "Request to auto-push $commit_hash to master" --allow-empty
   git log --oneline --decorate --graph -10
   git push --quiet "$ssh_repo_url" HEAD:auto-push || true # do not cause a tantrum in case of race conditions.
 fi
