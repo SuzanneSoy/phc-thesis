@@ -71,7 +71,7 @@ script:
  - raco test -x -p phc-thesis
  - raco setup --check-pkg-deps --pkgs phc-thesis
  - make
- - if test "${DEPLOY:-}" = "true"; then sh ./auto-push-gh-pages.sh; fi
+ - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
 
 #after_success:
 # - raco pkg install --deps search-auto cover cover-coveralls
