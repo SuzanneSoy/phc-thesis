@@ -39,7 +39,7 @@ else
   commit_hash="$(git rev-parse --short HEAD)"
   git log --oneline --decorate --graph -10
   git fetch origin auto-push
-  git checkout origin/auto-push
+  git checkout FETCH_HEAD
   echo "$commit_hash" > commit_hash
   git add commit_hash
   git commit -m "Request to auto-push $commit_hash to master" --allow-empty
