@@ -21,11 +21,12 @@ else
   mkdir -p ~/.ssh
   chmod 700 ~/.ssh
   set +x
-  if openssl aes-256-cbc -K $encrypted_8fdb34b09f5e_key -iv $encrypted_8fdb34b09f5e_iv -in travis-deploy-key-id_rsa.enc -out ~/.ssh/travis-deploy-key-id_rsa -d >/dev/null 2>&1; then
+  if openssl aes-256-cbc -K $encrypted_8fdb34b09f5e_key -iv $encrypted_8fdb34b09f5e_iv -in travis-deploy-key-id_rsa.enc -out travis-deploy-key-id_rsa -d >/dev/null 2>&1; then
     echo "Decrypted key successfully."
   else
     echo "Error while decrypting key."
   fi
+  mv travis-deploy-key-id_rsa ~/.ssh/travis-deploy-key-id_rsa
   set -x
   chmod 600 ~/.ssh/travis-deploy-key-id_rsa
   set +x
