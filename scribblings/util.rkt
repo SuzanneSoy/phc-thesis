@@ -24,13 +24,19 @@
          scriblib/render-cond
          racket/runtime-path
          scribble-enhanced/math
+         scribble/latex-properties
          scribble-math
          "abbreviations.rkt")
 
 (use-mathjax)
 
+(define (tex-header tex)
+  (elem #:style (style #f (list (tex-addition tex)))))
+
 ;; TODO: merge the handling of unicode chars into scribble-math.
-(define m setup-math)
+(define m
+  (list setup-math
+        (tex-header "\renewcommand{\rmdefault}{cmr}")))
 (define my-title
   ;; TODO: use this for the other wrapped procs in this file
   (make-keyword-procedure
