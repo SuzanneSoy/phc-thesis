@@ -42,5 +42,6 @@ else
   #echo 'document.write("<script src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default\"></script>");' > $TRAVIS_GH_PAGES_DIR/MathJax/MathJax.js
   touch $TRAVIS_GH_PAGES_DIR/.nojekyll
   (cd $TRAVIS_GH_PAGES_DIR && git add -A . && git commit -m "Auto-publish to gh-pages")
+  echo '(cd '"$TRAVIS_GH_PAGES_DIR"'; git push --force --quiet "https://git@github.com/jsmaniac/phc-thesis.git" master:gh-pages)'
   (cd $TRAVIS_GH_PAGES_DIR; git push --force --quiet "https://git@github.com/jsmaniac/phc-thesis.git" master:gh-pages >/dev/null 2>&1 || true) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
 fi
