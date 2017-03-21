@@ -36,11 +36,11 @@ else
   # Fetch commit
   repo_url="$(git config remote.origin.url)"
   commit_hash="$(cat commit_hash)"
-  ssh_repo_url="$(echo "$repo_url" | sed -e 's|^https://github.com/|git@github.com:'
-  git init auto-git/
-  cd auto-git
-  git remote add origin "$ssh_repo_url"
+  ssh_repo_url="$(echo "$repo_url" | sed -e 's|^https://github.com/|git@github.com:')"
+  #git init auto-git/
+  #cd auto-git
+  #git remote add origin "$ssh_repo_url"
   git fetch "$commit_hash"
-  git log --oneline --decorate --graph -10 "$commit_hash:master"
-  git push --quiet "$ssh_repo_url" "$commit_hash:master"
+  git log --oneline --decorate --graph -10 "$commit_hash"
+  git push --quiet "$ssh_repo_url" "$commit_hash:master" || true # Do not make a tantrum in case of race conditions
 fi
