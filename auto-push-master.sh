@@ -13,9 +13,9 @@ else
   set -x
   echo "Automatic push to master"
 
-  ## Git configuration:
-  #git config --global user.name "$(git log --format="%aN" HEAD -1) (Travis CI automatic commit)"
-  #git config --global user.email "$(git log --format="%aE" HEAD -1)"
+  # Git configuration:
+  git config --global user.name "$(git log --format="%aN" HEAD -1) (Travis CI automatic commit)"
+  git config --global user.email "$(git log --format="%aE" HEAD -1)"
 
   # SSH configuration
   mkdir -p ~/.ssh
@@ -33,9 +33,16 @@ else
   set -x
   ssh-add ~/.ssh/travis-deploy-key-id_rsa
 
+  # Push to the auto-git branch, which can then auto-push to master, after this build finished
+  repo_url="$(git config remote.origin.url)"
+  ssh_repo_url="$(echo "$repo_url" | sed -e 's|^https://github.com/|git@github.com:')"
+  commit_hash="$(git rev-parse --short HEAD)"
   git log --oneline --decorate --graph -10
-  set +x
-  echo 'git push --quiet "git@github.com/jsmaniac/phc-thesis.git" HEAD:master'
-  #(git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" HEAD:master >/dev/null 2>&1) >/dev/null 2>&1 # redirect to /dev/null to avoid showing credentials.
-  (git push --force --quiet "git@github.com:jsmaniac/phc-thesis.git" HEAD:master)
+  git fetch auto-push
+  git checkout auto-push
+  echo "$commit_hash" > commit_hash
+  git add commit_hash
+  git commit -m "Request to auto-push $commit_hash to master"
+  git log --oneline --decorate --graph -10
+  git push --quiet "$ssh_repo_url" HEAD:auto-push || true # do not cause a tantrum in case of race conditions.
 fi
