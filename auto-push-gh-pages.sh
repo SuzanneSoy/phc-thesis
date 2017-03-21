@@ -27,7 +27,7 @@ else
     echo "Error while decrypting key."
   fi
   set -x
-  chmod 600 ~/travis-deploy-key-id_rsa
+  chmod 600 ~/.ssh/travis-deploy-key-id_rsa
   set +x
   eval `ssh-agent -s`
   set -x
