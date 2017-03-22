@@ -91,8 +91,13 @@
       latter.@htodo{ Probably the former too.}}]
 
     @asection{
- @atitle{The case for bounded row polymorphism}
+  @atitle{The case for bounded row polymorphism}
       @todo{Explain the ``expression problem''.}
+      @todo{Talk about the various ways in which it can be ``solved'', and which
+            tradeoffs we aim for. Mention @url{
+             http://docs.racket-lang.org/extensible-functions}, another solution
+             to the expression problem in Racket, but with rather different
+             tradeoffs.}
 
       We strive to implement compilers using many passes. A pass should be
       able to accept a real-world AST, and produce accordingly a real-world
