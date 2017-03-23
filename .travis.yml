@@ -60,7 +60,7 @@ before_install:
 - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
 
 install:
- - raco pkg install --deps search-auto
+ - raco pkg install -j 2 --deps search-auto
 
 before_script:
 
