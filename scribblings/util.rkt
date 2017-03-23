@@ -15,7 +15,12 @@
          define-footnote ;; TODO: does not use the (superscript …)
          (all-from-out "abbreviations.rkt")
          (all-from-out scribble-math)
-         version-text)
+         version-text
+         aappendix
+         include-section*
+         include-asection
+         struct-update
+         part-style-update)
 
 (require racket/stxparam
          racket/splicing
@@ -27,13 +32,38 @@
          racket/runtime-path
          scribble-enhanced/math
          scribble/latex-properties
+         scribble/decode
          scribble-math
-         "abbreviations.rkt")
+         phc-toolkit/untyped/meta-struct
+         "abbreviations.rkt"
+         (for-syntax syntax/parse))
 
 (use-mathjax)
 
+(define-syntax struct-update
+  (syntax-parser
+    [(_ struct-type:id v:expr [field:id updater:expr] ...)
+     #'(let ([vv v])
+         (struct-copy struct-type
+                      vv
+                      [field (updater ((struct-accessor struct-type field) vv))]
+                      ...))]))
+     
+
 (define (tex-header tex)
   (elem #:style (style #f (list (tex-addition (string->bytes/utf-8 tex))))))
+
+(define scribble-tex-commands-addition
+  (tex-addition
+   (string->bytes/utf-8 "\\newcommand{\\scribbleTeXCommands}[1]{#1}")))
+
+(define (tex-code code)
+  (cond-element
+   [latex (elem #:style (style "scribbleTeXCommands"
+                               (list 'exact-chars
+                                     scribble-tex-commands-addition))
+                code)]
+   [else (list)]))
 
 (define (my-author+email author email)
   (cond-element
@@ -125,17 +155,94 @@
                                          #'asection-current-level))])
     . body))
 
+(define-syntax-parameter asection-current-is-appendix #f)
+(define-syntax-rule (aappendix . body)
+  (splicing-syntax-parameterize ([asection-current-is-appendix #t])
+    (appendix)
+    . body))
+
+
+;; Alpha numbering of appendices in HTML and TeX
+(define (num->alpha current parents)
+  (eprintf "(num->alpha ~s ~s)\n" current parents)
+  
+  (define letters
+    (vector->immutable-vector
+     (vector-map
+      symbol->string
+      #(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z))))
+
+  (define cur (sub1 current))
+
+  (define-values (oldlimit len)
+    (let loop ([oldlimit 0]
+               [limit 26]
+               [len 1])
+      (if (< cur limit)
+          (values oldlimit len)
+          (loop limit (+ (* limit 26) 26) (add1 len)))))
+    
+  (let-values ([(_ ans) (for/fold ([v (- cur oldlimit)]
+                                   [ans '()])
+                                  ([i (in-range len)])
+                          (define-values (q r) (quotient/remainder v 26))
+                          (values q
+                                  (cons (vector-ref letters r) ans)))])
+    (values (string-join ans "")
+            (add1 current))))
+(define appendix-numberer
+  (make-numberer num->alpha
+                 1))
+
+(define (part-style-update p updater)
+  (define (style-updater old-style)
+    (struct-update
+     style
+     old-style
+     [properties updater]))
+  (if (part-start? p)
+      (struct-update part-start p [style style-updater])
+      (struct-update part p [style style-updater])))
+
+;; make-appendix-section must be called by @atitle below
+(define (make-appendix-section p)
+  (part-style-update p (λ (old-props)
+                          (cons appendix-numberer
+                                old-props))))
+(define (appendix)
+  (list
+   (section #:style (style #f (list 'hidden 'toc-hidden 'unnumbered)))
+   (tex-code "\\appendix")))
+ 
 (define-syntax (atitle stx)
   (syntax-case stx ()
     [(_ . args)
      (case (syntax-parameter-value #'asection-current-level)
        [(0) #'(my-title . args)]
-       [(1) #'(section . args)]
+       [(1) (if (syntax-parameter-value #'asection-current-is-appendix)
+                #'(make-appendix-section (section . args))
+                #'(section . args))]
        [(2) #'(subsection . args)]
        [(3) #'(subsubsection . args)]
        [else
         ;; TODO: log a warning here maybe?
         #'(subsubsub*section . args)])]))
+
+(define-syntax (include-section* stx)
+  (syntax-case stx ()
+    [(_ mod)
+     (with-syntax ([doc (datum->syntax #'mod 'doc #'mod)])
+       #'(let ()
+           (local-require (only-in mod doc))
+           doc))]))
+
+(define-syntax (include-asection stx)
+  (syntax-case stx ()
+    [(_ mod)
+     (if (syntax-parameter-value #'asection-current-is-appendix)
+         #'(make-appendix-section (include-section* mod))
+         #'(include-section* mod))]))
+  
 
 ;; hidden todo:
 (define (htodo . args) (list))
