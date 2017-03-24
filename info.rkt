@@ -28,6 +28,9 @@
                      "trivial"
                      "typed-struct-props"
                      "xlist"
+                     ;; remember, multi-id, type-expander:
+                     "auto-syntax-e"
+                     "mutable-match-lambda"
                      ))
 (define scribblings '(("scribblings/phc-thesis.scrbl" ())))
 (define pkg-desc "Description Here")

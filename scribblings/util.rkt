@@ -17,6 +17,8 @@
          (all-from-out scribble-math)
          version-text
          aappendix
+         tex-header
+         tex-code
          include-section*
          include-asection
          struct-update
@@ -212,7 +214,10 @@
 (define (appendix)
   (list
    (section #:style (style #f (list 'hidden 'toc-hidden 'unnumbered)))
-   (tex-code "\\appendix")))
+   (tex-header
+    "\\usepackage{alphalph}")
+   (tex-code
+    "\\appendix\\renewcommand\\thesection{\\AlphAlph{\\value{section}}}")))
  
 (define-syntax (atitle stx)
   (syntax-case stx ()
