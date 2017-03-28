@@ -58,12 +58,6 @@ before_install:
 - latex newunicodechar.ins
 - mkdir -p "$latex_home/tex/latex/newunicodechar"
 - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
-- curl -L -o morewrites.ins     http://mirrors.ctan.org/macros/latex/contrib/morewrites/morewrites.ins
-- curl -L -o morewrites.dtx     http://mirrors.ctan.org/macros/latex/contrib/morewrites/morewrites.dtx
-- curl -L -o primargs.dtx       http://mirrors.ctan.org/macros/latex/contrib/morewrites/primargs.dtx
-- latex morewrites.ins
-- mkdir -p "$latex_home/tex/latex/morewrites"
-- mv morewrites.sty primargs.sty "$latex_home/tex/latex/morewrites"
 
 install:
  - raco pkg install -j 2 --deps search-auto

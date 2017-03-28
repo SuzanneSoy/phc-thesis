@@ -8,7 +8,11 @@
          scribble/core]
 @(use-mathjax)
 
-@tex-header{\usepackage{morewrites}}
+@;@tex-header{\usepackage{morewrites}}
+@tex-header{
+  \let\realtableofcontents\tableofcontents
+  \def\tableofcontents{\realtableofcontents\let\tableofcontents\relax}
+}
 
 @title[#:style (struct-update style
                               (with-html5 manual-doc-style)

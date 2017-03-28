@@ -52,8 +52,8 @@
                       ...))]))
      
 
-(define (tex-header tex)
-  (elem #:style (style #f (list (tex-addition (string->bytes/utf-8 tex))))))
+(define (tex-header . tex*)
+  (elem #:style (style #f (list (tex-addition (string->bytes/utf-8 (apply string-append tex*)))))))
 
 (define scribble-tex-commands-addition
   (tex-addition
