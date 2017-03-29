@@ -53,7 +53,8 @@
      
 
 (define (tex-header . tex*)
-  (elem #:style (style #f (list (tex-addition (string->bytes/utf-8 (apply string-append tex*)))))))
+  (elem #:style (style #f (list (tex-addition (string->bytes/utf-8
+                                               (apply string-append tex*)))))))
 
 (define scribble-tex-commands-addition
   (tex-addition
@@ -166,8 +167,6 @@
 
 ;; Alpha numbering of appendices in HTML and TeX
 (define (num->alpha current parents)
-  (eprintf "(num->alpha ~s ~s)\n" current parents)
-  
   (define letters
     (vector->immutable-vector
      (vector-map
@@ -190,7 +189,7 @@
                           (define-values (q r) (quotient/remainder v 26))
                           (values q
                                   (cons (vector-ref letters r) ans)))])
-    (values (string-join ans "")
+    (values (list (string-join ans "") ".")
             (add1 current))))
 (define appendix-numberer
   (make-numberer num->alpha
@@ -209,8 +208,8 @@
 ;; make-appendix-section must be called by @atitle below
 (define (make-appendix-section p)
   (part-style-update p (λ (old-props)
-                          (cons appendix-numberer
-                                old-props))))
+                         (cons appendix-numberer
+                               old-props))))
 (define (appendix)
   (list
    (section #:style (style #f (list 'hidden 'toc-hidden 'unnumbered)))
