@@ -60,7 +60,7 @@ before_install:
 - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
 
 install:
- - raco pkg install -j 2 --deps search-auto
+ - raco pkg install -j 1 --deps search-auto
 
 before_script:
 
@@ -69,7 +69,7 @@ before_script:
 # packages without it getting stuck on a confirmation prompt.
 script:
  - raco test -x -p phc-thesis
- - raco setup --check-pkg-deps --pkgs phc-thesis
+ - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
  - make
  - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
 
