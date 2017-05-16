@@ -5,8 +5,8 @@ if test "$(git config remote.origin.url)" != "https://github.com/jsmaniac/phc-th
   echo "Not on official repo, will not deploy gh-pages."
 elif test "$TRAVIS_PULL_REQUEST" != "false"; then
   echo "This is a Pull Request, will not deploy gh-pages."
-elif test "$TRAVIS_BRANCH" != "master"; then
-  echo "Not on master branch (TRAVIS_BRANCH = $TRAVIS_BRANCH), will not deploy gh-pages."
+elif test "$TRAVIS_BRANCH" != "dev" && "$TRAVIS_BRANCH" != "master"; then
+  echo "Not on master or dev branch (TRAVIS_BRANCH = $TRAVIS_BRANCH), will not deploy gh-pages."
 elif test -z "${encrypted_8fdb34b09f5e_key:-}" -o -z "${encrypted_8fdb34b09f5e_iv:-}"; then
   echo "Travis CI secure environment variables are unavailable, will not deploy gh-pages."
 else

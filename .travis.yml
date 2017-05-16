@@ -19,26 +19,41 @@ env:
     # - RACKET_VERSION=6.7
     - RACKET_VERSION=6.8
     - RACKET_VERSION=RELEASE
-    # - RACKET_VERSION=HEAD
+    # - RACKET_VERSION=HEAD # done in the deploy stage.
 
 before_install:
  - touch BeforeInstall
-# - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
-# - if $COV; then raco pkg install --deps search-auto doc-coverage cover cover-codecov; fi # or cover-coveralls
+ # - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
+ # - export PATH="${RACKET_DIR}/bin:${PATH}" #install-racket.sh can't set for us
+ # - echo "LaTeX extra packages:"
+ # - latex_home=$(kpsewhich -var-value=TEXMFHOME)
+ # - curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
+ # - curl -L -o newunicodechar.dtx http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.dtx
+ # - latex newunicodechar.ins
+ # - mkdir -p "$latex_home/tex/latex/newunicodechar"
+ # - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
 
 install:
  - touch Install
-# - raco pkg install --deps search-auto -j 2
+ # - raco pkg install -j 1 --deps search-auto
+
+before_script:
+ - touch BeforeScript
+ # - raco test -x -p phc-thesis
+ # - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
+ # - make
 
 script:
- - touch RegularScript$RACKET_VERSION
- - find
+ - touch RegularScript
+ # - echo Done.
 
 jobs:
   include:
     - stage: deploy
       env: RACKET_VERSION=HEAD
-      script: touch DeployScript; find
+      script:
+       - touch DeployScript
+       - find
 
 # script:
 # - raco test -x -p "$(basename "$TRAVIS_BUILD_DIR")"
