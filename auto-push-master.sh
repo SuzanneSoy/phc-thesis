@@ -3,8 +3,8 @@ set -e
 set +x
 if test "$(git config remote.origin.url)" != "https://github.com/jsmaniac/phc-thesis.git"; then
   echo "Not on official repo, will not auto-push to master."
-elif test "$TRAVIS_PULL_REQUEST" != "false"; then
-  echo "This is a Pull Request, will not auto-push to master."
+elif test "$TRAVIS_EVENT_TYPE" != "push"; then
+  echo "This is a not a Push event (TRAVIS_EVENT_TYPE=$TRAVIS_EVENT_TYPE), will not auto-push to master."
 elif test "$TRAVIS_BRANCH" != "dev"; then
   echo "Not on dev branch (TRAVIS_BRANCH = $TRAVIS_BRANCH), will not auto-push to master."
 elif test -z "${encrypted_8fdb34b09f5e_key:-}" -o -z "${encrypted_8fdb34b09f5e_iv:-}"; then

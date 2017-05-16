@@ -22,54 +22,45 @@ env:
     - RACKET_VERSION=RELEASE
     # - RACKET_VERSION=HEAD # done in the deploy stage.
 
-# addons:
-#   apt:
-#     packages:
-#     - texlive-latex-base
-#     - texlive-fonts-extra
-#     - texlive-fonts-recommended
-#     - texlive-latex-extra
-#     - latex-xcolor
-#     #- graphviz
+addons:
+  apt:
+    packages:
+    - texlive-latex-base
+    - texlive-fonts-extra
+    - texlive-fonts-recommended
+    - texlive-latex-extra
+    - latex-xcolor
+    #- graphviz
 
 before_install:
- - echo $RACKET_VERSION
- - if test "$RACKET_VERSION" = "OOPS"; then travis_terminate 0; fi
- 
- # Skip builds on master, unless they are pull requests, 
- # - if test "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_EVENT_TYPE" = "push" -a "$(git config remote.origin.url)" = "https://github.com/jsmaniac/phc-thesis.git"; then travis_terminate 0; fi
- 
- # # Otherwise:
- # - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
- # - export PATH="${RACKET_DIR}/bin:${PATH}" #install-racket.sh can't set for us
- # - echo "LaTeX extra packages:"
- # - latex_home=$(kpsewhich -var-value=TEXMFHOME)
- # - curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
- # - curl -L -o newunicodechar.dtx http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.dtx
- # - latex newunicodechar.ins
- # - mkdir -p "$latex_home/tex/latex/newunicodechar"
- # - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
+ Skip builds on master, unless they are pull requests, 
+ - if test "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_EVENT_TYPE" = "push" -a "$(git config remote.origin.url)" = "https://github.com/jsmaniac/phc-thesis.git"; then travis_terminate 0; fi
+ # Otherwise:
+ - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
+ - export PATH="${RACKET_DIR}/bin:${PATH}" #install-racket.sh can't set for us
+ - echo "LaTeX extra packages:"
+ - latex_home=$(kpsewhich -var-value=TEXMFHOME)
+ - curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
+ - curl -L -o newunicodechar.dtx http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.dtx
+ - latex newunicodechar.ins
+ - mkdir -p "$latex_home/tex/latex/newunicodechar"
+ - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
 
 install:
- - touch Install
- # - raco pkg install -j 1 --deps search-auto
+ - raco pkg install -j 1 --deps search-auto
 
 before_script:
- - touch BeforeScript
- # - raco test -x -p phc-thesis
- # - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
- # - make
+ - raco test -x -p phc-thesis
+ - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
+ - make
 
 script:
- - touch RegularScript
- # - echo Done.
+ - echo Done.
 
 jobs:
   include:
     - stage: deploy
       env: RACKET_VERSION=HEAD
       script:
-       - touch DeployScript
-       - find
-       # - sh ./auto-push-master.sh
-       # - sh ./auto-push-gh-pages.sh
+       - sh ./auto-push-master.sh
+       - sh ./auto-push-gh-pages.sh
