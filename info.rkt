@@ -19,6 +19,7 @@
                      "subtemplate"
                      "type-expander"
                      "typed-racket-doc"
+                     "typed-worklist"
                      ;; phc-adt:
                      "alexis-util"
                      "extensible-parser-specifications"
