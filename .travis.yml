@@ -32,7 +32,7 @@ addons:
     #- graphviz
 
 before_install:
- Skip builds on master, unless they are pull requests, 
+ # Skip builds on master, unless they are pull requests, 
  - if test "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_EVENT_TYPE" = "push" -a "$(git config remote.origin.url)" = "https://github.com/jsmaniac/phc-thesis.git"; then travis_terminate 0; fi
  # Otherwise:
  - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
