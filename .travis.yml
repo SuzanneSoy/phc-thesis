@@ -17,7 +17,6 @@ env:
     # - RACKET_VERSION=6.5
     # - RACKET_VERSION=6.6
     # - RACKET_VERSION=6.7
-    - RACKET_VERSION=OOPS
     - RACKET_VERSION=6.8
     - RACKET_VERSION=RELEASE
     # - RACKET_VERSION=HEAD # done in the deploy stage.
