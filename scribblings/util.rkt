@@ -22,7 +22,8 @@
          include-section*
          include-asection
          struct-update
-         part-style-update)
+         part-style-update
+         epigraph)
 
 (require racket/stxparam
          racket/splicing
@@ -38,7 +39,9 @@
          scribble-math
          phc-toolkit/untyped/meta-struct
          "abbreviations.rkt"
-         (for-syntax syntax/parse))
+         (for-syntax syntax/parse)
+         scribble/html-properties
+         scribble/latex-properties)
 
 (use-mathjax)
 
@@ -271,3 +274,82 @@
   (if precision
       (list (apply ~cite rest) ", " precision)
       (apply ~cite rest)))
+
+(define epigraph-css
+  #"
+.epigraphStyle p:last-child {
+    padding-bottom: 0.2em;
+    margin-bottom: 0;
+}
+
+.epigraphAuthorStyle p:first-child {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.epigraphOuter {
+    text-align: right;
+    display: table;
+    margin-right: 0;
+    padding-right: 0;
+    margin-left: auto;
+}
+
+.epigraphStyle {
+    display: table-cell;
+    border-bottom: thin solid gray;
+    font-style: italic;
+}
+
+.epigraphAuthorStyle {
+    display: table-cell;
+    padding-top: 0.5em;
+}
+
+.epigraphOuter > .SIntrapara {
+    margin: 0;
+    display: table-row; 
+}
+
+.epigraphOuter * {
+    margin-right: 0;
+    padding-right: 0;
+    margin-left: 0;
+    padding-left: 0;
+}
+")
+
+(define epigraph-tex
+  (string->bytes/utf-8
+   #<<EOTEX
+\usepackage{epigraph}
+\usepackage{environ}
+\def\lastepigraph{}
+\def\lastepigraphauthor{}
+\newenvironment{epigraphOuter}{}{}
+\def\setepigraphwidth#1{\setlength{\epigraphwidth}{#1}}
+\NewEnviron{epigraphStyle}{\global\let\lastepigraph\BODY}
+\NewEnviron{epigraphAuthorStyle}{%
+  \global\let\lastepigraphauthor\BODY%
+  \epigraph{\emph{\lastepigraph}}{\lastepigraphauthor}%
+}
+EOTEX
+   ))
+
+(define epigraph-additions
+  (list (css-addition epigraph-css)
+        (tex-addition epigraph-tex)))
+
+(define (epigraph #:width [width "6cm"] author . rest)
+  (nested #:style (style "epigraphOuter"
+                         '()
+                         #;(list
+                            (attributes
+                             `([style . ,(format "max-width: ~a;" width)]))))
+          (cond-element
+           [latex (elem #:style (style "setepigraphwidth" '()) width)]
+           [else (elem)])
+          (apply nested #:style (style "epigraphStyle" epigraph-additions)
+                 rest)
+          (nested #:style (style "epigraphAuthorStyle" epigraph-additions)
+                  author)))

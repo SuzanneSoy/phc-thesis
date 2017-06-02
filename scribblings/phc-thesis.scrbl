@@ -35,6 +35,7 @@
 
 @(table-of-contents)
 
+@include-asection{introduction.scrbl}
 @include-asection{state-of-the-art.scrbl}
 
 @;@(generate-bibliography-section)
