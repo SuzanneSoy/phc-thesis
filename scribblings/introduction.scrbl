@@ -176,7 +176,15 @@
     bugs: name clashes can occur if the qualification chosen is not sufficient
     to always distinguish nodes; @htodo{furthermore} compiler passes which
     duplicate nodes (for example specialising functions) or merge them must be
-    careful to correctly update identifiers.}
+    careful to correctly update identifiers.
+
+    Anecdotally, we can mention a bug in the @|monocecil| library (which allows
+    easy manipulation of @|dotnet| bytecode). When ``resolving'' a reference to
+    a primitive type, it can happen in some cases that @|monocecil| returns a
+    @tt{Type} metadata object which references a type with the correct name, but
+    exported from the wrong @|DLL| library.
+
+}
  @item{Alternatively, backward references may be encoded as a form of path
     from the referring node. @DeBruijn indices can be used in such an encoding,
     for example.
@@ -211,21 +219,21 @@
     as the computation of the various parts of the data manipulated do not occur
     in an intuitive order. Among other things, accidental infinite recursion
     could be triggered by an access to a value by totally unrelated code.}
- @item{Finally, Higher-Order Abstract Syntax, or HOAS for short, is a
+ @item{Finally, Higher-Order Abstract Syntax, or @|HOAS| for short, is a
     technique which encodes variable bindings as anonymous functions in the host
     language (whose parameters reify bindings at the level of the host
     language). Variable references are then nothing more than actual uses of the
     variable at the host language's level. Substitution, a common operation in
     compilers and interpreters, then becomes a simple matter of calling the
-    anonymous function with the desired substitute. HOAS has the additional
+    anonymous function with the desired substitute. @|HOAS| has the additional
     advantage that it enforces well-scopedness, as it is impossible to refer to
     a variable outside of its scope in the host language.
 
-    Parametric HOAS, dubbed PHOAS, also allows encoding the type of the
+    Parametric @|HOAS|, dubbed @|PHOAS|, also allows encoding the type of the
     variables in the representation. @todo{Can extra information other than the
      type be stored?}
 
-    There are a few drawbacks with HOAS and PHOAS:
+    There are a few drawbacks with @|HOAS| and @|PHOAS|:
 
     The ``target'' of a backward reference must be above all uses in the tree.
     This might not always be true. For example, pre/post-conditions could, in an
@@ -242,7 +250,7 @@
       support this should be feasible.}
     }
 
-    @todo{PHOAS naturally lends itself to the implementation of substitutions,
+    @todo{@|PHOAS| naturally lends itself to the implementation of substitutions,
      and therefore is well-suited to the writing of interpreters. However, the
      representation cannot be readily traversed and accesses like would be done
      with normal structures, and therefore the model could be counter-intuitive
@@ -259,9 +267,6 @@
   objects), they still involve low-level mechanisms to create the graph;
   furthermore code traversing the graph needs to be deal with cycles, in order
   to avoid running into an infinite loop (or infinite recursion).
-
-  anecdotally
-
   
   updates: all logical pointers to an updated node must be updated too.
 

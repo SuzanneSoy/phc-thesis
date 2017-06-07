@@ -550,8 +550,7 @@
     pointers}
  @item{The huet zipper@~cite["huet1997zipper"]. Implementation in untyped
     Racket, but not @|typedracket|@note{
-     @url{http://docs.racket-lang.org/zippers/}
-     @(linebreak)
+     @url{http://docs.racket-lang.org/zippers/} and
      @url{https://github.com/david-christiansen/racket-zippers}}}]
  }
 }

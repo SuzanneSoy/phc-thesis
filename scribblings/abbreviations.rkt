@@ -1,5 +1,6 @@
 #lang at-exp racket
-(provide typedracket Typedracket csharp CAML CLOS NIT CPP DeBruijn)
+(provide typedracket Typedracket csharp CAML CLOS NIT CPP DeBruijn HOAS PHOAS
+         monocecil dotnet DLL)
 
 (require scribble/base
          scribble/core
@@ -26,3 +27,9 @@
 (define NIT "NIT")
 (define CPP "C++")
 (define DeBruijn "De Bruijn")
+;; TODO: make it an <abbr> and give it a tooltip in HTML
+(define HOAS "HOAS")
+(define PHOAS "PHOAS")
+(define monocecil @tt{"Mono.Cecil"})
+(define dotnet ".NET")
+(define DLL "DLL")
