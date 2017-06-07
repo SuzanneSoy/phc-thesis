@@ -1,6 +1,8 @@
 #lang scribble/manual
 
-@require["util.rkt"]
+@require["util.rkt"
+         scribble/core
+         scribble/latex-properties]
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
@@ -409,3 +411,150 @@
   }
  }
  }@;{Algrbraic datatypes for compilers (phc-adt)}
+
+@asection{
+ @atitle[
+ #:style (style #f
+                (list
+                 (short-title "Writing compilers using many small passes")))
+ ]{Writing compilers using many small passes (a.k.a following the Nanopass
+  Compiler Framework philosophy)}
+}
+
+@asection{
+ @atitle{Representation and transformation of graphs}
+
+ @todo{There already were a few references in my proposal for JFLA.}
+ @todo{Look for articles about graph rewriting systems.}
+
+ @asection{
+  @atitle{Cycles in intermediate representations of programs}
+  The following sections present the many ways in which cycles within the
+  AST, CFG and other intermediate representations can be represented.
+
+  @asection{
+   @atitle{Mutable data structures}
+
+   @itemlist[
+ @item{Hard to debug}
+ @item{When e.g. using lazy-loading, it is easy to mistakenly load a
+     class or method after the Intermediate Representation was
+     frozen. Furthermore, unless a @tt{.freeze()} method actually
+     enforces this conceptual change from a mutable to an immutable
+     representation, it can be unclear at which point the IR (or parts of
+     it) is guaranteed to be complete and its state frozen. This is another
+     factor making maintenance of such code difficult.}]
+   Quote from@~cite{ramsey_applicative_2006}:
+
+   @quotation{
+    We are using ML to build a compiler that does low-level optimization. To
+    support optimizations in classic imperative style, we built a control-flow
+    graph using mutable pointers and other mutable state in the nodes. This
+    decision proved unfortunate: the mutable flow graph was big and complex,
+    and it led to many bugs. We have replaced it by a smaller, simpler,
+    applicative flow graph based on Huet’s (1997) zipper. The new flow graph
+    is a success; this paper presents its design and shows how it leads to a
+    gratifyingly simple implementation of the dataflow framework developed by
+    Lerner, Grove, and Chambers (2002).}
+  }
+
+  @asection{
+   @atitle{Unique identifiers used as a replacement for pointers}
+
+   @htodo{Check that the multi-reference worked correctly here}
+   Mono uses that@~cite["mono-cecil-website" "mono-cecil-source"], it is very
+   easy to use an identifier which is supposed to reference a missing
+   object, or an object from another version of the AST. It is also very
+   easy to get things wrong when duplicating nodes (e.g. while specializing
+   methods based on their caller), or when merging or removing nodes.
+
+  }
+
+  @asection{
+   @atitle{Explicit use of other common graph representations}
+
+   Adjacency lists, @DeBruijn indices.
+
+   @itemlist[
+ @item{ Error prone when updating the graph (moving nodes around, adding,
+     duplicating or removing nodes).}
+ @item{Needs manual @htodo{caretaking}}]
+
+  }
+
+  @asection{
+   @atitle{Using lazy programming languages}
+
+   @itemlist[
+ @item{Lazy programming is harder to debug.
+     @(linebreak)
+     Quote@~cite{nilsson1993lazy}:
+     @aquote{
+      Traditional debugging techniques are, however, not suited for lazy
+      functional languages since computations generally do not take place in the
+      order one might expect.
+     }
+
+     Quote@~cite{nilsson1993lazy}:
+     @aquote{
+      Within the field of lazy functional programming, the lack of suitable
+      debugging tools has been apparent for quite some time. We feel that
+      traditional debugging techniques (e.g. breakpoints, tracing, variable
+      watching etc.) are not particularly well suited for the class of lazy
+      languages since computations in a program generally do not take place in the
+      order one might expect from reading the source code.
+     }
+
+     Quote@~cite{wadler1998functional}:
+     @aquote{
+      To be usable, a language system must be accompanied by a debugger and a
+      profiler. Just as with interlanguage working, designing such tools is
+      straightforward for strict languages, but trickier for lazy languages.
+     }
+
+     Quote@~cite{wadler1998functional}:
+     @aquote{
+      Constructing debuggers and profilers for lazy languages is recognized as
+      difficult. Fortunately, there have been great strides in profiler research,
+      and most implementations of Haskell are now accompanied by usable time and
+      space profiling tools. But the slow rate of progress on debuggers for lazy
+      languages makes us researchers look, well, lazy.
+     }
+
+     Quote@~cite{morris1982real}:
+     @aquote{
+      How does one debug a program with a surprising evaluation order? Our
+      attempts to debug programs submitted to the lazy implementation have been
+      quite entertaining. The only thing in our experience to resemble it was
+      debugging a multi-programming system, but in this case virtually every
+      parameter to a procedure represents a new process. It was difficult to
+      predict when something was going to happen; the best strategy seems to be
+      to print out well-defined intermediate results, clearly labelled.
+    }}
+ @item{So-called ``infinite'' data structures constructed lazily have
+     problems with equality and serialization. The latter is especially
+     important for serializing and de-serializing Intermediate
+     Representations for the purpose of testing, and is also very important
+     for code generation: the backend effectively needs to turn the
+     infinite data structure into a finite one. The Revised$^6$ Report on
+     Scheme requires the @racket{equal?} predicate to correctly handle
+     cyclic data structures, but efficient algorithms implementing this
+     requirement are nontrivial@~cite{adams2008efficient}. Although any
+     representation of cyclic data structures will have at some point to
+     deal with equality and serialization, it is best if these concerns are
+     abstracted away as much as possible.}]
+  }
+
+  @asection{
+   @atitle{True graph representations using immutable data structures}
+   @itemlist[
+ @item{Roslyn@~cite{overbey2013immutable} : immutable trees with ``up'' pointers}
+ @item{The huet zipper@~cite{huet1997zipper}. Implementation in untyped Racket,
+     but not Typed
+     Racket@note{
+      @url{http://docs.racket-lang.org/zippers/}
+      @(linebreak)
+      @url{https://github.com/david-christiansen/racket-zippers}}}]
+  }
+ }
+}

@@ -1,5 +1,5 @@
 #lang at-exp racket
-(provide typedracket Typedracket csharp CAML CLOS NIT CPP)
+(provide typedracket Typedracket csharp CAML CLOS NIT CPP DeBruijn)
 
 (require scribble/base
          scribble/core
@@ -25,3 +25,4 @@
 (define CLOS "CLOS")
 (define NIT "NIT")
 (define CPP "C++")
+(define DeBruijn "De Bruijn")

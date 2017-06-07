@@ -23,7 +23,8 @@
          include-asection
          struct-update
          part-style-update
-         epigraph)
+         epigraph
+         usetech)
 
 (require racket/stxparam
          racket/splicing
@@ -263,12 +264,57 @@
         (coloured-elem "gray" "]" (superscript "Todo"))))
 
 (define (aquote . content)
-  (nested-flow (style #f '())
-               (list (paragraph (style #f '()) content))))
+  (apply nested
+         #:style (style "quote"
+                        (list (css-addition
+                               (string->bytes/utf-8 #<<EOCSS
+.quote {
+  background: #eee;
+  padding: 0.5em 1em;
+  margin-left: 2em;
+  margin-right: 2em;
+}
+EOCSS
+                                                    ))))
+         content #;(list (paragraph content))))
 
 (define (quotation . content)
-  (nested-flow (style #f '())
-               (list (paragraph (style #f '()) content))))
+  (apply nested
+         #:style (style "quotation"
+                        (list (css-addition
+                               (string->bytes/utf-8 #<<EOCSS
+.quotation {
+  background: #eee;
+  padding: 0.75em 1em;
+  margin-left: 2em;
+  margin-right: 2em;
+  quotes: "“" "”" "‘" "’";
+}
+
+.quotation > p:last-child {
+  margin-bottom: 0;
+}
+
+.quotation:before {
+  content: open-quote;
+  color:gray;
+  font-size: 200%;
+  float: left;
+  margin-left: -0.45em;
+  margin-top: -0.25em;
+}
+.quotation:after {
+  content: close-quote;
+  color:gray;
+  font-size: 200%;
+  float: right;
+  margin-right: -0.25em;
+  margin-top: -0.75em;
+}
+EOCSS
+                                                    ))))
+         content #;(list (paragraph (style #f '())
+                                    content))))
 
 (define (~cite* #:precision [precision #f] . rest)
   (if precision
@@ -353,3 +399,7 @@ EOTEX
                  rest)
           (nested #:style (style "epigraphAuthorStyle" epigraph-additions)
                   author)))
+
+;; For now, do not perform any check. Later on, we may verify automatically that
+;; a usetech always happens after the corresponding deftech.
+(define usetech list)
