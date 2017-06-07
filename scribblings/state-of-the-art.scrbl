@@ -14,8 +14,8 @@
  Our work explores one interesting use of macros: their use to extend a
  programming language's type system.
 
- Chang, Knauth and Greenman@~cite{chang2017type-systems-as-macros} took
- the decision to depart from Typed Racket, and implemented a new approach,
+ Chang, Knauth and Greenman@~cite["chang2017type-systems-as-macros"] took
+ the decision to depart from @|typedracket|, and implemented a new approach,
  which allows type systems to be implemented as macros. Typing information
  about identifiers is threaded across the program at compile-time, and macros
  can decide whether a term is well-typed or not.
@@ -24,56 +24,56 @@
  dependent type system implemented using Racket macros.
 
  Bracha suggests that pluggable type systems should be
- used@~cite{bracha2004pluggable-types}. Such a system, JavaCOP is presented by
+ used@~cite["bracha2004pluggable-types"]. Such a system, JavaCOP is presented by
  Andreae, Noble, Markstrum and
- Shane@~cite{pluggable-types-andreae2006framework} as a tool which ``enforces
+ Shane@~cite["pluggable-types-andreae2006framework"] as a tool which ``enforces
  user-defined typing constraints written in a declarative and expressive rule
  language''.
 
- In contrast, Typed Racket@~cite{tobin-hochstadt_design_2008} was
+ In contrast, @|typedracket|@~cite["tobin-hochstadt_design_2008"] was
  implemented using macros on top of ``untyped'' Racket, but was not
  designed as an extensible system: new rules in the type system must be
  added to the core implementation, a system which is complex to approach.
 
  Following work by Asumu
  Takikawa@note{@url{https://github.com/racket/racket/pull/604}}, we
- extended Typed Racket with support for macros in the type declarations and
+ extended @|typedracket| with support for macros in the type declarations and
  annotations. We call this sort of macro ``type expanders'', following the
  commonly-used naming convention (e.g. ``match expanders'' are macros which
  operate within patterns in pattern-matching forms). These type expanders
  allow users to easily extend the type system with new kinds of types, as
  long as these can be translated back to the types offered natively by
- Typed Racket.
+ @|typedracket|.
 
  While the Type Systems as Macros by Chang, Knauth and
- Greenman@~cite{chang2017type-systems-as-macros} allows greater flexibility
+ Greenman@~cite["chang2017type-systems-as-macros"] allows greater flexibility
  by not relying on a fixed set of core types, it also places on the
  programmer the burden of ensuring that the type checking macros are
- sound. In contrast, our type expanders rely on Typed Racket's type
+ sound. In contrast, our type expanders rely on @|typedracket|'s type
  checker, which will still catch type errors in the fully-expanded
  types. In other words, writing type expanders is safe, because they do not
- require any specific trust, and translate down to plain Typed Racket
+ require any specific trust, and translate down to plain @|typedracket|
  types, where any type error would be caught at that level.
 
  An interesting aspect of our work is that the support for type expanders
- was implemented without any change to the core of Typed Racket. Instead,
+ was implemented without any change to the core of @|typedracket|. Instead,
  the support for type expanders itself is available as a library, which
  overrides special forms like @tt{define}, @tt{lambda} or
  @tt{cast}, enhancing them by pre-processing type expanders, and
- translating back to the ``official'' forms from Typed Racket. It is worth
- noting that Typed Racket itself is implemented in a similar way: special
+ translating back to the ``official'' forms from @|typedracket|. It is worth
+ noting that @|typedracket| itself is implemented in a similar way: special
  forms like @tt{define} and @tt{lambda} support plain type
  annotations, and translate back to the ``official'' forms from so-called
  ``untyped'' Racket. In both cases, this approach goes with the Racket
  spirit of implementing languages as
- libraries@~cite{tobin-hochstadt_languages_as_libraries_2011}}
+ libraries@~cite["tobin-hochstadt_languages_as_libraries_2011"]}
 
 @asection{
  @atitle{Algebraic datatypes for compilers (phc-adt)}
  The @tt{phc-adt} library implements algebraic datatypes (variants and
  structures) which are adapted to compiler-writing.
 
- There is an existing ``simple'' datatype library for Typed/Racket (source
+ There is an existing ``simple'' datatype library for @|typedracket| (source
  code available at @url{https://github.com/pnwamk/datatype}). It differs
  from our library on several points:
  @itemlist[
@@ -134,17 +134,17 @@
 
   @subsubsub*section{Subtyping, polymorphism and alternatives}
   @|~|@(linebreak)
-  @~cite{ducournau-cours-lots}.  @htodo{The course includes a couple of
+  @~cite["ducournau-cours-lots"].  @htodo{The course includes a couple of
    other kinds of polymorphism and subtyping (or makes finer distinctions
    than in the list below). Refine and augment the list below using
    Roland's classification.} @htodo{Probably also cite:}
-  @~cite{cardelli1985understanding} @htodo{(apparently does not cover
+  @~cite["cardelli1985understanding"] @htodo{(apparently does not cover
    ``Higher-Kinded Polymorphism'', ``Structural Polymorphism'' and ``Row
    Polymorphism'')}
   @itemlist[
  @item{Subtyping (also called inclusion polymorphism, subtype
     polymorphism, or nominal subtyping ?): Subclasses and interfaces in
-    @csharp and Java, sub-structs and union types in Typed Racket,
+    @csharp and Java, sub-structs and union types in @|typedracket|,
     polymorphic variants in @CAML @~cite[#:precision @list{chap. 6, sec. Polymorphic Variants}]{minsky2013real}}
  @; https://realworldocaml.org/v1/en/html/variants.html
         
@@ -269,7 +269,7 @@
     the interface has to be explicitly implemented by the class (i.e. at
     the definition site, not at the use-site).
 
-    Palmer et al. present TinyBang@~cite{types-for-flexible-objects}, a
+    Palmer et al. present TinyBang@~cite["types-for-flexible-objects"], a
     typed language in which flexible manipulation of objects is possible,
     including adding and removing fields, as well as changing the type of
     a field. They implement in this way a sound, decidable form of static
@@ -328,7 +328,7 @@
      @; phc/reading/CITE/Object-Oriented Programming_ What is a concise definition of polymorphism_ - Quora.html
      @; TODO: fix the footnote here!
      See also post on Quora@superscript{\ref{quora-url-footnote}},
-     which links to @~cite{cardelli1985understanding}, and to a blog post by Sam
+     which links to @~cite["cardelli1985understanding"], and to a blog post by Sam
      Tobin-Hochstadt@note{@url|{https://medium.com/@samth/on-typed-untyped-and-uni-typed-languages-8a3b4bedf68c}|}
      The blog post by Sam Tobin-Hochstadt explains how @typedracket tries to
      explore and understand how programmers think about programs written in
@@ -422,139 +422,136 @@
 }
 
 @asection{
- @atitle{Representation and transformation of graphs}
+ @atitle{Cycles in intermediate representations of programs}
 
  @todo{There already were a few references in my proposal for JFLA.}
  @todo{Look for articles about graph rewriting systems.}
 
+ The following sections present the many ways in which cycles within the
+ AST, CFG and other intermediate representations can be represented.
+
  @asection{
-  @atitle{Cycles in intermediate representations of programs}
-  The following sections present the many ways in which cycles within the
-  AST, CFG and other intermediate representations can be represented.
+  @atitle{Mutable data structures}
 
-  @asection{
-   @atitle{Mutable data structures}
-
-   @itemlist[
+  @itemlist[
  @item{Hard to debug}
  @item{When e.g. using lazy-loading, it is easy to mistakenly load a
-     class or method after the Intermediate Representation was
-     frozen. Furthermore, unless a @tt{.freeze()} method actually
-     enforces this conceptual change from a mutable to an immutable
-     representation, it can be unclear at which point the IR (or parts of
-     it) is guaranteed to be complete and its state frozen. This is another
-     factor making maintenance of such code difficult.}]
-   Quote from@~cite{ramsey_applicative_2006}:
+    class or method after the Intermediate Representation was
+    frozen. Furthermore, unless a @tt{.freeze()} method actually
+    enforces this conceptual change from a mutable to an immutable
+    representation, it can be unclear at which point the IR (or parts of
+    it) is guaranteed to be complete and its state frozen. This is another
+    factor making maintenance of such code difficult.}]
+  Quote from@~cite["ramsey_applicative_2006"]:
 
-   @quotation{
-    We are using ML to build a compiler that does low-level optimization. To
-    support optimizations in classic imperative style, we built a control-flow
-    graph using mutable pointers and other mutable state in the nodes. This
-    decision proved unfortunate: the mutable flow graph was big and complex,
-    and it led to many bugs. We have replaced it by a smaller, simpler,
-    applicative flow graph based on Huet’s (1997) zipper. The new flow graph
-    is a success; this paper presents its design and shows how it leads to a
-    gratifyingly simple implementation of the dataflow framework developed by
-    Lerner, Grove, and Chambers (2002).}
-  }
+  @quotation{
+   We are using ML to build a compiler that does low-level optimization. To
+   support optimizations in classic imperative style, we built a control-flow
+   graph using mutable pointers and other mutable state in the nodes. This
+   decision proved unfortunate: the mutable flow graph was big and complex,
+   and it led to many bugs. We have replaced it by a smaller, simpler,
+   applicative flow graph based on Huet’s (1997) zipper. The new flow graph
+   is a success; this paper presents its design and shows how it leads to a
+   gratifyingly simple implementation of the dataflow framework developed by
+   Lerner, Grove, and Chambers (2002).}
+ }
 
-  @asection{
-   @atitle{Unique identifiers used as a replacement for pointers}
+ @asection{
+  @atitle{Unique identifiers used as a replacement for pointers}
 
-   @htodo{Check that the multi-reference worked correctly here}
-   Mono uses that@~cite["mono-cecil-website" "mono-cecil-source"], it is very
-   easy to use an identifier which is supposed to reference a missing
-   object, or an object from another version of the AST. It is also very
-   easy to get things wrong when duplicating nodes (e.g. while specializing
-   methods based on their caller), or when merging or removing nodes.
+  @htodo{Check that the multi-reference worked correctly here}
+  Mono uses that@~cite["mono-cecil-website" "mono-cecil-source"], it is very
+  easy to use an identifier which is supposed to reference a missing
+  object, or an object from another version of the AST. It is also very
+  easy to get things wrong when duplicating nodes (e.g. while specializing
+  methods based on their caller), or when merging or removing nodes.
 
-  }
+ }
 
-  @asection{
-   @atitle{Explicit use of other common graph representations}
+ @asection{
+  @atitle{Explicit use of other common graph representations}
 
-   Adjacency lists, @DeBruijn indices.
+  Adjacency lists, @DeBruijn indices.
 
-   @itemlist[
+  @itemlist[
  @item{ Error prone when updating the graph (moving nodes around, adding,
-     duplicating or removing nodes).}
+    duplicating or removing nodes).}
  @item{Needs manual @htodo{caretaking}}]
 
-  }
+ }
 
-  @asection{
-   @atitle{Using lazy programming languages}
+ @asection{
+  @atitle{Using lazy programming languages}
 
-   @itemlist[
+  @itemlist[
  @item{Lazy programming is harder to debug.
-     @(linebreak)
-     Quote@~cite{nilsson1993lazy}:
-     @aquote{
-      Traditional debugging techniques are, however, not suited for lazy
-      functional languages since computations generally do not take place in the
-      order one might expect.
-     }
+    @(linebreak)
+    Quote@~cite["nilsson1993lazy"]:
+    @aquote{
+     Traditional debugging techniques are, however, not suited for lazy
+     functional languages since computations generally do not take place in the
+     order one might expect.
+    }
 
-     Quote@~cite{nilsson1993lazy}:
-     @aquote{
-      Within the field of lazy functional programming, the lack of suitable
-      debugging tools has been apparent for quite some time. We feel that
-      traditional debugging techniques (e.g. breakpoints, tracing, variable
-      watching etc.) are not particularly well suited for the class of lazy
-      languages since computations in a program generally do not take place in the
-      order one might expect from reading the source code.
-     }
+    Quote@~cite["nilsson1993lazy"]:
+    @aquote{
+     Within the field of lazy functional programming, the lack of suitable
+     debugging tools has been apparent for quite some time. We feel that
+     traditional debugging techniques (e.g. breakpoints, tracing, variable
+     watching etc.) are not particularly well suited for the class of lazy
+     languages since computations in a program generally do not take place in
+     the order one might expect from reading the source code.
+    }
 
-     Quote@~cite{wadler1998functional}:
-     @aquote{
-      To be usable, a language system must be accompanied by a debugger and a
-      profiler. Just as with interlanguage working, designing such tools is
-      straightforward for strict languages, but trickier for lazy languages.
-     }
+    Quote@~cite["wadler1998functional"]:
+    @aquote{
+     To be usable, a language system must be accompanied by a debugger and a
+     profiler. Just as with interlanguage working, designing such tools is
+     straightforward for strict languages, but trickier for lazy languages.
+    }
 
-     Quote@~cite{wadler1998functional}:
-     @aquote{
-      Constructing debuggers and profilers for lazy languages is recognized as
-      difficult. Fortunately, there have been great strides in profiler research,
-      and most implementations of Haskell are now accompanied by usable time and
-      space profiling tools. But the slow rate of progress on debuggers for lazy
-      languages makes us researchers look, well, lazy.
-     }
+    Quote@~cite["wadler1998functional"]:
+    @aquote{
+     Constructing debuggers and profilers for lazy languages is recognized as
+     difficult. Fortunately, there have been great strides in profiler research,
+     and most implementations of Haskell are now accompanied by usable time and
+     space profiling tools. But the slow rate of progress on debuggers for lazy
+     languages makes us researchers look, well, lazy.
+    }
 
-     Quote@~cite{morris1982real}:
-     @aquote{
-      How does one debug a program with a surprising evaluation order? Our
-      attempts to debug programs submitted to the lazy implementation have been
-      quite entertaining. The only thing in our experience to resemble it was
-      debugging a multi-programming system, but in this case virtually every
-      parameter to a procedure represents a new process. It was difficult to
-      predict when something was going to happen; the best strategy seems to be
-      to print out well-defined intermediate results, clearly labelled.
-    }}
+    Quote@~cite["morris1982real"]:
+    @aquote{
+     How does one debug a program with a surprising evaluation order? Our
+     attempts to debug programs submitted to the lazy implementation have been
+     quite entertaining. The only thing in our experience to resemble it was
+     debugging a multi-programming system, but in this case virtually every
+     parameter to a procedure represents a new process. It was difficult to
+     predict when something was going to happen; the best strategy seems to be
+     to print out well-defined intermediate results, clearly labelled.
+   }}
  @item{So-called ``infinite'' data structures constructed lazily have
-     problems with equality and serialization. The latter is especially
-     important for serializing and de-serializing Intermediate
-     Representations for the purpose of testing, and is also very important
-     for code generation: the backend effectively needs to turn the
-     infinite data structure into a finite one. The Revised$^6$ Report on
-     Scheme requires the @racket{equal?} predicate to correctly handle
-     cyclic data structures, but efficient algorithms implementing this
-     requirement are nontrivial@~cite{adams2008efficient}. Although any
-     representation of cyclic data structures will have at some point to
-     deal with equality and serialization, it is best if these concerns are
-     abstracted away as much as possible.}]
-  }
+    problems with equality and serialization. The latter is especially
+    important for serializing and de-serializing Intermediate
+    Representations for the purpose of testing, and is also very important
+    for code generation: the backend effectively needs to turn the
+    infinite data structure into a finite one. The Revised$^6$ Report on
+    Scheme requires the @racket{equal?} predicate to correctly handle
+    cyclic data structures, but efficient algorithms implementing this
+    requirement are nontrivial@~cite["adams2008efficient"]. Although any
+    representation of cyclic data structures will have at some point to
+    deal with equality and serialization, it is best if these concerns are
+    abstracted away as much as possible.}]
+ }
 
-  @asection{
-   @atitle{True graph representations using immutable data structures}
-   @itemlist[
- @item{Roslyn@~cite{overbey2013immutable} : immutable trees with ``up'' pointers}
- @item{The huet zipper@~cite{huet1997zipper}. Implementation in untyped Racket,
-     but not Typed
-     Racket@note{
-      @url{http://docs.racket-lang.org/zippers/}
-      @(linebreak)
-      @url{https://github.com/david-christiansen/racket-zippers}}}]
-  }
+ @asection{
+  @atitle{True graph representations using immutable data structures}
+  @itemlist[
+ @item{Roslyn@~cite["overbey2013immutable"] : immutable trees with ``up''
+    pointers}
+ @item{The huet zipper@~cite["huet1997zipper"]. Implementation in untyped
+    Racket, but not @|typedracket|@note{
+     @url{http://docs.racket-lang.org/zippers/}
+     @(linebreak)
+     @url{https://github.com/david-christiansen/racket-zippers}}}]
  }
 }

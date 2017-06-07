@@ -22,8 +22,8 @@
  concerned with logical errors in their own code, and should not fear that the
  compiler introduces erroneous behaviour on its own; extensible because the
  language is likely to evolve over time; and fast because the programmer's
- edit-build-test cycle should be as frequent as possible@todo{@~cite{
-   smalltalk-programmer-efficiency-cycle}}.
+ edit-build-test cycle should be as frequent as
+ possible@todo{@~cite["smalltalk-programmer-efficiency-cycle"]}.
 
  Given their broad role, the complexity of the transformations involved, and
  the stringent requirements, writing compilers is a difficult task. Multiple
@@ -33,15 +33,8 @@
  closer to correctness, and easier to maintain.
 
  @require[scribble/core scribble/html-properties scribble/latex-properties]
- @elem[#:style (style "hrStyle"
-                      (list (alt-tag "hr")
-                            (css-addition
-                             #".hrStyle { margin-bottom: 1em; }")
-                            (tex-addition
-                             (string->bytes/utf-8 #<<EOTEX
-\def\hrStyle#1{\noindent{\centerline{\rule[0.5ex]{0.5\linewidth}{0.5pt}}}}
-EOTEX
-                                                  ))))]{}
+
+ @hr
 
  The overall structure of a compiler will usually include a lexer and parser,
  which turn the the program's source into an in-memory representation. This
@@ -59,8 +52,8 @@ EOTEX
 
  @itemlist[
  @item{It is easy to reuse excessively a single @usetech{intermediate
-    representation}, instead of properly distinguishing the features of the input
-   and output of each pass;}
+    representation}, instead of properly distinguishing the features of the
+   input and output of each pass;}
  @item{There is a high risk
    associated with the definition of large, monolithic passes, which are hard to
    test, debug, and extend;}
@@ -199,15 +192,25 @@ EOTEX
     (thereby really representing the program as an ``Abstract Syntax Graph''),
     using mutation to patch nodes after they are initially created.
 
-    @todo{Mutation: verification (two phases for invariants), generally frowned
-     upon, reference some of Roland's and others' work on freezing objects. (as
-     long as it is ensured that no improper manipulation of the objects is done
-     before freezing).}}
+    In order to prevent undesired mutation of the graph after it is created, it
+    is possible to ``freeze'' the objects contained within@todo{references}.
+    This intuitively gives the guarantees similar to those obtained from a
+    purely immutable representation. However, the use of mutation could obstruct
+    formal verification efforts, as some invariants will need to take into
+    account the two phases of an object's lifetime (during the creation of the
+    containing graph, and after freezing it). More generally speaking, it is
+    necessary to ensure that no mutation of objects happens during the graph
+    construction, with the exception of the mutation required to patch cycles.}
  @item{The compiler could also manipulate lazy data structures, where the
     actual value of a node in the graph is computed on the fly when that node is
     accessed.
 
-    @todo{Lazy: harder to debug}}
+    Lazy programs are however harder to debug@~cite["nilsson1993lazy"
+                                                    "wadler1998functional"
+                                                    "morris1982real"],
+    as the computation of the various parts of the data manipulated do not occur
+    in an intuitive order. Among other things, accidental infinite recursion
+    could be triggered by an access to a value by totally unrelated code.}
  @item{Finally, Higher-Order Abstract Syntax, or HOAS for short, is a
     technique which encodes variable bindings as anonymous functions in the host
     language (whose parameters reify bindings at the level of the host
@@ -287,4 +290,103 @@ EOTEX
   different input and output type.
   
  }
+}
+
+@asection{
+ @atitle{Summary}
+ 
+ @asection{ @atitle{Extensible type system} We implemented a different type
+  system on top of @|typedracket|, using macros. Macros have been used not only
+  to extend a language's syntax (control structures, contract annotations, and
+  so on), but also to reduce the amount of ``boilerplate'' code and obtain
+  clearer syntax for common or occasional tasks. Macros have further been used
+  to extend the language with new paradigms, like adding an object system
+  (CLOS@~cite["bobrow_common_1988"]@todo{is it really implemented using
+   macros?}, Racket classes@~cite["flatt_scheme_classes_2006"]) or supporting
+  logic programming (Racket
+  Datalog@note{@url{http://docs.racket-lang.org/datalog/}} and
+  Racklog@note{@url{http://docs.racket-lang.org/racklog/}},
+  Rosette@~cite["torlak_growing_rosette_2013"]). In the past,
+  @|typedracket|@~cite["tobin-hochstadt_design_2008"] has proved that a type
+  system can be successfully fitted onto an existing ``untyped'' language, using
+  macros. We implemented the @racketmodname[type-expander] library atop
+  @|typedracket|, without altering @|typedracket| itself. Our
+  @racketmodname[type-expander] library allows macros to be used in contexts
+  where a type is expected.
+
+  This shows that an existing type system can be made extensible using macros,
+  without altering the core implementation of the type system. We further use
+  these type expanders to build new kinds of types which were not initially
+  supported by @|typedracket|: non-nominal algebraic types, with row
+  polymorphism. @|Typedracket| has successfully been extended in the past (for
+  example by adding type primitives for Racket's class system, which
+  incidentally also support row polymorphism), but these extensions required
+  modifications to the trusted core of @|typedracket|. Aside from a small hack
+  (needed to obtain non-nominal algebraic types which remain equivalent across
+  multiple files), our extension integrates seamlessly with other built-in
+  types, and code using these types can use idiomatic @|typedracket| features.
+
+  @Typedracket was not initially designed with this extension in mind, nor,
+  that we know of, was it designed with the goal of being extensible. We
+  therefore argue that a better choice of primitive types supported by the
+  core implementation could enable many extensions without the need to resort
+  to hacks the like of which was needed in our case. In other words, a better
+  design of the core types with extensibility in mind would have made our job
+  easier.
+
+  In particular, Types in Typed
+  Clojure@~cite["practical_types_for_clojure_2016"] support fine-grained typing
+  of heterogeneous hash tables, this would likely allow us to build much more
+  easily the ``strong duck typing'' primitives on which our algebraic data types
+  are based, and without the need to resort to hacks.
+
+  In languages making heavy uses of macros, it would be beneficial to design
+  type systems with a well-chosen set of primitive type, on top of which more
+  complex types can be built using macros.
+
+  Building the type system via macros atop a small kernel is an approach that
+  has been pursued by Cur, a dependently-typed language developed with Racket,
+  in which the tactics language is entirely built using macros, and does not
+  depend on Cur's trusted type-checking core.}
+
+ @asection{
+  @atitle{Compiler-writing framework}
+
+  Our goal was to introduce a compiler-writing framework, which:
+  @itemlist[
+ @item{Supports writing a compiler using many small passes (in the spirit of
+    Nanopass)}
+ @item{Allows writing the compiler in a strongly-typed language}
+ @item{Uses immutable data structures for the Intermediate Representations
+    (ASTs)}
+ @item{Supports transversal and backwards branches in the AST, making it
+    rather an Abstract Syntax Graph (this is challenging due to the use of
+    immutable data structures).}
+ @item{Provides easy manipulation of the Intermediate Representations: local
+    navigation from node to node, global higher-order operations over many
+    nodes, easy construction, easy serialization, with the guarantee that at
+    no point an incomplete representation can be manipulated. These operations
+    should handle seamlessly transversal and backwards arcs.}
+ @item{Enforces structural invariants (either at compile-time or at
+    run-time), and ensures via the type system that unchecked values cannot be
+    used where a value respecting the invariant is expected.}
+ @item{Has extensive support for testing the compiler, by allowing the
+    generation of random ASTs @todo{(note that the user guides the random
+     generation, it's not fully automatic like quickcheck)}, making it
+    possible to read and write ASTs from files and compare them, and allows
+    compiler passes to consume ASTs containing only the relevant fields (using
+    row polymorphism).}]}
+
+ @htodo{
+  testing (random stuff)
+
+  TODO:@~cite{quickcheck} and other things related to test generation
+  (I have something in Zotero)
+
+  TODO: and the l-sets (find something about that)
+
+  TODO: Problems with ``mocks'' and strong typing (null values everywhere,
+  bleargh).
+ }
+
 }

@@ -24,7 +24,8 @@
          struct-update
          part-style-update
          epigraph
-         usetech)
+         usetech
+         hr)
 
 (require racket/stxparam
          racket/splicing
@@ -263,39 +264,24 @@
         args
         (coloured-elem "gray" "]" (superscript "Todo"))))
 
-(define (aquote . content)
-  (apply nested
-         #:style (style "quote"
-                        (list (css-addition
-                               (string->bytes/utf-8 #<<EOCSS
-.quote {
-  background: #eee;
-  padding: 0.5em 1em;
-  margin-left: 2em;
-  margin-right: 2em;
-}
-EOCSS
-                                                    ))))
-         content #;(list (paragraph content))))
-
-(define (quotation . content)
-  (apply nested
-         #:style (style "quotation"
-                        (list (css-addition
-                               (string->bytes/utf-8 #<<EOCSS
+(define quote-quotation-css (string->bytes/utf-8 #<<EOCSS
+.quote,
 .quotation {
   background: #eee;
-  padding: 0.75em 1em;
-  margin-left: 2em;
-  margin-right: 2em;
+  padding: 0.885rem 1.18em; /* 0.75 and 1 ×main font-size */
+  margin-left: 2.36rem; /* 2×main font-size */
+  margin-right: 2.36rem; /* 2×main font-size */
+  margin-top: 1.77rem; /* 1.5×main font-size */
   quotes: "“" "”" "‘" "’";
 }
 
+.quote > p:last-child,
 .quotation > p:last-child {
   margin-bottom: 0;
 }
 
-.quotation:before {
+.quote-old:before,
+.quotation-old:before {
   content: open-quote;
   color:gray;
   font-size: 200%;
@@ -303,18 +289,47 @@ EOCSS
   margin-left: -0.45em;
   margin-top: -0.25em;
 }
+
+.quote:before,
+.quotation:before {
+    content: open-quote;
+    color: gray;
+    font-size: 2.36rem; /* 2×outer font-size */
+    float: left;
+    background: #eee;
+    border-radius: 1.77rem; /* 1.5×outer font-size */
+    width: 3.54rem; /* 3×outer font-size */
+    height: 2.36rem; /* 2×outer font-size */
+    text-align: center;
+    padding: 0.826rem 0 0.354rem; /* 0.7, 0 and 0.3 ×outer font-size */
+    display: inline-block;
+    margin-left: -2.95rem; /* -2.5×outer font-size */
+    margin-top: -2.36rem; /* -2×outer font-size */
+    margin-right: -2.95rem; /* -2.5×outer font-size */
+}
+
+.quote:after,
 .quotation:after {
   content: close-quote;
-  color:gray;
-  font-size: 200%;
+  color: gray;
+  font-size: 2.36rem; /* 2×outer font-size */
   float: right;
-  margin-right: -0.25em;
-  margin-top: -0.75em;
+  margin-right: -0.295rem; /* -0.25×outer font-size */
+  margin-top: -1.18rem; /* -1×outer font-size */
 }
+
 EOCSS
-                                                    ))))
-         content #;(list (paragraph (style #f '())
-                                    content))))
+                                                 ))
+
+(define (aquote . content)
+  (apply nested
+         #:style (style "quote" (list (css-addition quote-quotation-css)))
+         content #;(list (paragraph content))))
+
+(define (quotation . content)
+  (apply nested
+         #:style (style "quotation" (list (css-addition quote-quotation-css)))
+         content))
 
 (define (~cite* #:precision [precision #f] . rest)
   (if precision
@@ -403,3 +418,14 @@ EOTEX
 ;; For now, do not perform any check. Later on, we may verify automatically that
 ;; a usetech always happens after the corresponding deftech.
 (define usetech list)
+
+(define hr
+  (elem #:style (style "hrStyle"
+                       (list (alt-tag "hr")
+                             (css-addition
+                              #".hrStyle { margin-bottom: 1em; }")
+                             (tex-addition
+                              (string->bytes/utf-8 #<<EOTEX
+\def\hrStyle#1{\noindent{\centerline{\rule[0.5ex]{0.5\linewidth}{0.5pt}}}}
+EOTEX
+                                                   ))))))
