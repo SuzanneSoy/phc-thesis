@@ -1,6 +1,8 @@
 #lang scribble/manual
 
-@require["util.rkt"]
+@require["util.rkt"
+         (for-label racket
+                    (only-in srfi/1 zip))]
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
@@ -149,16 +151,17 @@
  @asection{
   @atitle{Graphs}
 
+   @htodo{full stop in the middle of sentence}
   Nontrivial programs are inherently graphs: they may contain mutually
   recursive functions (which directly refer to each other, and therefore will
   form a cycle in a representation of the program), circular and (possibly
   mutually) recursive datatypes may syntactically contain (possibly indirect)
   references to themselves, and the control flow graph of a function or method
-  may, as its name implies, contain instructions which perform conditional or
+  can, as its name implies, contain instructions which perform conditional or
   unconditional backwards branches.
 
   However, nearly every compiler textbook will mention the use of
-  @tech[#:key "AST"]{ Abstract Syntax Trees} (ASTs) to represent the program.
+  @tech[#:key "AST"]{Abstract Syntax Trees} (ASTs) to represent the program.
   This means that a structure, which intrinsically has the shape of a graph, is
   encoded as a tree.
 
@@ -173,8 +176,8 @@
     control flow graph), an automatically-generated unique identifier.
 
     Manipulation of these identifiers introduces a potential for some sorts of
-    bugs: name clashes can occur if the qualification chosen is not sufficient
-    to always distinguish nodes; @htodo{furthermore} compiler passes which
+    bugs: name clashes can occur if the chosen qualification is not sufficient
+    to always distinguish nodes. Thus compiler passes which
     duplicate nodes (for example specialising functions) or merge them must be
     careful to correctly update identifiers.
 
@@ -182,9 +185,7 @@
     easy manipulation of @|dotnet| bytecode). When ``resolving'' a reference to
     a primitive type, it can happen in some cases that @|monocecil| returns a
     @tt{Type} metadata object which references a type with the correct name, but
-    exported from the wrong @|DLL| library.
-
-}
+    @todo{exported} from the wrong @|DLL| library.}
  @item{Alternatively, backward references may be encoded as a form of path
     from the referring node. @DeBruijn indices can be used in such an encoding,
     for example.
@@ -192,8 +193,8 @@
     Once again, manipulating these references is risky, and @DeBruijn indices
     are particularly brittle, for example when adding a wrapper around a node
     (i.e. adding an intermediate node on the path from the root), the @DeBruijn
-    indices used in some of descendents of that node (but not all) must be
-    updated. It is understandably easy to incorrectly implement updates to these
+    indices used in some of the descendents of that node (but not all) must be
+    updated. It is understandably easy to incorrectly implement updates of these
     indices, and a single off-by-one error can throw the graph's representation
     into an inconsistent state.}
  @item{The program's representation could also contain actual pointers
@@ -202,23 +203,23 @@
 
     In order to prevent undesired mutation of the graph after it is created, it
     is possible to ``freeze'' the objects contained within@todo{references}.
-    This intuitively gives the guarantees similar to those obtained from a
+    This intuitively gives guarantees similar to those obtained from a
     purely immutable representation. However, the use of mutation could obstruct
     formal verification efforts, as some invariants will need to take into
     account the two phases of an object's lifetime (during the creation of the
     containing graph, and after freezing it). More generally speaking, it is
     necessary to ensure that no mutation of objects happens during the graph
-    construction, with the exception of the mutation required to patch cycles.}
+    construction, with the exception of the mutations required to patch cycles.}
  @item{The compiler could also manipulate lazy data structures, where the
     actual value of a node in the graph is computed on the fly when that node is
     accessed.
 
-    Lazy programs are however harder to debug@~cite["nilsson1993lazy"
-                                                    "wadler1998functional"
-                                                    "morris1982real"],
-    as the computation of the various parts of the data manipulated do not occur
-    in an intuitive order. Among other things, accidental infinite recursion
-    could be triggered by an access to a value by totally unrelated code.}
+    Lazy programs are however harder to
+    debug@~cite["nilsson1993lazy" "wadler1998functional" "morris1982real"],
+    as the computation of the various parts of the data manipulated does not
+    occur in an intuitive order. Among other things, accidental infinite
+    recursion could be triggered by totally unrelated code which merely reads a
+    value.}
  @item{Finally, Higher-Order Abstract Syntax, or @|HOAS| for short, is a
     technique which encodes variable bindings as anonymous functions in the host
     language (whose parameters reify bindings at the level of the host
@@ -235,12 +236,14 @@
 
     There are a few drawbacks with @|HOAS| and @|PHOAS|:
 
-    The ``target'' of a backward reference must be above all uses in the tree.
-    This might not always be true. For example, pre/post-conditions could, in an
-    early pass in the compiler, be located outside of the normal scope of a
-    function's signature, but still refer to the function's parameters. If the
-    pre/post-condition language allows breaking encapsulation, these could even
-    refer to some temporary variables declared inside the function.
+    The ``target'' of a backward reference must be above all uses in the tree
+    (i.e. a node may be the target of either backward references, forward
+    references, but not a mix of both). This might not always be the case. For
+    example, pre/post-conditions could, in an early pass in the compiler, be
+    located outside of the normal scope of a function's signature, but still
+    refer to the function's parameters. If the pre/post-condition language
+    allows breaking encapsulation, these could even refer to some temporary
+    variables declared inside the function.
 
     @;{
      @; True for HOAS, not sure for PHOAS.
@@ -252,23 +255,50 @@
 
     @todo{@|PHOAS| naturally lends itself to the implementation of substitutions,
      and therefore is well-suited to the writing of interpreters. However, the
-     representation cannot be readily traversed and accesses like would be done
-     with normal structures, and therefore the model could be counter-intuitive
-     for some programmers.}
+     representation cannot be readily traversed and accessed as would be done
+     with normal structures, and therefore the model could be
+     counterintuitive.}
 
     @todo{It seems difficult to encode an arbitrary number of variables bound in
      a single construct (e.g. to represent bound type names across the whole
      program, or an arbitrary number of mutually-recursive functions declared
      via @racketid[let … and … in …], with any number of @racketid[and] clauses
-     in the compiled language.}}
- ]
+     in the compiled language.}}]
   
   Although some of these seem like viable solutions (e.g. explicitly freezing
-  objects), they still involve low-level mechanisms to create the graph;
-  furthermore code traversing the graph needs to be deal with cycles, in order
-  to avoid running into an infinite loop (or infinite recursion).
-  
-  updates: all logical pointers to an updated node must be updated too.
+  objects), they still involve low-level mechanisms to create the graph. When
+  functionally replacing a node with a new version of itself, all references to
+  it must be updated to point to the new version. Furthermore, code traversing
+  the graph to gather information or perform updates needs to deal with
+  cycles, in order to avoid running into an infinite loop (or infinite
+  recursion). Finally, backward edges are not represented in the same way as
+  forward edges, introducing an arbitrary distinction when fetching data from
+  the neighbours of a node. This last aspect reduces the extensibility of code
+  which manipulates graphs where access to fields is not done uniformly:
+  supposing new features of the language to be compiled require turning a
+  ``seamless'' edge into one which must be explicitly resolved in some way (e.g.
+  because this node, in the updated @tech{IR}, may now be part of cycles), this
+  change of interface will likely break old code which relied on seamless access
+  to that field.
+
+  We think that the compiler engineer could benefit from abstracting over these
+  implementation details, and think of compiler passes in terms of graph
+  transformations. Programmers using functional languages often write list
+  transformations using @htodo{higher-order} functions like @racket[map],
+  @racket[foldl], @racket[filter], @racket[zip] and so on, instead of explicitly
+  writing recursive functions.
+
+  The graph can be manipulated by updating some or all nodes of a given type,
+  using an old-node to new-node transformation function. This transformation
+  function could produce more than one node, by referencing the extra nodes from
+  the replacement one. It should furthermore be possible to locally navigate
+  through the graph, from its root and from the node currently being
+  transformed. This interface would allow to seamlessly handle cycles —
+  transformations which apply over a whole collection of nodes need not be
+  concerned with cycles — and still allow local navigation, without
+  distinguishing backward and forward edges.
+
+  @htodo{Be a bit more verbose on what cool stuff it allows}
 
   @htodo{Think about ensuring that nodes from two distinct graphs are not mixed
    in unexpected ways (placing a dummy phantom type somewhere should be enough
@@ -278,7 +308,62 @@
 
  @asection{
   @atitle{Expressing the data dependencies of a path via row types}
- }
+
+  It is easy enough to test a compiler by feeding it sample programs and
+  checking that the compiled output behaves as expected. However, @htodo{
+   triggering} a specific set of conditions inside a given pass, in order to
+  achieve reasonably complete code coverage, may prove to be a harder task:
+  previous passes may modify the input program in unexpected ways, and obtaining
+  a certain data configuration at some point in the compiler requires the
+  developer to mentally execute the compiler's code @emph{backwards} from that
+  point, in order to determine the initial conditions which will produce the
+  desired configuration many steps later. This means that extensively testing
+  corner cases which may occur in principle, but are the result of unlikely
+  combinations of features in the input program, is a cumbersome task. @htodo{
+   i.e. unit testing vs other forms which test larger components.}
+
+  If the compiler consists of many small passes, whose inputs and outputs are
+  serializable, then it becomes possible to thoroughly test a single pass in
+  isolation, by supplying an artificial, crafted input, and checking some
+  properties of its output.
+
+  However, a compiler written following the @|nanopass| philosophy will feature
+  many small passes which read and update only a @htodo{small: repetition} small
+  part of their input. Specifying actual values for the irrelevant parts of the
+  data not only makes the test cases more verbose than they need to be, but also
+  hides out of plain sight which variations of the input matter (and may thus
+  allow the detection of new errors), and which parts of the input are mere
+  placeholders whose actual value will not influence the outcome of the pass,
+  aside from being copied over without changes.
+
+  It is desirable to express, in a statically verifiable way, which parts of
+  the input are relevant, and which parts are copied verbatim (modulo updated
+  sub-elements). Furtherfomre, it would be useful to be able to only specify the
+  relevant parts of tests, and omit the rest (instead of supplying dummy
+  values).
+
+  @htodo{embed within each graph a ``mapper'': specify one (or more?) mappings
+   (not anchored to the root) and the mapper updates these nodes, keeping the
+   rest intact. A pass then may expect a ``mappable'' object, regardless of the
+   actual shape of the irrelevant parts (including those on the paths between
+   the root and the relevant nodes).}
+
+  Row polymorphism allows us to satisfy both expectations. The irrelevant
+  fields of a record and the irrelevant cases of a variant type can be
+  abstracted away under a single row type variable. ``Row'' operations on
+  records allow reading and updating relevant fields, while keeping the part
+  abstracted by the row type variable intact. When invoking a compiler pass, the
+  row type variables may be instantiated to the full set of extra fields present
+  in the real @tech{IR}, when the pass is called as part of the actual
+  compilation; it is also possible, when the pass is called during testing, to
+  instantiate them to an empty set of fields (or to use a single field
+  containing a unique identifier, used to track ``object identity'').}
+
+ @asection{
+  @atitle{Verification}
+
+  The implementation presented in this thesis cannot be immediately extended to
+  support end-to-end }
  
 
  @;{
@@ -288,8 +373,8 @@
   These transformations are often non-trivial and may require aggregating and
   analysing data scattered across the program.
 
-  We build upon the achievements of the Nanopass Compiler Framework project,
-  which is presented in more detail in section XYZ. Simply put, Nanopass helps
+  We build upon the achievements of the @|nanopass-c-f| project,
+  which is presented in more detail in section XYZ. Simply put, @|nanopass| helps
   the programmer define a myriad of compiler passes, each doing a very small
   amount of code (and therefore easy to test and maintain), and each with a
   different input and output type.
@@ -360,7 +445,7 @@
   Our goal was to introduce a compiler-writing framework, which:
   @itemlist[
  @item{Supports writing a compiler using many small passes (in the spirit of
-    Nanopass)}
+    @|nanopass|)}
  @item{Allows writing the compiler in a strongly-typed language}
  @item{Uses immutable data structures for the Intermediate Representations
     (ASTs)}
@@ -395,3 +480,4 @@
  }
 
 }
+

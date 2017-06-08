@@ -1,6 +1,6 @@
 #lang at-exp racket
 (provide typedracket Typedracket csharp CAML CLOS NIT CPP DeBruijn HOAS PHOAS
-         monocecil dotnet DLL)
+         monocecil dotnet DLL nanopass nanopass-c-f)
 
 (require scribble/base
          scribble/core
@@ -22,6 +22,8 @@
 
 (define typedracket "Typed Racket")
 (define Typedracket "Typed Racket")
+(define nanopass "Nanopass")
+(define nanopass-c-f "Nanopass Compiler Framework")
 (define CAML "CAML")
 (define CLOS "CLOS")
 (define NIT "NIT")

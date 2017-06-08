@@ -9,6 +9,8 @@
                      "scribble-enhanced"
                      "scribble-math"
                      "phc-toolkit"
+                     "srfi-doc"
+                     "srfi-lite-lib"
                      ;; Literate programming dependencies:
                      ;; phc-graph:
                      "aful"
