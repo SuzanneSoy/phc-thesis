@@ -1,6 +1,7 @@
 #lang at-exp racket
 (provide typedracket Typedracket csharp CAML CLOS NIT CPP DeBruijn HOAS PHOAS
-         monocecil dotnet DLL nanopass nanopass-c-f)
+         monocecil dotnet DLL nanopass nanopass-c-f haskell haskell98 Hackett
+         turnstile Turnstile cur Cur)
 
 (require scribble/base
          scribble/core
@@ -35,3 +36,10 @@
 (define monocecil @tt{"Mono.Cecil"})
 (define dotnet ".NET")
 (define DLL "DLL")
+(define haskell "haskell")
+(define haskell98 "Haskell 98")
+(define Hackett "Hackett")
+(define turnstile "Turnstile")
+(define Turnstile "Turnstile")
+(define cur "Cur")
+(define Cur "Cur")

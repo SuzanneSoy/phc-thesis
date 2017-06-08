@@ -25,7 +25,8 @@
          part-style-update
          epigraph
          usetech
-         hr)
+         hr
+         lastname)
 
 (require racket/stxparam
          racket/splicing
@@ -429,3 +430,5 @@ EOTEX
 \def\hrStyle#1{\noindent{\centerline{\rule[0.5ex]{0.5\linewidth}{0.5pt}}}}
 EOTEX
                                                    ))))))
+
+(define lastname list)

@@ -151,7 +151,7 @@
  @asection{
   @atitle{Graphs}
 
-   @htodo{full stop in the middle of sentence}
+  @htodo{full stop in the middle of sentence}
   Nontrivial programs are inherently graphs: they may contain mutually
   recursive functions (which directly refer to each other, and therefore will
   form a cycle in a representation of the program), circular and (possibly
@@ -362,8 +362,136 @@
  @asection{
   @atitle{Verification}
 
+  @todo{Needs a transition from the previous section, or this should be moved
+   elsewhere.}
+
   The implementation presented in this thesis cannot be immediately extended to
-  support end-to-end }
+  support end-to-end formal verification of the compiler being written. However,
+  it contributes to pave the way for writing formally verified compilers:
+  Firstly, the smaller passes are easier to verify. Secondly, the use of
+  intermediate representations which closely match the input and output data can
+  be used, given a formal semantic of each @tech{IR}, to assert that a
+  transformation pass is systematically preserving the semantics of the input.
+  Thirdly, the use of a typed language instead of the currently ``untyped''
+  @|nanopass| framework means that a lot of properties can be ensured by relying
+  on the type system. @|Typedracket|'s type checker is not formally verified
+  itself and would have to be trusted (alternatively, the adventurous researcher
+  could attempt to derive well-typedness proofs automatically by hijacking the
+  type checker to generate traces of the @htodo{type checking} steps involved,
+  or manually, only using the type checker as a helper tool to detect and weed
+  out issues during development. Fourthly, the explicit specification of the
+  dependencies of passes on their input via row types is a form of frame
+  specification@htodo{reference}, and can significantly ease the verification
+  effort, as the engineer can rely on the fact that irrelevant parts were not
+  modified in the output. These @htodo{frame properties}@htodo{or rather frame
+   specifications?} are statically enforced by our extension of @|typedracket|'s
+  type system, which we formalise in chapter @todo{??}. This relies on trusting
+  @|typedracket| itself once again, and on the correctness of the implementation
+  of our translation from the extended type system to @|typedracket|'s core type
+  system. Fifthly we provide means to express graph transformations as such
+  instead of working with an encoding of graphs as abstract syntax trees (or
+  directed acyclic graphs), with explicit backward and transversal references.
+  We are hopeful that eliminating this mismatch will be beneficial to the formal
+  verification of the transformation passes.
+
+  These advantages would be directly available to engineers attempting a formal
+  proof of their compiler, while trusting the correctness of @|typedracket|, as
+  well as that of our framework. The implementation of our framework is not
+  hardened, and @|typedracket| itself suffers from a small number of known
+  sources of unsoundness@note{See
+   @url["https://github.com/racket/typed-racket/issues"].}, however. In order to
+  do an end-to-end verification of a compiler, it would be necessary to port our
+  approach to a language better suited to formal verification. Alternatively,
+  Racket could in principle be extended to help formalisation efforts. Two
+  approaches come to mind: the first consists in proving that the macros
+  correctly implement the abstraction which they attempt to model; the second
+  would be to have the macros inject annotations and hints indicating properties
+  that must be proven, in the same way that type annotations are currently
+  inserted. These hints could then be used by the prover to generate proof
+  obligations, which could then be solved manually or automatically.
+
+  @htodo{atitle{…}}
+
+  Mixing macros and language features which help obtaining static guarantees is
+  a trending topic in the Racket ecosystem and in other communities.
+
+  @|Typedracket| is still in active development, and several other projects
+  were presented recently.
+
+  @|Hackett|@note{@url["https://github.com/lexi-lambda/hackett"]}, mainly
+  developed by by @lastname{King}, is a recent effort to bring a
+  @|haskell98|-like type system to Racket.
+
+  @|Hackett| is built on the techniques developed by @lastname{Chang},
+  @lastname{ Knauth} and @lastname{Greenman} in
+  @~cite["chang2017type-systems-as-macros"], which lead to the @|turnstile|
+  library@note{@url["https://bitbucket.org/stchang/macrotypes.git"]}.
+  @|Turnstile| is a helper library which facilitates the creation of typed
+  languages in Racket. Macros are amended with typing rules, which are used to
+  thread type information through uses of macros, definition forms and other
+  special forms. Type checking is therefore performed during macro-expansion,
+  and does not rely on an external type checker which would work on the expanded
+  code. As a result, new languages built with Racket and @|turnstile| are not
+  limited to a pre-existing type system, but can rather devise their own from
+  the ground up. This approach brings a lot of flexibility, the drawback being
+  that more trust is put in the language designer.
+
+  The work presented in this thesis@htodo{, which started before @|turnstile|
+   was publicly announced,} aims to follow a different path than that followed
+  by @|turnstile|: we chose to implement our extended type system as an
+  abstraction over the existing type system of @|typedracket|. This means that
+  we do not rely so much on the correctness of our typing rules: instead of
+  verifying ourselves the well-typedness of compilers written using our
+  framework, we inject type annotations in the expanded code, which are then
+  verified by @|typedracket|. Therefore, we are confident that type errors will
+  be caught by @|typedracket|, safe in the knowledge that the code obtained
+  after macro-expansion is type-safe@note{We actually use on a few occasions
+   @racket[unsafe-cast]. Such a blunt instrument is however only used in cases
+   where @|typedracket| already has the required type information, but the type
+   checker fails to deduce the equivalence between two formulations of the same
+   type, or does not acknowledge that the term being checked has the expected
+   type. These issues are being worked on by the developers of @|typedracket|,
+   however, and we hope to be able to remove these uses of @racket[unsafe-cast]
+   in later versions.}. This increased serenity comes at the cost of
+  flexibility, as @|typedracket|'s type system was not able to express the type
+  constructs that we wanted to add. We therefore had to resort to a few hacks to
+  translate our types into constructs that could be expressed using
+  @|typedracket|.
+
+  The approach of building more complex type constructs atop small trusted
+  kernel has been pursued by
+  @|cur|@note{@url["https://github.com/wilbowma/cur"]}, developed by @lastname{
+   Bowman}. @|Cur| is a dependently typed language which permits theorem proving
+  and verified programming. It is based on a small kernel (the Curnel), which
+  does not contain language features which can be expressed by macro
+  transformations. Most notably, the prover's tactics are defined using
+  metaprogramming tools, and are not part of the core language.
+
+  Another tool worth mentioning is
+  Rosette@note{@url["https://github.com/emina/rosette"]}@todo{reference}.
+  Rosette, mainly developed by @lastname{Torlak}, is a solver-aided language: it
+  tightly integrates an SMT solver with some Racket constructs, so that powerful
+  queries can be performed and answered, for example ``what input values to the
+  function f will generate outputs which satisfy the predicate p?''. It can also
+  generate simple functions which satisfy given conditions. These features allow
+  it to be used both as a helper tool during development, for engineers coming
+  from various domains, and as a verifier, as the solver can be used to assert
+  that a function will never give an erroneous output, given a set of
+  constraints on its input.
+
+  @htodo{Check that I'm not saying anything wrong about Turnstile here.} The
+  idea of expressing the type of macro transformations at some level (e.g. by
+  indicating the type of the resulting expression in terms of the type of the
+  input terms, as is allowed by @|turnstile|) is not new: in 2001, Ganz, Sabry
+  and Taha already presented in 2001
+  MacroML@~cite["ganz2001macros-as-multi-stage-computations"], an experimental
+  language which allows type checking programs before macro-expansion. However,
+  it seems that there is interest, both in the Racket community and elsewhere,
+  for languages with powerful metaprogramming facilities, coupled with an
+  expressive type system. We are hopeful that this will lead to innovations
+  concerning the formal verification of programs making heavy use of complex
+  macros.
+ }
  
 
  @;{
@@ -374,16 +502,20 @@
   analysing data scattered across the program.
 
   We build upon the achievements of the @|nanopass-c-f| project,
-  which is presented in more detail in section XYZ. Simply put, @|nanopass| helps
-  the programmer define a myriad of compiler passes, each doing a very small
-  amount of code (and therefore easy to test and maintain), and each with a
-  different input and output type.
+  which is presented in more detail in section XYZ. Simply put, @|nanopass|
+  helps the programmer define a myriad of compiler passes, each doing a very
+  small amount of code (and therefore easy to test and maintain), and each with
+  a different input and output type.
   
  }
 }
 
 @asection{
  @atitle{Summary}
+
+ @epigraph[#:width "8cm"
+           @elem{Unknown}]{
+  Once upon a time…}
  
  @asection{ @atitle{Extensible type system} We implemented a different type
   system on top of @|typedracket|, using macros. Macros have been used not only
@@ -396,11 +528,11 @@
   logic programming (Racket
   Datalog@note{@url{http://docs.racket-lang.org/datalog/}} and
   Racklog@note{@url{http://docs.racket-lang.org/racklog/}},
-  Rosette@~cite["torlak_growing_rosette_2013"]). In the past,
-  @|typedracket|@~cite["tobin-hochstadt_design_2008"] has proved that a type
-  system can be successfully fitted onto an existing ``untyped'' language, using
-  macros. We implemented the @racketmodname[type-expander] library atop
-  @|typedracket|, without altering @|typedracket| itself. Our
+  Rosette@~cite["torlak_growing_rosette_2013" "torlak_rosette_symbolic_vm"]). In
+  the past, @|typedracket|@~cite["tobin-hochstadt_design_2008"] has proved that
+  a type system can be successfully fitted onto an existing ``untyped''
+  language, using macros. We implemented the @racketmodname[type-expander]
+  library atop @|typedracket|, without altering @|typedracket| itself. Our
   @racketmodname[type-expander] library allows macros to be used in contexts
   where a type is expected.
 
@@ -479,5 +611,187 @@
   bleargh).
  }
 
-}
+ @asection{
+  @atitle{Overview}
+
+  The rest of this document is structured as follows:
+
+  @htodo{auto chapter and section numbers}
+  @(let ([related-chap
+          @seclink["State_of_the_art"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Chapter 2}]
+         [related-type-expander
+          @seclink["related-type-expander"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 2.1}]
+         [related-adt
+          @seclink["related-adt"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 2.2}]
+         [related-nanopass
+          @seclink["related-nanopass"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{section 2.3}]
+         [related-cycles
+          @seclink["related-cycles"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{section 2.4}]
+         [initial-examples-chap
+          @seclink["initial-examples-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Chapter 3}]
+         [tr-chap
+          @seclink["tr-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 4.1}]
+         [type-expander-chap
+          @seclink["type-expander-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 4.2}]
+         [adt-chap
+          @seclink["adt-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 4.3}]
+         [typed-nanotrees-chap
+          @seclink["typed-nanotrees-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 5.1}]
+         [typed-nanodags-chap
+          @seclink["typed-nanodags-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 5.2}]
+         [typed-nanographs-chap
+          @seclink["typed-nanographs-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 5.3}]
+         [structural-invariants-chap
+          @seclink["structural-invariants-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 5.4}]
+         [future-extensions-chap
+          @seclink["future-extensions-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Section 5.5}]
+         [results-chap
+          @seclink["results-chap"
+                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
+                   ]{Chapter 6}])
+     @list{
+   @itemlist[
+ @item{@|related-chap| presents related work. It discusses approaches to
+     extensible type systems in @|related-type-expander|. @|related-adt|
+     considers how structures, variants and polymorphism may exhibit different
+     properties in different languages, and makes the case for bounded row
+     polymorphism as a well-suited tool for building compilers.
+     The @|nanopass-c-f| is presented in @|related-nanopass|, and techniques
+     used to encode and manipulate graphs are studied in @|related-cycles|.}
+ @item{In @|initial-examples-chap|, we give some example uses of the compiler
+     framework described in this thesis. We indicate the pitfalls, bugs
+     and boilerplate avoided thanks to its use.
+     @todo{Move this above the related work?}}
+ @item{@|tr-chap| gives an overview of the features of @|typedracket|'s type
+     system. It then formalises the features relevant to our work, by giving
+     the subtyping rules, as well as the builder and accessor primitives
+     for values of these types.}
+ @item{@|type-expander-chap| explains how we implemented support for type-level
+     macros as an extension to @|typedracket|, without modifying the core
+     implementation. We detail the reduction rules which allow translating
+     a type making use of expanders into a plain type.}
+ @item{@|adt-chap| discusses the flavour of algebraic datatypes which we chose
+     to implement atop @|typedracket|, as well as its extension with row types.
+     We explain in detail our goals and constraints, and present two
+     implementations — a first attempt, which unfortunately required verbose
+     annotations for some ``row operations'', and a second solution, which
+     greatly reduces the number of annotations required, by using a different
+     implementation strategy. We give formal semantics for these extensions,
+     give the reduction rules which translate them back to @|typedracket|'s type
+     system, and show that this reduction preserves the original semantics. We
+     then finally define a layer of syntactic sugar which allows convenient
+     use of these new type primitives.}
+ @item{@|typed-nanotrees-chap| builds upon these algebraic datatypes and row
+     types to define a typed version of the @|nanopass-c-f| which operates on
+     abstract syntax trees. We explain the notions of
+     @htodo{tech}@tech{tree nodes}, @htodo{tech}@tech{mapping functions} and
+     @htodo{tech}@tech{cata-morphisms}, show how these interact with row typing,
+     and give an overview of the implementation. We then extend this with
+     @tech{detached mappings}: this feature allows the user to map a function
+     over all nodes of a given type in a graph, regardless of the structure of
+     the graph outisde of the relevant parts which are manipulated by the
+     mapping function. This allows test data to not only omit irrelevant
+     branches in the abstract syntax tree by omitting the field pointing to
+     these branches, but also irrelevant parts located above the interesting
+     nodes. In other words, this feature allows cutting and removing the top of
+     the abstract syntax tree, and glue together the resulting forest.
+     We also formally describe the result of applying a set of detached or
+     regular mapping functions to an input tree.}
+ @item{@|typed-nanodags-chap| extends this typed version of @|nanopass| to
+     handle directed acyclic graphs. We start by considering concerns such as
+     equality of nodes (for which the previous chapter assumed a predicate
+     existed, without actually implementing it), and hash consing. This allows
+     us to prepare the ground for the extension presented in the next chapter,
+     namely graphs.}
+ @item{We can then introduce support for cycles in @|typed-nanographs-chap|:
+     instead of describing abstract syntax tree transformations, it then becomes
+     possible to describe graphs transformations. To this end, we introduce new
+     kinds of nodes: @tech{placeholders}, which are used during the construction
+     of the graph, @tech{with-indices} nodes, which encode references to
+     neighbouring nodes as indices into arrays containing all nodes of a given
+     type, for the current graph, and @tech{with-promises} nodes, which hide
+     away this implementation detail by lazily resolving all references, using
+     a uniform API. This allows all fields of a given node to be accessed in the
+     same way, while still allowing logical cycles built atop a purely immutable
+     representation.
+
+     We give an overview of how our implementation handles cycles, using
+     worklists which gather and return @tech{placeholders} when the mapping
+     functions perform recursive calls, and subsequently turn the results into
+     first into @tech{with-indices} nodes, then into @tech{with-promises} ones.
+     We then update our notion of equality and hash consing to account for
+     cycles, and update the formal semantics too.}
+ @item{@;{The fourth feature…}
+     Extra safety can be obtained by introducing some structural invariants
+     which constrain the shape of the graph. For example, it is possible to
+     ensure the well-scopedness of variable references. Another desirable
+     property would be the absence of cycles, either to better model the
+     @tech{IR}, knowing that cyclic references are not allowed at some point by
+     the target language, or to detect early on changes in the @tech{IR} which
+     may break code assuming the absence of cycles. A third option would be to
+     ensure that ``parent'' pointers are correct, and that the node containing
+     them is indeed referenced by the parent (i.e., ensure the @emph{presence}
+     of well-formed cycles). @|structural-invariants-chap| presents an extension
+     of our graph manipulation framework, which allows the specification of
+     structural invariants. These can in some cases be checked statically,
+     in other cases it may be necessary to follow a macro-enforced discipline,
+     and as a last resort, a dynamic check may be performed.
+     
+     @htodo{+ singleton / all nodes of a given type referenced by a central
+      point with bounded length / only one node with a given value for a given
+      property.}
+    
+     We further explain how we use phantom types to reflect at the type level
+     which invariants were checked on an instance of a graph. The types used to
+     represent that an instance satisfies an invariant are chosen so that
+     instances with stronger invariants are subtypes of instances with weaker
+     invariants.}
+ @item{Finally, in @|future-extensions-chap| we succinctly present some
+     extensions which could be added to the framework presented in the previous
+     chapters. We discuss how it would be possible to garbage-collect unused
+     parts of the graph when only a reference to an internal node is kept, and
+     the root is logically unreachable. Another useful feature would be the
+     ability to define general-purpose graph algorithm (depth-first traversal,
+     topological sort, graph colouring, and so on), operating on a subset of
+     the graph's fields. This would allow to perform these common operations
+     while considering only a subgraph of the one being manipulated. Finally,
+     we mention the possibility to implement an α-equivalence comparison
+     operator.@;{α-normal form}}
+ @item{In @|results-chap|, we present more examples and revisit the initial
+     examples illustrating our goals in the light of the previous chapters.
+     
+     We ported the most complete compiler written with @|nanopass| (a Scheme
+     compiler) to our framework; we summarise our experience and compare our
+     approach with @|nanopass|, by indicating the changes required, in
+     particular how many additional type annotations were necessary.}
+ @item{Finally, we conclude and list future work directions.
+     @htodo{(turnstile, improvements to Racket itself, etc.)}}]})}}
 

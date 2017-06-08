@@ -9,7 +9,7 @@
        #:version (version-text)]{State of the art}
 
 @asection{
- @atitle{Extending the type system via macros (type-expander)}
+ @atitle[#:tag "prelated-type-expander"]{Extending the type system via macros}
 
  Our work explores one interesting use of macros: their use to extend a
  programming language's type system.
@@ -69,7 +69,7 @@
  libraries@~cite["tobin-hochstadt_languages_as_libraries_2011"]}
 
 @asection{
- @atitle{Algebraic datatypes for compilers (phc-adt)}
+ @atitle[#:tag "related-adt"]{Algebraic datatypes for compilers}
  The @tt{phc-adt} library implements algebraic datatypes (variants and
  structures) which are adapted to compiler-writing.
 
@@ -91,6 +91,8 @@
    update and extension of its product types with values for existing and
    new fields, regardless of optional fields. We implement the
    latter.@htodo{ Probably the former too.}}]
+
+ @todo{Cite the variations on variants paper (for Haskell)}
 
  @asection{
   @atitle{The case for bounded row polymorphism}
@@ -329,7 +331,7 @@
      @; TODO: fix the footnote here!
      See also post on Quora@superscript{\ref{quora-url-footnote}},
      which links to @~cite["cardelli1985understanding"], and to a blog post by Sam
-     Tobin-Hochstadt@note{@url|{https://medium.com/@samth/on-typed-untyped-and-uni-typed-languages-8a3b4bedf68c}|}
+     Tobin-Hochstadt@note{@url["https://medium.com/@samth/on-typed-untyped-and-uni-typed-languages-8a3b4bedf68c"]}
      The blog post by Sam Tobin-Hochstadt explains how @typedracket tries to
      explore and understand how programmers think about programs written in
      so-called ``untyped'' languages (namely that the programmers still
@@ -417,12 +419,15 @@
  #:style (style #f
                 (list
                  (short-title "Writing compilers using many small passes")))
- ]{Writing compilers using many small passes (a.k.a following the Nanopass
-  Compiler Framework philosophy)}
+ #:tag "related-nanopass"
+ ]{Writing compilers using many small passes @elem[
+ #:style (style #f '(aux))]{(a.k.a following the Nanopass Compiler
+   Framework philosophy)}}
 }
 
 @asection{
- @atitle{Cycles in intermediate representations of programs}
+ @atitle[#:tag "related-cycles"]{Cycles in intermediate representations of
+  programs}
 
  @todo{There already were a few references in my proposal for JFLA.}
  @todo{Look for articles about graph rewriting systems.}
