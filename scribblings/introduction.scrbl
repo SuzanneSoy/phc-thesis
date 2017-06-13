@@ -39,7 +39,7 @@
  @hr
 
  The overall structure of a compiler will usually include a lexer and parser,
- which turn the the program's source into an in-memory representation. This
+ which turn the program's source into an in-memory representation. This
  initial representation will often be translated into an @deftech[#:key "IR"]{
   intermediate representation} (IR) better suited to the subsequent steps. At
  some early point, the program will be analysed for syntactical or semantic
@@ -65,7 +65,7 @@
    bugs which could easily be avoided by using a higher-level abstraction
    specifically aiming to represent a graph.}]
  
- The two first issues are prone to manifestations of some form or another of
+ The first two issues are prone to manifestations of some form or another of
  the ``god object'' anti-pattern@note{The ``god object'' anti-pattern describes
   object-oriented classes which @emph{do} too much or @emph{know} too much. The
   size of these classes tends to grow out of control, and there is usually a
@@ -107,8 +107,8 @@
   @atitle{Overusing a single @usetech{intermediate representation}}
 
   The static analysis, optimisation and code generation phases could in
-  principle work on the same @usetech{intermediate representation}. Several
-  issues arise from this situation, however.
+  principle work on the same @usetech{intermediate representation}. However,
+  several issues arise from this situation.
 
   In principle, new information gained by the static analysis may be added to
   the existing representation via mutation, or the optimiser could directly
@@ -132,11 +132,11 @@
 
   Furthermore, a mutable @tech{IR} hinders parallel execution of compiler
   passes. Indeed, some compiler passes will perform global transformations or
-  transversal analyses, and such code may be intrinsically difficult to @htodo{
-   parallelise}. @;{is "parallelise" the right word?} Many other passes however
-  are mere local transformations, and can readily be executed on distinct parts
-  of the abstract syntax tree, as long as there is no need to synchronise
-  concurrent accesses or modifications.
+  transversal analyses, and such code may be intrinsically difficult to 
+  parallelise. @htodo{is "parallelise" the right word?} Many other passes
+  however are mere local transformations, and can readily be executed on
+  distinct parts of the abstract syntax tree, as long as there is no need to
+  synchronise concurrent accesses or modifications.
   
   Using immutable intermediate representations (and performing shallow copies
   when updating data) can help with this second issue. However, there is more to
@@ -338,7 +338,7 @@
 
   It is desirable to express, in a statically verifiable way, which parts of
   the input are relevant, and which parts are copied verbatim (modulo updated
-  sub-elements). Furtherfomre, it would be useful to be able to only specify the
+  sub-elements). Furthermore, it would be useful to be able to only specify the
   relevant parts of tests, and omit the rest (instead of supplying dummy
   values).
 
@@ -368,7 +368,7 @@
   The implementation presented in this thesis cannot be immediately extended to
   support end-to-end formal verification of the compiler being written. However,
   it contributes to pave the way for writing formally verified compilers:
-  Firstly, the smaller passes are easier to verify. Secondly, the use of
+  firstly, the smaller passes are easier to verify. Secondly, the use of
   intermediate representations which closely match the input and output data can
   be used, given a formal semantic of each @tech{IR}, to assert that a
   transformation pass is systematically preserving the semantics of the input.
@@ -388,7 +388,7 @@
   type system, which we formalise in chapter @todo{??}. This relies on trusting
   @|typedracket| itself once again, and on the correctness of the implementation
   of our translation from the extended type system to @|typedracket|'s core type
-  system. Fifthly we provide means to express graph transformations as such
+  system. Fifthly, we provide means to express graph transformations as such
   instead of working with an encoding of graphs as abstract syntax trees (or
   directed acyclic graphs), with explicit backward and transversal references.
   We are hopeful that eliminating this mismatch will be beneficial to the formal
@@ -419,7 +419,7 @@
   were presented recently.
 
   @|Hackett|@note{@url["https://github.com/lexi-lambda/hackett"]}, mainly
-  developed by by @lastname{King}, is a recent effort to bring a
+  developed by @lastname{King}, is a recent effort to bring a
   @|haskell98|-like type system to Racket.
 
   @|Hackett| is built on the techniques developed by @lastname{Chang},
@@ -458,7 +458,7 @@
   translate our types into constructs that could be expressed using
   @|typedracket|.
 
-  The approach of building more complex type constructs atop small trusted
+  The approach of building more complex type constructs atop a small trusted
   kernel has been pursued by
   @|cur|@note{@url["https://github.com/wilbowma/cur"]}, developed by @lastname{
    Bowman}. @|Cur| is a dependently typed language which permits theorem proving
@@ -563,7 +563,7 @@
   are based, and without the need to resort to hacks.
 
   In languages making heavy uses of macros, it would be beneficial to design
-  type systems with a well-chosen set of primitive type, on top of which more
+  type systems with a well-chosen set of primitive types, on top of which more
   complex types can be built using macros.
 
   Building the type system via macros atop a small kernel is an approach that
@@ -746,7 +746,7 @@
      We give an overview of how our implementation handles cycles, using
      worklists which gather and return @tech{placeholders} when the mapping
      functions perform recursive calls, and subsequently turn the results into
-     first into @tech{with-indices} nodes, then into @tech{with-promises} ones.
+     into @tech{with-indices} nodes, then into @tech{with-promises} ones.
      We then update our notion of equality and hash consing to account for
      cycles, and update the formal semantics too.}
  @item{@;{The fourth feature…}
@@ -779,7 +779,7 @@
      chapters. We discuss how it would be possible to garbage-collect unused
      parts of the graph when only a reference to an internal node is kept, and
      the root is logically unreachable. Another useful feature would be the
-     ability to define general-purpose graph algorithm (depth-first traversal,
+     ability to define general-purpose graph algorithms (depth-first traversal,
      topological sort, graph colouring, and so on), operating on a subset of
      the graph's fields. This would allow to perform these common operations
      while considering only a subgraph of the one being manipulated. Finally,
