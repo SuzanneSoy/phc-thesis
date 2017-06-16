@@ -1,7 +1,7 @@
 #lang at-exp racket
 (provide typedracket Typedracket csharp CAML CLOS NIT CPP DeBruijn HOAS PHOAS
          monocecil dotnet DLL nanopass nanopass-c-f haskell haskell98 Hackett
-         turnstile Turnstile cur Cur)
+         turnstile Turnstile cur Cur LaTeX C-language java)
 
 (require scribble/base
          scribble/core
@@ -43,3 +43,7 @@
 (define Turnstile "Turnstile")
 (define cur "Cur")
 (define Cur "Cur")
+(define LaTeX (cond-element [latex (elem #:style (style "LaTeX" '()))]
+                            [else "LaTeX"]))
+(define C-language "C")
+(define java "Java")

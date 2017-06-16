@@ -37,6 +37,8 @@
 
 @include-asection{introduction.scrbl}
 @include-asection{state-of-the-art.scrbl}
+@include-asection{initial-examples.scrbl}
+@include-asection{tr-te-adt.scrbl}
 
 @;@(generate-bibliography-section)
 @; Generate the bibliography with a numbered section:

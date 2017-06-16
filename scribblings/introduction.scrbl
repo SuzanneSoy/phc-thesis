@@ -5,8 +5,26 @@
                     (only-in srfi/1 zip))]
 @(use-mathjax)
 
+@htodo{No parsers}
+
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Introduction}
+
+@asection{
+ @atitle{Warm-up}
+
+ @todo{What does a compiler do}
+
+ @todo{This thesis aims to build a framework which helps write compilers.}
+ 
+ @todo{Our focus is on compilers, not virtual machines or other run-time
+  systems. We are also not concerned with parsers — there are lots of existing
+  approaches and libraries which help writing parsers, although parsing in
+  general is not yet a solved problem on all accounts.}
+ 
+ @todo{IR = the macroscopic structure of the program (i.e. the meta-model
+  (explain what it is)) + the code of functions and/or methods (statements and
+  expressions, basic blocks of statements, or bytecode instructions)}}
 
 @asection{
  @atitle{The challenges of writing compilers}
@@ -20,10 +38,16 @@
  languages. A compiler will parse the program, transform it in various ways,
  perform some more or less advanced static checks, and optimise the input
  program before producing an output in the desired target language. A compiler
- must be correct, extensible and fast: correct because programmers are
+ must be correct, reusable and fast. It must be correct because programmers are
  concerned with logical errors in their own code, and should not fear that the
- compiler introduces erroneous behaviour on its own; extensible because the
- language is likely to evolve over time; and fast because the programmer's
+ compiler introduces erroneous behaviour on its own. It must be also
+ well-architectured: extensible, because the language is likely to evolve over
+ time, modular in the hope that some components can be improved independently
+ of the rest of the compiler (e.g. replacing or improving an optimisation
+ phase, or changing the compiler's front-end, to support another input
+ language), and more generally reusable, so that parts can be repurposed to
+ build other compilers, or other tools (analysers, IDEs, code instrumentation
+ and so on). Finally, a fast compiler is desirable because the programmer's
  edit-build-test cycle should be as frequent as
  possible@todo{@~cite["smalltalk-programmer-efficiency-cycle"]}.
 
@@ -39,31 +63,31 @@
  @hr
 
  The overall structure of a compiler will usually include a lexer and parser,
- which turn the program's source into an in-memory representation. This
- initial representation will often be translated into an @deftech[#:key "IR"]{
+ which turn the program's source into an in-memory representation. This initial
+ representation will often be translated into an @deftech[#:key "IR"]{
   intermediate representation} (IR) better suited to the subsequent steps. At
  some early point, the program will be analysed for syntactical or semantic
  inconsistencies (ranging from missing parentheses to duplicate definitions of
- the same variable), and may also perform a more thorough static analysis. The
- translation can then include an optimisation phase, based on
- locally-recognisable patterns or on the results of the program-wide analysis
- performed separately. Finally, code in the target language or for the target
- architecture is generated.
+ the same variable), and may also perform a more thorough static analysis.
+ Finally, code in the target language or for the target architecture is
+ generated. The translation can additionally include optimisation phases in
+ several spots: during code generation, using locally-recognisable patterns, or
+ for example earlier, using the results of the program-wide analysis performed
+ separately.
 
  We identify three pitfalls which await the compiler-writer:
 
  @itemlist[
  @item{It is easy to reuse excessively a single @usetech{intermediate
-    representation}, instead of properly distinguishing the features of the
-   input and output of each pass;}
+    representation} type, instead of properly distinguishing the specifics of
+   the input and output type of each pass;}
  @item{There is a high risk
    associated with the definition of large, monolithic passes, which are hard to
    test, debug, and extend;}
  @item{The fundamental structure of the program being compiled is often a
    graph, but compilers often work on an Abstract Syntax Tree, which requires
-   explicit handling of the backward and transversal arcs; This is a source of
-   bugs which could easily be avoided by using a higher-level abstraction
-   specifically aiming to represent a graph.}]
+   explicit handling of the backward arcs; This is a source of bugs which could
+   be avoided by using a better abstraction.}]
  
  The first two issues are prone to manifestations of some form or another of
  the ``god object'' anti-pattern@note{The ``god object'' anti-pattern describes
@@ -80,12 +104,12 @@
  @asection{
   @atitle{Large monolithic passes}
    
-  Large, monolithic passes, which perform many transformations in parallel have
-  the advantage of possibly being faster than several smaller passes chained one
-  after another. Furthermore, as one begins writing a compiler, it is tempting
-  to incrementally extend an initial pass to perform more work, rather than
-  starting all over again with a new @usetech{intermediate representation}, and
-  a new scaffolding to support its traversal.
+  Large, monolithic passes, which perform many transformations simultaneously
+  have the advantage of possibly being faster than several smaller passes
+  chained one after another. Furthermore, as one begins writing a compiler, it
+  is tempting to incrementally extend an initial pass to perform more work,
+  rather than starting all over again with a new @usetech{intermediate
+   representation}, and a new scaffolding to support its traversal.
 
   However, the drawback is that large compiler passes are harder to test (as
   there are many more combinations of paths through the compiler's code to
@@ -132,7 +156,7 @@
 
   Furthermore, a mutable @tech{IR} hinders parallel execution of compiler
   passes. Indeed, some compiler passes will perform global transformations or
-  transversal analyses, and such code may be intrinsically difficult to 
+  analyses, and such code may be intrinsically difficult to 
   parallelise. @htodo{is "parallelise" the right word?} Many other passes
   however are mere local transformations, and can readily be executed on
   distinct parts of the abstract syntax tree, as long as there is no need to
@@ -390,7 +414,7 @@
   of our translation from the extended type system to @|typedracket|'s core type
   system. Fifthly, we provide means to express graph transformations as such
   instead of working with an encoding of graphs as abstract syntax trees (or
-  directed acyclic graphs), with explicit backward and transversal references.
+  directed acyclic graphs), with explicit backward references.
   We are hopeful that eliminating this mismatch will be beneficial to the formal
   verification of the transformation passes.
 
@@ -581,14 +605,14 @@
  @item{Allows writing the compiler in a strongly-typed language}
  @item{Uses immutable data structures for the Intermediate Representations
     (ASTs)}
- @item{Supports transversal and backwards branches in the AST, making it
+ @item{Supports backwards branches in the AST, making it
     rather an Abstract Syntax Graph (this is challenging due to the use of
     immutable data structures).}
  @item{Provides easy manipulation of the Intermediate Representations: local
     navigation from node to node, global higher-order operations over many
     nodes, easy construction, easy serialization, with the guarantee that at
     no point an incomplete representation can be manipulated. These operations
-    should handle seamlessly transversal and backwards arcs.}
+    should handle seamlessly backwards arcs.}
  @item{Enforces structural invariants (either at compile-time or at
     run-time), and ensures via the type system that unchecked values cannot be
     used where a value respecting the invariant is expected.}

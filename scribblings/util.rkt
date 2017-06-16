@@ -129,7 +129,13 @@
 ;; TODO: merge the handling of unicode chars into scribble-math.
 (define m
   (list setup-math
-        (tex-header "\\renewcommand{\\rmdefault}{cmr}")))
+        (tex-header "\\renewcommand{\\rmdefault}{cmr}")
+        (elem #:style (style #f (list (css-addition
+                                       #".NoteBox {
+  height: auto !important;
+  clear: right;
+  margin-bottom: 1em !important;
+}"))))))
 (define my-title
   ;; TODO: use this for the other wrapped procs in this file
   (make-keyword-procedure

@@ -11,6 +11,14 @@
                      "phc-toolkit"
                      "srfi-doc"
                      "srfi-lite-lib"
+                     "datalog"
+                     "racklog"
+                     "scribble-doc"
+                     "slideshow-doc"
+                     "r5rs-doc"
+                     "r6rs-doc"
+                     "redex-doc"
+                     "turnstile"
                      ;; Literate programming dependencies:
                      ;; phc-graph:
                      "aful"
