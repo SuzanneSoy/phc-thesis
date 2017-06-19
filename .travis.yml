@@ -62,7 +62,7 @@ before_install:
 
 install:
  - raco pkg install -j 2 --deps search-auto --no-setup
- - raco setup --pkgs phc-thesis
+ - raco setup -v -j 2 --pkgs phc-thesis
 
 before_script:
 
