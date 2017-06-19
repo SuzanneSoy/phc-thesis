@@ -1,8 +1,12 @@
 #lang scribble/manual
 
 @require["util.rkt"
-         (for-label (only-meta-in 0 typed/racket))]
+         (for-label (only-meta-in 0 typed/racket))
+         scribble/example
+         racket/string]
 @(use-mathjax)
+
+@(define tr-eval (make-eval-factory '(typed/racket)))
 
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)
@@ -96,6 +100,16 @@ therefore keep our overview succinct and gloss over most details.
    as the type of functions which never return — in that way it is similar to
    @|C-language|'s @tt["__attribute__ ((__noreturn__))"].} and so on.
 
+  @examples[#:label #f #:eval (tr-eval)
+            (ann #true Boolean)
+            243
+            "Hello world"
+            #\c
+            (code:comment "The void function produces the void value")
+            (code:comment "Void values on their own are not printed,")
+            (code:comment "so we place it in a list to make it visible.")
+            (list (void))]
+  
   For numbers, @|typedracket| offers a ``numeric tower'' of
   partially-overlapping types: @racket[Positive-Integer] is a subtype of
   @racket[Integer], which is itself a subtype of @racket[Number]. @racket[Zero],
@@ -108,7 +122,12 @@ therefore keep our overview succinct and gloss over most details.
   @racket[0] type. Every number, character, string and boolean value can be used
   as a type, which is only inhabited by the same number, character, string or
   boolean value. For example, @racket[243] belongs to the singleton type
-  @racket[243], which is a subtype of @racket[Positive-Integer].}
+  @racket[243], which is a subtype of @racket[Positive-Integer].
+
+  @examples[#:label #f #:eval (tr-eval)
+            0
+            (ann 243 243)
+            #t]}
 
  @asection{
   @atitle{Pairs and lists}
@@ -123,6 +142,10 @@ therefore keep our overview succinct and gloss over most details.
   element, has the type @racket[(Pairof Number Boolean)], or using the most
   precise singleton types, @racket[(Pairof 729 #true)].
 
+  @examples[#:label #f #:eval (tr-eval)
+            (cons 729 #true)
+            '(729 . #true)]
+
   Heterogeneous linked lists of fixed length can be given a precise type by
   nesting the same number of pairs at the type level. For example, the list
   built with @racket[(list 81 #true 'hello)] has the type
@@ -132,7 +155,12 @@ therefore keep our overview succinct and gloss over most details.
   2-tuples in languages like @|CAML| or @|haskell|. The analog in
   object-oriented languages with support for generics would be a class
   @tt["Pair<A, B>"], where the generic type argument @racketid[B] could be
-  instantiated by another instance of @racketid[Pair], and so on.
+  instantiated by another instance of @tt["Pair"], and so on.
+
+  @examples[#:label #f #:eval (tr-eval)
+            (cons 81 (cons #true (cons 'hello null)))
+            (ann (list 81 #true 'hello)
+                 (Pairof Number (Pairof Boolean (Pairof Symbol Null))))]
 
   The type of variable-length homogeneous linked lists can be described using
   the @racket[Listof] type operator. The type @racket[(Listof Integer)] is
@@ -141,7 +169,10 @@ therefore keep our overview succinct and gloss over most details.
    types}, and @racket[U] describes @seclink["tr-presentation-unions"]{unions}.
   Both of these features are described below, for now we will simply say that
   the previously given type is a recursive type @racket[R], which can be a
-  @racket[(Pairof Integer R)] or @racket[Null] (to terminate the linked list).}
+  @racket[(Pairof Integer R)] or @racket[Null] (to terminate the linked list).
+
+  @examples[#:label #f #:eval (tr-eval)
+            (ann (range 0 5) (Listof Number))]}
 
  @asection{
   @atitle{Symbols}
@@ -158,6 +189,9 @@ therefore keep our overview succinct and gloss over most details.
   belong. Additionally, there is a singleton type for each symbol: the type
   @racket['foo] is only inhabited by the symbol @racket['foo].
 
+  @examples[#:label #f #:eval (tr-eval)
+            'foo]
+
   Singleton types containing symbols can be seen as similar to constructors
   without arguments in @|CAML| and @|haskell|, and as globally unique enum
   values in object-oriented languages. The main difference resides in the scope
@@ -167,7 +201,11 @@ therefore keep our overview succinct and gloss over most details.
   declarations of an enum will yield objects of different types. In contrast,
   two uses of an interned symbols in Racket and @|typedracket| will produce
   identical values and types. A way of seeing this is that symbols act as uses
-  of constructors which are implicitly declared globally.}
+  of constructors which are implicitly declared globally.
+
+  @examples[#:label #f #:eval (tr-eval)
+            ]
+  }
   
  @asection{
   @atitle[#:tag "tr-presentation-unions"]{Unions}
@@ -187,17 +225,33 @@ therefore keep our overview succinct and gloss over most details.
   units of code.
 
   Unions of symbols are similar to variants which contain zero-argument
-  constructors, in @|CAML| or @|haskell|. A union such as
-  @racket[(U 'ca (List 'cb Number) (List 'cc String Symbol))] can be seen as
-  roughly the equivalent of a variant with three constructors, @racketid[ca],
-  @racket[cb] and @racketid[cc], where the first has no arguments, the second
-  has one argument (a @racket[Number]), and the third has two arguments (a
-  @racket[String] and a @racket[Symbol]). The main difference is that a symbol
-  can be used as parts of several unions, e.g. @racket[(U 'a 'b)] and
-  @racket[(U 'b 'c)], while constructors can often only be part of the variant
-  used to declare them. Unions of symbols are in this sense closer to @|CAML|'s
-  so-called polymorphic variants@~cite["minskyRealWorldOCaml"] than to regular
-  variants.
+  constructors, in @|CAML| or @|haskell|.
+
+  @examples[#:label #f #:eval (tr-eval)
+            (define v : (U 'foo 'bar) 'foo)
+            v
+            (set! v 'bar)
+            v
+            ;; This throws an error at compile-time:
+            (eval:error (set! v 'oops))]
+
+  A union such as @racket[(U 'ca (List 'cb Number) (List 'cc String Symbol))]
+  can be seen as roughly the equivalent of a variant with three constructors,
+  @racketid[ca], @racket[cb] and @racketid[cc], where the first has no
+  arguments, the second has one argument (a @racket[Number]), and the third has
+  two arguments (a @racket[String] and a @racket[Symbol]).
+
+  The main difference is that a symbol can be used as parts of several unions,
+  e.g. @racket[(U 'a 'b)] and @racket[(U 'b 'c)], while constructors can often
+  only be part of the variant used to declare them. Unions of symbols are in
+  this sense closer to @|CAML|'s so-called polymorphic
+  variants@~cite["minskyRealWorldOCaml"] than to regular variants.
+  
+  @examples[#:label #f #:eval (tr-eval)
+            ;; 'foo is used in a first union
+            (define v : (U 'foo 'bar) 'bar)
+            ;; The same 'foo is reused in another union
+            (define w : (U 'foo 'quux) 'quux)]
 
   Finally, it is possible to mix different sorts of types within the same
   union: the type @racket[(U 0 #true 'other)] is inhabited by the number
@@ -292,9 +346,25 @@ therefore keep our overview succinct and gloss over most details.
   ancestor's predicate. When a struct inherits from another, it includes its
   parent's fields, and can add extra fields of its own.
 
-  Each struct declaration within a @|typedracket| program also declares a
-  corresponding type. In @|typedracket|, structs have a number of polymorphic
-  type arguments, which can be used within the types of the struct's fields.
+  Each struct declaration within a @|typedracket| program additionally declares
+  corresponding type.
+
+  @examples[#:label #f #:eval (tr-eval)
+            (struct s ([field₁ : (Pairof String Symbol)]
+                       [field₂ : Integer]
+                       [field₃ : Symbol])
+              #:transparent)
+            (s (cons "x" 'y) 123 'z)]
+
+  In @|typedracket|, structs can have polymorphic type arguments, which can be
+  used within the types of the struct's fields.
+
+  @examples[#:label #f #:eval (tr-eval)
+            (struct (A B) poly-s ([field₁ : (Pairof A B)]
+                                  [field₂ : Integer]
+                                  [field₃ : B])
+              #:transparent)
+            (poly-s (cons "x" 'y) 123 'z)]
 
   Racket further supports
   @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{ struct type
@@ -319,13 +389,13 @@ therefore keep our overview succinct and gloss over most details.
   interface'' itself (i.e. what Object Oriented languages call an interfece), as
   and for specifying the implementation of said interface.
 
-  @|Typedracket| offers no support for struct type properties and generic
-  interfaces for now. It is impossible to assert that a struct implements a
-  given property at the type level, and it is also for example not possible to
-  describe the type of a function accepting any struct implementing a given
-  property or generic interface. Finally, no type checks are performed on the
-  body of functions bound to such properties, and to check verifies that a
-  function implementation with the right signature is supplied to a given
+  @|Typedracket| unfortunately offers no support for struct type properties and
+  generic interfaces for now. It is impossible to assert that a struct
+  implements a given property at the type level, and it is also for example not
+  possible to describe the type of a function accepting any struct implementing
+  a given property or generic interface. Finally, no type checks are performed
+  on the body of functions bound to such properties, and to check verifies that
+  a function implementation with the right signature is supplied to a given
   property. Since struct type properties and generics cannot be used in a
   type-safe way for now, we refrain from using these features, and only use them
   to implement some very common properties@note{We built a thin macro wrapper
@@ -335,11 +405,11 @@ therefore keep our overview succinct and gloss over most details.
   which is equivalent to @|java|'s @tt["boolean equals(Object o)"] and
   @tt["int hashCode()"].
 
-  }
+ }
  
  @asection{
   @atitle[#:tag "tr-presentation-functions"]{Functions}
-   @itemlist[
+  @itemlist[
  @item{Simple function types}
  @item{Rest arguments}
  @item{Case functions (i.e. lightweight dependent function types)}
@@ -351,7 +421,7 @@ therefore keep our overview succinct and gloss over most details.
 
  @asection{
   @atitle[#:tag "tr-presentation-recursive-types"]{Recursive types}
-   + recursion via named types
+  + recursion via named types
  }
 
  @asection{
