@@ -2,7 +2,7 @@
 (define collection "phc-thesis")
 (define deps '("base"
                "rackunit-lib"))
-(define build-deps '("scribble-lib"
+(define build-deps '(("scribble-lib" #:version "1.20")
                      "racket-doc"
                      "typed-racket-lib"
                      "at-exp-lib"
