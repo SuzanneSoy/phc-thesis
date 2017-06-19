@@ -62,7 +62,7 @@ before_install:
 
 install:
  - raco pkg install -j 2 --deps search-auto --no-setup
- - raco setup -v -j 2 --pkgs phc-thesis
+ - (while ! test -e ~/done.txt; do sleep 10; echo -n '.'; done) & raco setup -v -j 2 --pkgs phc-thesis && touch ~/done.txt
 
 before_script:
 
