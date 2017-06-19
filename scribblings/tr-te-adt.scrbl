@@ -8,3 +8,5 @@
        #:version (version-text)]{Type systems and Algebraic Datatypes}
 
 @include-asection{tr.scrbl}
+@include-asection{te.scrbl}
+@include-asection{adt.scrbl}

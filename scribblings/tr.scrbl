@@ -5,7 +5,8 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{@|Typedracket|}
+       #:version (version-text)
+       #:tag "tr-chap"]{@|Typedracket|}
 
 We start this section with some history: Lisp, @emph{the} language with lots
 of parentheses, shortly following Fortran as one of the first high-level
@@ -303,15 +304,23 @@ therefore keep our overview succinct and gloss over most details.
   type property is therefore roughly equivalent to the declaration of an
   interface with a single method.
 
-  @todo{Briefly talk about Racket's
-   ``@seclink["struct-generics"
-              #:doc '(lib "scribblings/reference/reference.scrbl")]{
-    generic interfaces}'', which are an abstraction over struct type
-   properties and support the definition of several ``methods'' as part of a
-   single generic interface.}
+  Struct type properties are often considered a low-level mechanism in Racket.
+  Among other things, a struct type property can only be used to define a single
+  property at a time. When multiple ``methods'' have to be defined at once (for
+  example, when defining the @racket[prop:equal+hash] property, which requires
+  the definition of an equality comparison function, and two hashing functions),
+  these can be grouped together in a list of functions, which is then used as
+  the property's value.
+  ``@seclink["struct-generics"
+             #:doc '(lib "scribblings/reference/reference.scrbl")]{
+   Generic interfaces}'' are a higher-level feature, which among other things
+  allow the definition of multiple ``methods'' as part of a single generic
+  interface, and offers a friendlier API for specifying the ``generic
+  interface'' itself (i.e. what Object Oriented languages call an interfece), as
+  and for specifying the implementation of said interface.
 
   @|Typedracket| offers no support for struct type properties and generic
-  interfaces, however. It is impossible to specify that a struct implement a
+  interfaces for now. It is impossible to assert that a struct implements a
   given property at the type level, and it is also for example not possible to
   describe the type of a function accepting any struct implementing a given
   property or generic interface. Finally, no type checks are performed on the

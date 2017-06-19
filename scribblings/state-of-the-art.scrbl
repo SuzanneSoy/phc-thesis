@@ -9,7 +9,7 @@
        #:version (version-text)]{State of the art}
 
 @asection{
- @atitle[#:tag "prelated-type-expander"]{Extending the type system via macros}
+ @atitle[#:tag "related-type-expander"]{Extending the type system via macros}
 
  Our work explores one interesting use of macros: their use to extend a
  programming language's type system.
