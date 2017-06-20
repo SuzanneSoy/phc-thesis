@@ -74,7 +74,7 @@ script:
  - raco test -x -p phc-thesis
  - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
  - mv doc/ auto-doc/
- - raco scribble --dest doc/phc-thesis --html --dest-name index ++main-xref-in --redirect-main http://docs.racket-lang.org/ scribblings/phc-thesis.scrbl
+ - raco scribble --dest doc/phc-thesis --html --dest-name index ++main-xref-in --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl
  - make
  - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
 
