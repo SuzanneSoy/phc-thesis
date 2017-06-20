@@ -1,6 +1,7 @@
 #lang scribble/manual
 
 @require["util.rkt"
+         scriblib/render-cond
          (for-label racket
                     (only-in srfi/1 zip))]
 @(use-mathjax)
@@ -550,8 +551,14 @@
   (CLOS@~cite["bobrow_common_1988"]@todo{is it really implemented using
    macros?}, Racket classes@~cite["flatt_scheme_classes_2006"]) or supporting
   logic programming (Racket
-  Datalog@note{@url{http://docs.racket-lang.org/datalog/}} and
-  Racklog@note{@url{http://docs.racket-lang.org/racklog/}},
+  @cond-element[
+ [html @elem{
+      @seclink["top" #:doc '(lib "datalog/scribblings/datalog.scrbl")]{Datalog}
+      and
+      @seclink["top" #:doc '(lib "racklog/racklog.scrbl")]{Racklog}}]
+ [else @elem{
+      Datalog@note{@url{http://docs.racket-lang.org/datalog/}} and
+      Racklog@note{@url{http://docs.racket-lang.org/racklog/}}}]],
   Rosette@~cite["torlak_growing_rosette_2013" "torlak_rosette_symbolic_vm"]). In
   the past, @|typedracket|@~cite["tobin-hochstadt_design_2008"] has proved that
   a type system can be successfully fitted onto an existing ``untyped''

@@ -19,6 +19,8 @@
                      "r6rs-doc"
                      "redex-doc"
                      "turnstile"
+                     "extensible-functions"
+                     "zippers"
                      ;; Literate programming dependencies:
                      ;; phc-graph:
                      "aful"

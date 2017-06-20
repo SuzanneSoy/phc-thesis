@@ -2,7 +2,8 @@
 
 @require["util.rkt"
          scribble/core
-         scribble/latex-properties]
+         scribble/latex-properties
+         scriblib/render-cond]
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
@@ -98,8 +99,15 @@
   @atitle{The case for bounded row polymorphism}
   @todo{Explain the ``expression problem''.}
   @todo{Talk about the various ways in which it can be ``solved'', and which
-   tradeoffs we aim for. Mention @url{
-    http://docs.racket-lang.org/extensible-functions}, another solution
+   tradeoffs we aim for. Mention @cond-element[
+ [html @elem{
+      @seclink["top"
+               #:doc
+               '(lib
+                 "extensible-functions/documentation/extensible-functions.scrbl"
+                 )]{extensible-functions}}]
+ [else @elem{extensible-functions@note{@url{
+    http://docs.racket-lang.org/extensible-functions}}}]], another solution
    to the expression problem in Racket, but with rather different
    tradeoffs.}
 
@@ -555,7 +563,11 @@
     pointers}
  @item{The huet zipper@~cite["huet1997zipper"]. Implementation in untyped
     Racket, but not @|typedracket|@note{
-     @url{http://docs.racket-lang.org/zippers/} and
+     See @cond-element[
+ [html @elem{
+         @seclink["top" #:doc '(lib "zippers/scribblings/zippers.scrbl")]{
+          zippers}}]
+ [else @elem{@url{http://docs.racket-lang.org/zippers/}}]], and
      @url{https://github.com/david-christiansen/racket-zippers}}}]
  }
 }
