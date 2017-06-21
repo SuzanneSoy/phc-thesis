@@ -66,7 +66,7 @@ before_install:
 
 install:
  - raco pkg update --all --scope user
- - raco pkg install -j 2 phc-adt
+ - raco pkg install -j 2 phc-adt --deps search-auto
 # - raco pkg install -j 2 --deps search-auto
 # --no-setup
 # - (while ! test -e ~/done.txt; do sleep 10; echo -n '.'; done) & raco setup -v -j 2 --pkgs phc-thesis && touch ~/done.txt
