@@ -66,8 +66,8 @@ before_install:
 
 install:
  - raco pkg update --all --scope user
- - raco pkg install -j 2 --deps search-auto phc-adt
-# - raco pkg install -j 2 --deps search-auto
+# - raco pkg install -j 2 --deps search-auto phc-adt # Help a bit by populating the cache.
+ - raco pkg install -j 2 --deps search-auto
 # --no-setup
 # - (while ! test -e ~/done.txt; do sleep 10; echo -n '.'; done) & raco setup -v -j 2 --pkgs phc-thesis && touch ~/done.txt
 
@@ -78,12 +78,13 @@ before_script:
 # packages without it getting stuck on a confirmation prompt.
 script:
  echo "."
- #- raco test -x -p phc-thesis
- #- raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
-# - rm -fr doc/
-# - raco scribble --dest doc/phc-thesis --html --dest-name index ++main-xref-in --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl
-# - make
-# - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
+ - raco test -x -p phc-thesis
+ - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
+ - rm -fr doc/
+ - raco scribble --dest doc/phc-thesis --html --dest-name index ++main-xref-in --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl
+ - make
+ - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
+ - du -hs ~/.racket
 
 #after_success:
 # - raco pkg install --deps search-auto cover cover-coveralls
