@@ -65,6 +65,7 @@ before_install:
 - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
 
 install:
+ - raco pkg remove --no-trash phc-thesis || true # Attempt to remove already cached version.
  - raco pkg update --all --scope user
 # - raco pkg install -j 2 --deps search-auto phc-adt # Help a bit by populating the cache.
  - raco pkg install -j 2 --deps search-auto
