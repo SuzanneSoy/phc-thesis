@@ -33,6 +33,10 @@ env:
     - RACKET_VERSION=6.9 DEPLOY=true
     #- RACKET_VERSION=HEAD
 
+cache:
+  directories:
+    - $HOME/.racket
+
 addons:
   apt:
     packages:
@@ -61,7 +65,8 @@ before_install:
 - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
 
 install:
- - raco pkg install -j 2 --deps search-auto
+ - raco pkg update --all --scope user
+ - raco pkg install -j 2 --deps search-auto --no-launcher
 # --no-setup
 # - (while ! test -e ~/done.txt; do sleep 10; echo -n '.'; done) & raco setup -v -j 2 --pkgs phc-thesis && touch ~/done.txt
 
@@ -71,9 +76,9 @@ before_script:
 # `raco pkg install --deps search-auto` to install any required
 # packages without it getting stuck on a confirmation prompt.
 script:
- - raco test -x -p phc-thesis
- - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
- - mv doc/ auto-doc/
+ #- raco test -x -p phc-thesis
+ #- raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs phc-thesis
+ - rm -fr doc/
  - raco scribble --dest doc/phc-thesis --html --dest-name index ++main-xref-in --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl
  - make
  - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
