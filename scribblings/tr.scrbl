@@ -200,12 +200,21 @@ therefore keep our overview succinct and gloss over most details.
   using the ``type-safe enum'' design pattern, two otherwise identical
   declarations of an enum will yield objects of different types. In contrast,
   two uses of an interned symbols in Racket and @|typedracket| will produce
-  identical values and types. A way of seeing this is that symbols act as uses
-  of constructors which are implicitly declared globally.
+  identical values and types. A way of seeing this is that symbols are similar
+  to constructors (in the functional programming sense) or enums which are
+  implicitly declared globally.
 
   @examples[#:label #f #:eval (tr-eval)
-            ]
-  }
+            (module m1 typed/racket
+              (define sym1 'foo)
+              (provide sym1))
+            (module m2 typed/racket
+              (define sym2 'foo)
+              (provide sym2))
+            (require 'm1 'm2)
+            (code:comment "The tow independent uses of 'foo are identical:")
+            (eq? sym1 sym2)]
+ }
   
  @asection{
   @atitle[#:tag "tr-presentation-unions"]{Unions}
@@ -232,7 +241,7 @@ therefore keep our overview succinct and gloss over most details.
             v
             (set! v 'bar)
             v
-            ;; This throws an error at compile-time:
+            (code:comment "This throws an error at compile-time:")
             (eval:error (set! v 'oops))]
 
   A union such as @racket[(U 'ca (List 'cb Number) (List 'cc String Symbol))]
@@ -248,14 +257,18 @@ therefore keep our overview succinct and gloss over most details.
   variants@~cite["minskyRealWorldOCaml"] than to regular variants.
   
   @examples[#:label #f #:eval (tr-eval)
-            ;; 'foo is used in a first union
-            (define v : (U 'foo 'bar) 'bar)
-            ;; The same 'foo is reused in another union
-            (define w : (U 'foo 'quux) 'quux)]
+            (define-type my-variant (U 'ca
+                                       (List 'cb Number)
+                                       (List 'cc String Symbol)))
+            (define v₁ : my-variant 'ca)
+            (define v₂ : my-variant (list 'cb 2187))
+            (define v3 : my-variant (list 'cc "Hello" 'world))]
 
   Finally, it is possible to mix different sorts of types within the same
   union: the type @racket[(U 0 #true 'other)] is inhabited by the number
   @racket[0], the boolean @racket[#true], and the symbol @racket['other].
+  Translating such an union to a language like @|CAML| could be done by
+  explicitly tagging each case of the union with a distinct constructor.
 
   Implementation-wise, all values in the so-called ``untyped'' version of
   Racket are tagged: a few bits within the value's representation are reserved
@@ -278,20 +291,27 @@ therefore keep our overview succinct and gloss over most details.
   the singleton type @racket[0]. The intersection of @racket[(U 'a 'b 'c)] and
   @racket[(U 'b 'c 'd)] will be @racket[(U 'b 'c)], as @racket['b] and
   @racket['c] belong to both unions.
+
+  @examples[
+ #:label #f #:eval (tr-eval)
+ (code:comment ":type shows the given type, or a simplified version of it")
+ (:type (∩ (U 'a 'b 'c) (U 'b 'c 'd)))]
   
   @|Typedracket| is able to reduce some intersections such as those given above
   at compile-time. However, in some cases, it is forced to keep the intersection
   type as-is. For example, structs (@seclink["tr-presentation-structs"]{
-   describled below} can, using special properties, impersonate functions.
-  @|Typedracket| does not handle these properties (yet), and therefore cannot
-  determine whether a given struct type also impersonates a function or not.
-  This means that the intersection @racket[(∩ s (→ Number String))], where
-  @racket[s] is a struct type, cannot be reduced to @racket[Nothing], because
-  @|typedracket| cannot determine whether the struct @racket[s] can act as a
-  function or not.
+   describled below} can, using special properties, impersonate functions. This
+  mechanism is similar to PHP's @tt["__invoke"], the ability to overload
+  @tt["operator()"] in @|CPP|. @|Typedracket| does not handle these properties
+  (yet), and therefore cannot determine whether a given struct type also
+  impersonates a function or not. This means that the intersection
+  @racket[(∩ s (→ Number String))], where @racket[s] is a struct type, cannot be
+  reduced to @racket[Nothing], because @|typedracket| cannot determine whether
+  the struct @racket[s] can act as a function or not.
 
-  Another situation where @|typedracket| cannot reduce the intersection of two
-  function types (@seclink["tr-presentation-functions"]{presented below}).
+  Another situation where @|typedracket| cannot reduce the intersection is when
+  intersecting two function types (@seclink["tr-presentation-functions"]{
+   presented below}).
 
   @racketblock[
  (∩ (→ Number String) (→ Number Symbol))
@@ -330,7 +350,32 @@ therefore keep our overview succinct and gloss over most details.
   @racket[Nothing] propagates outwards). However, if the user directly specifies
   the type @racket[(Pairof (∩ 'a 'b) Integer)], it is simplified to
   @racket[(Pairof Nothing Integer)], but the @racket[Nothing] does not propagate
-  outwards beyond the initial use of @racket[∩].}
+  outwards beyond the initial use of @racket[∩].
+
+  @examples[#:label #f #:eval (tr-eval)
+            (:type (∩ 'a 'b))
+            (:type (∩ (Pairof 'a 'x) (Pairof 'b 'x)))
+            (:type (Pairof (∩ 'a 'b) Integer))]
+
+  A simple workaround exists: the outer type, which could be collapsed to
+  @racket[Nothing], can be intersected again with a type of the same shape. The
+  outer intersection will traverse both types (the desired one and the
+  ``shape''), and propagate the leftover @racket[Nothing] further out.
+
+  @examples[#:label #f #:eval (tr-eval)
+            (:type (Pairof (∩ 'a 'b) Integer))
+            (:type (∩ (Pairof (∩ 'a 'b) Integer)
+                      (Pairof Any Any)))]
+
+  These intersections are not very interesting on their own, as in most cases
+  it is possible to express the resulting simplified type without using the
+  intersection operator. They become more useful when mixed with polymorphic
+  types: intersecting a polymorphic type variable with another type can be used
+  to restrict the actual values that may be used. The type @racket[(∩ A T)],
+  where @racket[A] is a polymorphic type variable and @racket[T] is a type
+  defined elsewhere, is equivalent to the use of bounded type parameters in
+  @|java| or @|csharp|. In @|csharp|, for example, the type @racket[(∩ A T)]
+  would be written using an @tt["where A : T"] clause.}
  
  @asection{
   @atitle[#:tag "tr-presentation-structs"]{Structs}
@@ -350,14 +395,15 @@ therefore keep our overview succinct and gloss over most details.
   corresponding type.
 
   @examples[#:label #f #:eval (tr-eval)
-            (struct s ([field₁ : (Pairof String Symbol)]
-                       [field₂ : Integer]
-                       [field₃ : Symbol])
+            (struct parent ([field₁ : (Pairof String Symbol)])
+              #:transparent)
+            (struct s parent ([field₂ : Integer]
+                              [field₃ : Symbol])
               #:transparent)
             (s (cons "x" 'y) 123 'z)]
 
   In @|typedracket|, structs can have polymorphic type arguments, which can be
-  used within the types of the struct's fields.
+  used inside the types of the struct's fields.
 
   @examples[#:label #f #:eval (tr-eval)
             (struct (A B) poly-s ([field₁ : (Pairof A B)]
@@ -367,7 +413,7 @@ therefore keep our overview succinct and gloss over most details.
             (poly-s (cons "x" 'y) 123 'z)]
 
   Racket further supports
-  @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{ struct type
+  @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{struct type
    properties}, which can be seen as a limited form of method definitions for a
   struct, thereby making them closer to real objects. The same struct type
   property can be implemented by many structs, and the declaration of a struct
@@ -409,23 +455,142 @@ therefore keep our overview succinct and gloss over most details.
  
  @asection{
   @atitle[#:tag "tr-presentation-functions"]{Functions}
-  @itemlist[
- @item{Simple function types}
- @item{Rest arguments}
- @item{Case functions (i.e. lightweight dependent function types)}
- @item{Polymorphic functions}
- @item{Keyword and optional arguments}
- @item{Filters (information gained on the input when a predicate returns true
-    or false)}]
- }
+   
+  @|Typedracket| supports rich function types, to support some of the flexible
+  use patterns allowed by Racket.
+
+  The simple function type below indicates that the function expects two
+  arguments (an integer and a string), and returns a boolean:
+
+  @racketblock[(→ Integer String Boolean)]
+
+  We note that unlike @|haskell| and @|CAML| functions, Racket functions are
+  not implicitly curried. To express the corresponding curried function type,
+  one would write:
+
+  @racketblock[(→ Integer (→ String Boolean))]
+
+  A function may additionally accept optional positional arguments, and keyword
+  (i.e. named) arguments, both mandatory and optional:
+
+  @racketblock[
+ (code:comment "Mandatory string, optional integer and boolean arguments:")
+ (->* (String) (Integer Boolean) Boolean)
+ (code:comment "Mandatory keyword arguments:")
+ (→ #:size Integer #:str String Boolean)
+ (code:comment "Mandatory #:str, optional #:size and #:opt:")
+ (->* (#:str String) (#:size Integer #:opt Boolean) Boolean)]
+
+  Furthermore, functions in Racket accept a catch-all ``rest'' argument, which
+  allows for the definition of variadic functions. Typed racket also allows
+  expressing this at the type level, as long as the arguments covered by the
+  ``rest'' clause all have the same type:
+
+  @racketblock[
+ (code:comment "The function accepts one integer and any number of strings:")
+ (-> Integer String * Boolean)
+ (code:comment "Same thing with an optional symbol inbetween: ")
+ (->* (Integer) (Symbol) #:rest String Boolean)]
+
+  One of @|typedracket|'s main goals is to be able to typecheck idiomatic
+  Racket programs. Such programs may include functions whose return type depends
+  on the values of the input arguments. Similarly, @racket[case-lambda] can be
+  used to create lambda functions which dispatch to multiple behaviours based on
+  the number of arguments passed to the function.
+
+  @|Typedracket| provides the @racket[case→] type operator, which can be used to
+  describe the type of these functions:
+
+  @racketblock[
+ (code:comment "Allows 1 or 3 arguments, with the same return type.")
+ (case→ (→ Integer Boolean)
+        (→ Integer String Symbol Boolean))
+ (code:comment "A similar type based on optional arguments allows 1, 2 or 3")
+ (code:comment " arguments in contrast:")
+ (->* (Integer) (String Symbol) Boolean)
+ (code:comment "The output type can depend on the input type:")
+ (case→ (→ Integer Boolean)
+        (→ String Symbol))
+ (code:comment "Both features (arity and dependent output type) can be mixed")
+ (case→ (→ Integer Boolean)
+        (→ Integer String (Listof Boolean)))]
+
+  Another important feature, which can be found in the type system of most
+  functional programming languages, and most object-oriented languages, is
+  parametric polymorphism. @|Typedracket| allows the definition of polymorphic
+  structs, as detailed above, as well as polymorphic functions. For example, the
+  function @racket[cons] can be considered as a polymorphic function with two
+  polymorphic type arguments @racket[A] and @racket[B], which takes an argument
+  of type @racket[A], an argument of type @racket[B], and returns a pair of
+  @racket[A] and @racket[B].
+
+  @racketblock[(∀ (A B) (→ A B (Pairof A B)))]
+
+  @htodo{Something on which types can be inferred and which can't (for now).}
+
+  Finally, predicates (functions whose results can be interpreted as booleans)
+  can be used to gain information about the type of their argument, depending on
+  the result. The type of a predicate can include positive and negative filters,
+  indicated with @racket[#:+] and @racket[#:-], respectively. The type of the
+  @racket[string?] predicate is:
+
+  @racketblock[(→ Any Boolean : #:+ String #:- (! String))]
+
+  In this notation, the positive filter @racket[#:+ String] indicates that when
+  the predicate returns @racket[#true], the argument is known to be a
+  @racket[String]. Conversely, when the predicate exits with @racket[#false],
+  the negative filter @racket[#:- (! String)] indicates that the input could not
+  (@racket[!]) possibly have been a string. The information gained this way
+  allows regular conditionals based on arbitrary predicates to work like
+  pattern-matching:
+
+  @examples[#:label #f #:eval (tr-eval)
+            (define (f [x : (U String Number Symbol)])
+              (if (string? x)
+                  (code:comment "x is known to be a String here:")
+                  (ann x String)
+                  (code:comment "x is known to be a Number or a Symbol here:")
+                  (ann x (U Number Symbol))))]
+
+  The propositions do not necessarily need to refer to the value as a whole,
+  and can instead give information about a sub-part of the value. Right now, the
+  user interface for specifying paths can only target the left and right members
+  of @racket[cons] pairs, recursively. Internally, @|typedracket| supports
+  richer paths, and the type inference can produce filters which give
+  information about individual structure fields, or about the result of forced
+  promises, for example.}
 
  @asection{
   @atitle[#:tag "tr-presentation-recursive-types"]{Recursive types}
-  + recursion via named types
- }
+   
+  @|Typedracket| allows recursive types, both via (possibly mutually-recursive)
+  named declarations, and via the @racket[Rec] type operator.
+
+  In the following examples, the types @racket[Foo] and @racket[Bar] are
+  mutually recursive. The type @racket[Foo] matches lists with an even number of
+  alternating @racket[Integer] and @racket[String] elements, starting with an
+  @racket[Integer],
+
+  @racketblock[
+ (define-type Foo (Pairof Integer Bar))
+ (define-type Bar (Pairof String (U Foo Null)))]
+
+  This same type could alternatively be defined using the @racket[Rec]
+  operator. The notation @racket[(Rec R T)] builds the type @racket[T], where
+  occurrences of @racket[R] are interpreted as recursive occurrences of
+  @racket[T] itself.
+  
+  @racketblock[
+ (Rec R
+      (Pairof Integer
+              (Pairof String
+                      (U R Null))))]}
 
  @asection{
   @atitle{Classes}
+
+  The @racketmodname[racket/class] module provides an object-oriented system for
+  Racket. 
  }
 
  @asection{

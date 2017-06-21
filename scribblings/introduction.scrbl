@@ -332,7 +332,7 @@
  }
 
  @asection{
-  @atitle{Expressing the data dependencies of a path via row types}
+  @atitle{Expressing the data dependencies of a pass via row types}
 
   It is easy enough to test a compiler by feeding it sample programs and
   checking that the compiled output behaves as expected. However, @htodo{
