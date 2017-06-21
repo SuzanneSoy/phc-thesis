@@ -11,7 +11,7 @@ env:
 
 cache:
   directories:
-    - $HOME/.racket
+    - ~/.racket
 
 before_install:
 - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
@@ -21,11 +21,13 @@ jobs:
   include:
     - stage: phase1
       install:
+      - mv ~/.racket ~/.racket-discard
+      - mkdir ~/.racket
       - echo hello > ~/.racket/hello
       - echo "$TRAVIS_BUILD_ID" > ~/.racket/travis_build_id
       script:
-      - ls -la $HOME
-      - tree ~/.racket
+      - ls -la ~
+      - find ~/.racket
     - stage: phase2
       addons:
         apt:
@@ -36,7 +38,7 @@ jobs:
       - cat ~/.racket/hello
       - if "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id`; then travis_terminate 1; fi
       script:
-      - ls -la $HOME
-      - tree ~/.racket
+      - ls -la ~
+      - find ~/.racket
       - mv ~/.racket ~/.racket-discard
       - mkdir ~/.racket # clear the cache
