@@ -27,6 +27,7 @@ jobs:
       - echo "$TRAVIS_BUILD_ID" > ~/.racket/travis_build_id
       - raco pkg install --deps search-auto -j 2 phc-adt # Start installing stuff, continue later to avoid timeout.
       script:
+      - echo .
     - stage: phase2
       addons:
         apt:
@@ -56,6 +57,7 @@ jobs:
       - mv ~/.racket ~/.racket-discard
       - mkdir ~/.racket # clear the cache
       script:
+      - echo .
 
 #after_success:
 # - sh ./auto-push-master.sh
