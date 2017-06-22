@@ -39,6 +39,16 @@
 @include-asection{state-of-the-art.scrbl}
 @include-asection{initial-examples.scrbl}
 @include-asection{tr-te-adt.scrbl}
+@asection{ @atitle{Typed nanopass}
+ @asection{@atitle[#:tag "typed-nanotrees-chap"]{Typed nanopass on trees}}
+ @asection{@atitle[#:tag "typed-nanodags-chap"]{Typed nanopass on DAGs}}
+ @asection{@atitle[#:tag "typed-nanographs-chap"]{Typed nanopass on graphs}}
+ @asection{@atitle[#:tag "structural-invariants-chap"]{Structural invariants}}
+ @asection{@atitle[#:tag "future-extensions-chap"]{Further possible
+   extensions}} }
+@asection{@atitle[#:tag "results-chap"]{Examples and results}}
+@asection{@atitle[#:tag "conclusion-future-chap"]{Conclusion and future work
+  directions}}
 
 @;@(generate-bibliography-section)
 @; Generate the bibliography with a numbered section:

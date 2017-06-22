@@ -2,6 +2,7 @@
 
 @require["util.rkt"
          scriblib/render-cond
+         racket/string
          (for-label racket
                     (only-in srfi/1 zip))]
 @(use-mathjax)
@@ -10,6 +11,38 @@
 
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Introduction}
+
+@(define (sec-number→string tag #:doc [doc #f])
+   (delayed-element
+    (λ (the-renderer the-part the-resolve-info)
+      (define sec-tag (make-section-tag tag #:doc doc))
+      (define resolved-sec-tag (resolve-get the-part the-resolve-info sec-tag))
+      (if resolved-sec-tag
+          (let ()
+            (unless (and (vector? resolved-sec-tag)
+                         (>= (vector-length resolved-sec-tag) 3))
+              (error (format (string-append
+                              "Resolved section tag was not a"
+                              " vector of more than 3 elements: ~a")
+                       resolved-sec-tag)))
+            (define sec-number (vector-ref resolved-sec-tag 2))
+            (unless (list? sec-number)
+              (error "Third element of a resolved section tag was not a list."))
+            (if (= (length sec-number) 1)
+                (format "Chapter ~a" (car sec-number))
+                (format "Section ~a" (string-join (map number->string
+                                                       (reverse sec-number))
+                                                  "."))))
+          (elem #:style (style "badlink" '())
+                tag " #:doc " (format "~s" doc))))
+    (λ ()
+      "Section ??")
+    (λ ()
+      "Section ??")))
+
+@(define (sec-number-ref tag #:doc [doc #f])
+   (seclink tag #:doc doc (sec-number→string tag #:doc doc)))
+@(define sec-n-ref sec-number-ref)
 
 @asection{
  @atitle{Warm-up}
@@ -647,132 +680,75 @@
 
   The rest of this document is structured as follows:
 
-  @htodo{auto chapter and section numbers}
-  @(let ([related-chap
-          @seclink["State_of_the_art"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Chapter 2}]
-         [related-type-expander
-          @seclink["related-type-expander"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 2.1}]
-         [related-adt
-          @seclink["related-adt"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 2.2}]
-         [related-nanopass
-          @seclink["related-nanopass"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{section 2.3}]
-         [related-cycles
-          @seclink["related-cycles"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{section 2.4}]
-         [initial-examples-chap
-          @seclink["initial-examples-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Chapter 3}]
-         [tr-chap
-          @seclink["tr-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 4.1}]
-         [type-expander-chap
-          @seclink["type-expander-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 4.2}]
-         [adt-chap
-          @seclink["adt-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 4.3}]
-         [typed-nanotrees-chap
-          @seclink["typed-nanotrees-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 5.1}]
-         [typed-nanodags-chap
-          @seclink["typed-nanodags-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 5.2}]
-         [typed-nanographs-chap
-          @seclink["typed-nanographs-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 5.3}]
-         [structural-invariants-chap
-          @seclink["structural-invariants-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 5.4}]
-         [future-extensions-chap
-          @seclink["future-extensions-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Section 5.5}]
-         [results-chap
-          @seclink["results-chap"
-                   #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")
-                   ]{Chapter 6}])
-     @list{
+  @(define (sec-n-ref-self tag)
+     (sec-n-ref tag #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")))
+  @list{
    @itemlist[
- @item{@|related-chap| presents related work. It discusses approaches to
-     extensible type systems in @|related-type-expander|. @|related-adt|
+ @item{@sec-n-ref-self["State_of_the_art"] presents related work. It discusses
+     approaches to extensible type systems in
+     @sec-n-ref-self["related-type-expander"]. @sec-n-ref-self["related-adt"]
      considers how structures, variants and polymorphism may exhibit different
      properties in different languages, and makes the case for bounded row
-     polymorphism as a well-suited tool for building compilers.
-     The @|nanopass-c-f| is presented in @|related-nanopass|, and techniques
-     used to encode and manipulate graphs are studied in @|related-cycles|.}
- @item{In @|initial-examples-chap|, we give some example uses of the compiler
-     framework described in this thesis. We indicate the pitfalls, bugs
-     and boilerplate avoided thanks to its use.
-     @todo{Move this above the related work?}}
- @item{@|tr-chap| gives an overview of the features of @|typedracket|'s type
-     system. It then formalises the features relevant to our work, by giving
-     the subtyping rules, as well as the builder and accessor primitives
-     for values of these types.}
- @item{@|type-expander-chap| explains how we implemented support for type-level
-     macros as an extension to @|typedracket|, without modifying the core
-     implementation. We detail the reduction rules which allow translating
-     a type making use of expanders into a plain type.}
- @item{@|adt-chap| discusses the flavour of algebraic datatypes which we chose
-     to implement atop @|typedracket|, as well as its extension with row types.
-     We explain in detail our goals and constraints, and present two
-     implementations — a first attempt, which unfortunately required verbose
-     annotations for some ``row operations'', and a second solution, which
-     greatly reduces the number of annotations required, by using a different
-     implementation strategy. We give formal semantics for these extensions,
-     give the reduction rules which translate them back to @|typedracket|'s type
-     system, and show that this reduction preserves the original semantics. We
-     then finally define a layer of syntactic sugar which allows convenient
-     use of these new type primitives.}
- @item{@|typed-nanotrees-chap| builds upon these algebraic datatypes and row
-     types to define a typed version of the @|nanopass-c-f| which operates on
-     abstract syntax trees. We explain the notions of
-     @htodo{tech}@tech{tree nodes}, @htodo{tech}@tech{mapping functions} and
-     @htodo{tech}@tech{cata-morphisms}, show how these interact with row typing,
-     and give an overview of the implementation. We then extend this with
-     @tech{detached mappings}: this feature allows the user to map a function
-     over all nodes of a given type in a graph, regardless of the structure of
-     the graph outisde of the relevant parts which are manipulated by the
-     mapping function. This allows test data to not only omit irrelevant
-     branches in the abstract syntax tree by omitting the field pointing to
-     these branches, but also irrelevant parts located above the interesting
-     nodes. In other words, this feature allows cutting and removing the top of
-     the abstract syntax tree, and glue together the resulting forest.
-     We also formally describe the result of applying a set of detached or
-     regular mapping functions to an input tree.}
- @item{@|typed-nanodags-chap| extends this typed version of @|nanopass| to
-     handle directed acyclic graphs. We start by considering concerns such as
-     equality of nodes (for which the previous chapter assumed a predicate
-     existed, without actually implementing it), and hash consing. This allows
-     us to prepare the ground for the extension presented in the next chapter,
-     namely graphs.}
- @item{We can then introduce support for cycles in @|typed-nanographs-chap|:
-     instead of describing abstract syntax tree transformations, it then becomes
-     possible to describe graphs transformations. To this end, we introduce new
-     kinds of nodes: @tech{placeholders}, which are used during the construction
-     of the graph, @tech{with-indices} nodes, which encode references to
-     neighbouring nodes as indices into arrays containing all nodes of a given
-     type, for the current graph, and @tech{with-promises} nodes, which hide
-     away this implementation detail by lazily resolving all references, using
-     a uniform API. This allows all fields of a given node to be accessed in the
-     same way, while still allowing logical cycles built atop a purely immutable
-     representation.
+     polymorphism as a well-suited tool for building compilers. The
+     @|nanopass-c-f| is presented in @sec-n-ref-self["related-nanopass"], and
+     techniques used to encode and manipulate graphs are studied in
+     @sec-n-ref-self["related-cycles"].}
+ @item{In @sec-n-ref-self["initial-examples-chap"], we give some example uses
+     of the compiler framework described in this thesis. We indicate the
+     pitfalls, bugs and boilerplate avoided thanks to its use. @todo{Move this
+      above the related work?}}
+ @item{@sec-n-ref-self["tr-chap"] gives an overview of the features of
+     @|typedracket|'s type system. It then formalises the features relevant to
+     our work, by giving the subtyping rules, as well as the builder and
+     accessor primitives for values of these types.}
+ @item{@sec-n-ref-self["type-expander-chap"] explains how we implemented
+     support for type-level macros as an extension to @|typedracket|, without
+     modifying the core implementation. We detail the reduction rules which
+     allow translating a type making use of expanders into a plain type.}
+ @item{@sec-n-ref-self["adt-chap"] discusses the flavour of algebraic
+     datatypes which we chose to implement atop @|typedracket|, as well as its
+     extension with row types. We explain in detail our goals and constraints,
+     and present two implementations — a first attempt, which unfortunately
+     required verbose annotations for some ``row operations'', and a second
+     solution, which greatly reduces the number of annotations required, by
+     using a different implementation strategy. We give formal semantics for
+     these extensions, give the reduction rules which translate them back to
+     @|typedracket|'s type system, and show that this reduction preserves the
+     original semantics. We then finally define a layer of syntactic sugar which
+     allows convenient use of these new type primitives.}
+ @item{@sec-n-ref-self["typed-nanotrees-chap"] builds upon these algebraic
+     datatypes and row types to define a typed version of the @|nanopass-c-f|
+     which operates on abstract syntax trees. We explain the notions of @htodo{
+      tech}@tech{tree nodes}, @htodo{tech}@tech{mapping functions} and @htodo{
+      tech}@tech{cata-morphisms}, show how these interact with row typing, and
+     give an overview of the implementation. We then extend this with @tech{
+      detached mappings}: this feature allows the user to map a function over
+     all nodes of a given type in a graph, regardless of the structure of the
+     graph outisde of the relevant parts which are manipulated by the mapping
+     function. This allows test data to not only omit irrelevant branches in the
+     abstract syntax tree by omitting the field pointing to these branches, but
+     also irrelevant parts located above the interesting nodes. In other words,
+     this feature allows cutting and removing the top of the abstract syntax
+     tree, and glue together the resulting forest. We also formally describe the
+     result of applying a set of detached or regular mapping functions to an
+     input tree.}
+ @item{@sec-n-ref-self["typed-nanodags-chap"] extends this typed version of
+     @|nanopass| to handle directed acyclic graphs. We start by considering
+     concerns such as equality of nodes (for which the previous chapter assumed
+     a predicate existed, without actually implementing it), and hash consing.
+     This allows us to prepare the ground for the extension presented in the
+     next chapter, namely graphs.}
+ @item{We can then introduce support for cycles in
+     @sec-n-ref-self["typed-nanographs-chap"]: instead of describing abstract
+     syntax tree transformations, it then becomes possible to describe graphs
+     transformations. To this end, we introduce new kinds of nodes: @tech{
+      placeholders}, which are used during the construction of the graph, @tech{
+      with-indices} nodes, which encode references to neighbouring nodes as
+     indices into arrays containing all nodes of a given type, for the current
+     graph, and @tech{with-promises} nodes, which hide away this implementation
+     detail by lazily resolving all references, using a uniform API. This allows
+     all fields of a given node to be accessed in the same way, while still
+     allowing logical cycles built atop a purely immutable representation.
 
      We give an overview of how our implementation handles cycles, using
      worklists which gather and return @tech{placeholders} when the mapping
@@ -790,11 +766,11 @@
      may break code assuming the absence of cycles. A third option would be to
      ensure that ``parent'' pointers are correct, and that the node containing
      them is indeed referenced by the parent (i.e., ensure the @emph{presence}
-     of well-formed cycles). @|structural-invariants-chap| presents an extension
-     of our graph manipulation framework, which allows the specification of
-     structural invariants. These can in some cases be checked statically,
-     in other cases it may be necessary to follow a macro-enforced discipline,
-     and as a last resort, a dynamic check may be performed.
+     of well-formed cycles). @sec-n-ref-self["structural-invariants-chap"]
+     presents an extension of our graph manipulation framework, which allows the
+     specification of structural invariants. These can in some cases be checked
+     statically, in other cases it may be necessary to follow a macro-enforced
+     discipline, and as a last resort, a dynamic check may be performed.
      
      @htodo{+ singleton / all nodes of a given type referenced by a central
       point with bounded length / only one node with a given value for a given
@@ -805,24 +781,25 @@
      represent that an instance satisfies an invariant are chosen so that
      instances with stronger invariants are subtypes of instances with weaker
      invariants.}
- @item{Finally, in @|future-extensions-chap| we succinctly present some
-     extensions which could be added to the framework presented in the previous
-     chapters. We discuss how it would be possible to garbage-collect unused
-     parts of the graph when only a reference to an internal node is kept, and
-     the root is logically unreachable. Another useful feature would be the
-     ability to define general-purpose graph algorithms (depth-first traversal,
-     topological sort, graph colouring, and so on), operating on a subset of
-     the graph's fields. This would allow to perform these common operations
-     while considering only a subgraph of the one being manipulated. Finally,
-     we mention the possibility to implement an α-equivalence comparison
-     operator.@;{α-normal form}}
- @item{In @|results-chap|, we present more examples and revisit the initial
-     examples illustrating our goals in the light of the previous chapters.
+ @item{Finally, in @sec-n-ref-self["future-extensions-chap"] we succinctly
+     present some extensions which could be added to the framework presented in
+     the previous chapters. We discuss how it would be possible to
+     garbage-collect unused parts of the graph when only a reference to an
+     internal node is kept, and the root is logically unreachable. Another
+     useful feature would be the ability to define general-purpose graph
+     algorithms (depth-first traversal, topological sort, graph colouring, and
+     so on), operating on a subset of the graph's fields. This would allow to
+     perform these common operations while considering only a subgraph of the
+     one being manipulated. Finally, we mention the possibility to implement an
+     α-equivalence comparison operator.@;{α-normal form}}
+ @item{In @sec-n-ref-self["results-chap"], we present more examples and
+     revisit the initial examples illustrating our goals in the light of the
+     previous chapters.
      
      We ported the most complete compiler written with @|nanopass| (a Scheme
      compiler) to our framework; we summarise our experience and compare our
      approach with @|nanopass|, by indicating the changes required, in
      particular how many additional type annotations were necessary.}
  @item{Finally, we conclude and list future work directions.
-     @htodo{(turnstile, improvements to Racket itself, etc.)}}]})}}
+     @htodo{(turnstile, improvements to Racket itself, etc.)}}]}}}
 
