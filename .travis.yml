@@ -23,22 +23,39 @@ jobs:
       install:
       - mv ~/.racket ~/.racket-discard
       - mkdir ~/.racket
-      - echo hello > ~/.racket/hello
+      - echo "$TRAVIS_BUILD_ID"
       - echo "$TRAVIS_BUILD_ID" > ~/.racket/travis_build_id
+      - raco pkg install --deps search-auto -j 2 phc-adt # Start installing stuff, continue later to avoid timeout.
       script:
-      - ls -la ~
-      - find ~/.racket
     - stage: phase2
       addons:
         apt:
           packages:
           - texlive-latex-base
+          - texlive-fonts-extra
+          - texlive-fonts-recommended
+          - texlive-latex-extra
+          - latex-xcolor
       install:
-      - echo bye > ~/.racket/hello
-      - cat ~/.racket/hello
       - if test "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id`; then travis_terminate 1; fi
-      script:
-      - ls -la ~
-      - find ~/.racket
+      - rm -f ~/.racket/travis_build_id
+      - echo "LaTeX extra packages:"
+      - latex_home=$(kpsewhich -var-value=TEXMFHOME)
+      - curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
+      - curl -L -o newunicodechar.dtx http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.dtx
+      - latex newunicodechar.ins
+      - mkdir -p "$latex_home/tex/latex/newunicodechar"
+      - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
+      - raco pkg install --deps search-auto -j 2
+      - raco test -x -p "$(basename "$TRAVIS_BUILD_DIR")"
+      - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$TRAVIS_BUILD_DIR")";
+      - rm -fr doc/
+      - raco scribble --dest doc/phc-thesis --html --dest-name index ++main-xref-in --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl
+      - make
+      - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
       - mv ~/.racket ~/.racket-discard
       - mkdir ~/.racket # clear the cache
+      script:
+
+#after_success:
+# - sh ./auto-push-master.sh
