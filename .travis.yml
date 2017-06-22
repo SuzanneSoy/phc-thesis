@@ -51,7 +51,7 @@ jobs:
       - raco test -x -p "$(basename "$TRAVIS_BUILD_DIR")"
       - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$TRAVIS_BUILD_DIR")";
       - rm -fr doc/
-      - raco scribble --dest doc/phc-thesis --html --dest-name index ++main-xref-in --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl
+      - raco scribble --dest doc/phc-thesis --html --dest-name index --redirect-main https://docs.racket-lang.org// --redirect https://docs.racket-lang.org// scribblings/phc-thesis.scrbl
       - make
       - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
       - mv ~/.racket ~/.racket-discard
