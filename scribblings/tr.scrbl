@@ -1,7 +1,8 @@
 #lang scribble/manual
 
 @require["util.rkt"
-         (for-label (only-meta-in 0 typed/racket))
+         (for-label (only-meta-in 0 typed/racket)
+                    typed/racket/class)
          scribble/example
          racket/string]
 @(use-mathjax)
@@ -530,9 +531,9 @@ therefore keep our overview succinct and gloss over most details.
 
   Finally, predicates (functions whose results can be interpreted as booleans)
   can be used to gain information about the type of their argument, depending on
-  the result. The type of a predicate can include positive and negative filters,
-  indicated with @racket[#:+] and @racket[#:-], respectively. The type of the
-  @racket[string?] predicate is:
+  the result. The type of a predicate can include positive and negative
+  @deftech{filters}, indicated with @racket[#:+] and @racket[#:-], respectively.
+  The type of the @racket[string?] predicate is:
 
   @racketblock[(→ Any Boolean : #:+ String #:- (! String))]
 
@@ -559,6 +560,47 @@ therefore keep our overview succinct and gloss over most details.
   richer paths, and the type inference can produce filters which give
   information about individual structure fields, or about the result of forced
   promises, for example.}
+
+ @asection{
+  @atitle{Occurrence typing}
+
+  @|Typedracket| is built atop @racket[Racket], which does not natively support
+  pattern matching. Instead, pattern matching forms are implemented as macros,
+  and expand to nested uses of @racket[if].
+
+  As a result, @|typedracket| needs to typecheck code with the following
+  structure:
+
+  @racketblock[
+ (λ ([v : (U Number String)])
+   (if (string? v)
+       (string-append v ".")
+       (+ v 1)))]
+
+  In this short example, the type of @racket[v] is a union type including
+  @racket[Number] and @racket[String]. After applying the @racket[string?]
+  predicate, the type of @racket[v] is narrowed down to @racket[String] in the
+  @emph{then} branch, and it is narrowed down to @racket[Number] in the @emph{
+   else} branch. The type information gained thanks to the predicate comes from
+  the @tech{filter} part of the predicate's type (as explained in
+  @secref["tr-presentation-functions"]).
+
+  Occurrence typing only works on immutable variables and values. Indeed, if
+  the variable is modified with @racket[set!], or if the subpart of the value
+  stored within which is targeted by the predicate is mutable, it is possible
+  for that value to change between the moment the predicate is executed, and the
+  moment when the value is actually used. This places a strong incentive to
+  mostly use immutable variables and values in @|typedracket| programs, so that
+  pattern-matching and other forms work well.
+
+  In principle, it is always possible to copy the contents of a mutated
+  variable to a temporary one (or copy a mutable subpart of the value to a new
+  temporary variable), and use the predicate on that temporary copy. The code in
+  the @emph{then} and @emph{else} branches should also use the temporary copy,
+  to benefit from the typing information gained via the predicate. In our
+  experience, however, it seems that most macros which perform tasks similar to
+  pattern-matching do not provide an easy means to achieve this copy. It
+  therefore remains more practical to avoid mutation altogether when possible.}
 
  @asection{
   @atitle[#:tag "tr-presentation-recursive-types"]{Recursive types}
@@ -589,17 +631,234 @@ therefore keep our overview succinct and gloss over most details.
  @asection{
   @atitle{Classes}
 
-  The @racketmodname[racket/class] module provides an object-oriented system for
-  Racket. It supports the definition of classes with methods and fields.
+  The @racketmodname[racket/class] module provides an object-oriented system
+  for Racket. It supports the definition of a hierarchy of classes with single
+  inheritance, interfaces with multiple inheritance, mixins and traits (methods
+  and fields which may be injected at compile-time into other classes), method
+  renaming, and other features.
 
-  We will not describe this 
+  The @racketmodname[typed/racket/class] module makes most of the features of
+  @racketmodname[racket/class] available to @|typedracket|. In particular, it
+  defines the following type operators:
+
+  @itemlist[
+ @item{@racket[Class] is used to describe the features a class, including the
+    signature of its constructor, as well as the public fields and methods
+    exposed by the class. We will note that a type expressed with @racket[Class]
+    does not mention the name of the class. Any concrete implementation which
+    exposes all (and only) the required methods, fields and constructor will
+    inhabit the type. In other words, the types built with @racket[Class] are
+    structural, and not nominal.
+   }
+ @item{@racket[Object] is used to describe the methods and fields which an
+    already-built object bears.}
+ @item{The @racket[(Instance (Class …))] type is a shorthand for the
+    @racket[Object] type of instances of the given class type. It can be useful
+    to describe the type of an instance of a class without repeating all the
+    fields and methods (which could have been declared elsewhere).}
+ @item{In types described using @racket[Class] and @racket[Instance], it is
+    possible to omit fields which are not relevant. These fields get grouped
+    under a single @emph{row polymorphic} type variable. A row polymorphic
+    function can, for example, accept a class with some existing fields, and
+    produce a new class extending the existing one:
+
+    @(let ([ev (tr-eval)])
+       @list{
+     @examples[#:label #f #:eval ev
+               (: add-my-field (∀ (r #:row)
+                                  (-> (Class (field [existing Number])
+                                             #:row-var r)
+                                      (Class (field [existing Number]
+                                                    [my-field String])
+                                             #:row-var r))))
+               (define (add-my-field parent%)
+                 (class parent%
+                   (super-new)
+                   (field [my-field : String "Hello"])))]
+
+     The small snippet of code above defined a function @racket[add-my-field]
+     which accepts a @racket[parent%] class exporting at least the
+     @racket[existing] field (and possibly other fields and methods). It then
+     creates an returns a subclass of the given @racket[parent%] class, extended
+     with the @racket[my-field] field.
+
+     We consider the following class, with the required @racket[existing] field,
+     and a supplementary @racket[other] field:
+
+     @examples[#:label #f #:eval ev
+               (define a-class%
+                 (class object%
+                   (super-new)
+                   (field [existing : Integer 0]
+                          [other : Boolean #true])))]
+
+     When passed to the @racket[add-my-field] function, the row type variable is
+     implicitly instantiated with the field @racket[[other Boolean]]. The result
+     of that function call is therefore a class with the three fields
+     @racket[existing], @racket[my-field] and @racket[other].
+
+     @examples[#:label #f #:eval ev
+               (add-my-field a-class%)]
+
+     These mechanisms can be used to perform reflective operations on classes
+     like adding new fields and methods to dynamically-created subclasses, in a
+     type-safe fashion.
+
+     The @racket[Row] operator can be used along with @racket[row-inst] to
+     explicitly instantiate a row type variable to a specific set of fields and
+     methods. The following call to @racket[add-my-field] is equivalent to the
+     preceding one, but does not rely on the automatic inference of the row type
+     variable.
+
+     @examples[#:label #f #:eval ev
+               ({row-inst add-my-field (Row (field [other Boolean]))} a-class%)]
+     })}]
+
+  We will not further describe this object system here, as our work does not
+  rely on this aspect of @|typedracket|'s type system. We invite the curious
+  reader to refer to the documentation for @racketmodname[racket/class] and
+  @racketmodname[typed/racket/class] for more details.
+
+  We will simply note one feature which is so far missing from @|typedracket|'s
+  object system: immutability. It is not possible yet to indicate in the type of
+  a class that a field is immutable, or that a method is pure (in the sense of
+  always returning the same value given the same input arguments). The absence
+  of immutability means that occurrence typing does not work on fields. After
+  testing the value of a field against a predicate, it is not possible to narrow
+  the type of that field, because it could be mutated by a third party between
+  the check and future uses of the field.
  }
 
  @asection{
-  @atitle{Occurrence typing}
+  @atitle{Local type inference}
+
+  Unlike many other statically typed functional languages, @|typedracket| does
+  not rely on a Hindley–Milner type system@~cite["HMMilner78" "HMHindley69"].
+  This choice was made for several reasons@~cite["tobin-hochstadt_typed_2010"]:
+  @itemlist[
+ @item{@|Typedracket|'s type system is rich and contains many features. Among
+    other things, it mixes polymorphism and subtyping, which notoriously make
+    typechecking difficult.}
+ @item{The authors of @|typedracket| claim that global type inference often
+    produces indecipherable error messages, with a small change having
+    repercussions on the type of terms located in other distant parts of the
+    program.}
+ @item{The authors of @|typedracket| suggest that type annotations are often
+    beneficial as documentation. Since the type annotations are checked at
+    compile-time, they additionally will stay synchronised with the code that
+    they describe, and will not become out of date.}]
+
+  Instead of relying on global type inference, @|typedracket| uses local type
+  inference to determine the type of local variables and expressions.
+  @|Typedracket|'s type inference can also determine the correct instantiation
+  for most calls to polymorphic functions. It however requires type annotations
+  in some places. For example, it is usually necessary to indicate the type of
+  the parameters when defining a function.}
+ @htodo{Vectors}
+}
+
+@(begin
+   (define (array #:valign [valign 'mid] colspec . lines)
+     (define valign-letter (case valign [(top) "t"] [(mid) "m"] [(bot) "b"]))
+     @list{
+ \begin{array}[@valign-letter]{@colspec}
+ @lines
+ \end{array}
+}
+     )
+
+   (define acase list)
+   (define (cases #:first-sep [first-sep "\vphantom{x} :="]
+             #:then-sep [then-sep "|"] term
+             . the-cases)
+     (list
+      term
+      (array #:valign 'top "rl"
+             @(for/list ([c (in-list the-cases)]
+                         [i (in-naturals)])
+                (list (if (= i 0) first-sep then-sep)
+                      " & "
+                      c
+                      (if (= i (sub1 (length the-cases))) "" "\\")))
+             )))
+   (define (frac x y)
+     @list{\frac{@x}{@y}}))
+
+@asection{
+ @atitle{Formal semantics for part of Typed Racket's type system}
+
+ We define the universe of values that can be created manipulated with
+ @|typedracket| as follows:
+
+ @$${
+  @cases["𝔻"]{
+   @acase{\mathsf{num}\ \mathit{c} ∈ ℂ^∞}
+   @acase{\mathsf{chr}\ \mathit{ch} ∈ ℍ}
+   @acase{\mathsf{str}\ \mathit{s} ∈ 𝕊}
+   @acase{\mathsf{sym}\ \mathit{sym} ∈ 𝕐}
+   @acase{\mathsf{f} ∈ 𝔽}@; Functions
+   @acase{\mathsf{pair}(d, d') \text{ where } d,d' ∈ 𝔻}
+   @acase{\mathsf{vec}(d₁, …, dₙ) \text{ where } dᵢ ∈ 𝔻, n ∈ ℕ}
+   @acase{\mathsf{null}}
+   @acase{\mathsf{void}}
+   @acase{\mathsf{true} ∈ 𝟙}
+   @acase{\mathsf{false} ∈ 𝟙}
+   @acase{\mathsf{struct}(f₁ = d₁, …, fₙ = dₙ)
+    \text{ where } fᵢ ∈ ℱ, dᵢ ∈ 𝔻}
+  }
  }
 
- @asection{
-  @atitle{Global type inference}
+ where @${ℂ^∞} is the subset of complex numbers that can be represented in
+ Racket, extended with a few values like floating-point infinities and ``not a
+ number'' special values@note{More precisely Racket can represent complex
+  rationals with arbitrary precision (i.e. numbers of the form @${@frac["a" "b"]
+   + @frac["c" "d"]} where @${a,b,c,d ∈ ℕ} and are small enough to be
+  represented without running out of memory), as well as single-precision and
+  double-precision IEEE floating-point numbers, including special values like
+  positive and negative infinity (for double-precision floats: @racket[+inf.0]
+  and @racket[-inf.0]), positive and negative zero (@racket[+0.0] and
+  @racket[-0.0]) and positive and negative ``not a number'' values
+  (@racket[+nan.0] and @racket[-nan.0]).}.
+
+ @${ℍ} is the set of characters that can be represented in Racket@note{That
+  is, all the Unicode code points in the ranges 0 – d7ff@subscript{16} and
+  e000@subscript{16} – 10ffff@subscript{16}}.
+
+ @${𝕊} is the set of strings based on characters present in @${ℍ}.@htodo{is
+  this a free monoid or something?}
+
+ @${Y} is the set of symbols that can be manipulated in Racket. It includes
+ interned symbols (which are identified by their string representation), and
+ @racket[#:doc '(lib "scribblings/reference/reference.scrbl")]{uninterned}
+ symbols which are different from all other symbols, including those with the
+ same string representation@note{We will not consider
+  @racket[#:doc '(lib "scribblings/reference/reference.scrbl")]{unreadable
+   symbols}, whose behaviour is inbetween@htodo{This sentence sounds weird}.}.
+
+                                                                             
+
+ We voluntarily omit some more exotic data types such as
+ @tech[#:doc '(lib "scribblings/guide/guide.scrbl")]{byte strings} (indexed
+ strings of bytes, compared to the indexed strings of unicode characters
+ presented above),
+ @tech[#:key "regexp" #:doc '(lib "scribblings/guide/guide.scrbl")]{regular
+  expressions} and preexisting opaque structure types from Racket's standard
+ library (@racket[Subprocess], for example, which represent a running
+ subprocess on which a few actions are available). We also do not consider
+ mutable strings and pairs, which exist in @|typedracket| for backwards
+ compatibility, but which are seldom used in practice.
+
+ @todo{value-belongs-to-type relationship}
+
+ The association with types and values given above naturally yields the
+ subtyping relationship @tr<: explicited below:
+
+  @$${
+  @array["rl"]{
+   n ∈ ℂ ⇒ τ(n) & \mathrel{<:_\mathit{tr}} Number\\
+   s ∈ \mathsf{symbols} ⇒ τ(s) & \mathrel{<:_\mathit{tr}} Symbol \\
+   Number & \mathrel{<:_\mathit{tr}} Any \\
+   A & \mathrel{<:_\mathit{tr}} (U\ A\ B\ …)
+  }
  }
 }

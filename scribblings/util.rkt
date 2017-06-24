@@ -26,7 +26,8 @@
          epigraph
          usetech
          hr
-         lastname)
+         lastname
+         tr<:)
 
 (require racket/stxparam
          racket/splicing
@@ -44,7 +45,8 @@
          "abbreviations.rkt"
          (for-syntax syntax/parse)
          scribble/html-properties
-         scribble/latex-properties)
+         scribble/latex-properties
+         scribble-math)
 
 (use-mathjax)
 
@@ -438,3 +440,6 @@ EOTEX
                                                    ))))))
 
 (define lastname list)
+
+;; Math stuff
+(define tr<: ($ "\\mathrel{<:_\\mathit{tr}}"))
