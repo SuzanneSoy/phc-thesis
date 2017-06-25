@@ -768,7 +768,7 @@ therefore keep our overview succinct and gloss over most details.
      )
 
    (define acase list)
-   (define (cases #:first-sep [first-sep "\vphantom{x} :="]
+   (define (cases #:first-sep [first-sep "\\vphantom{x} :="]
              #:then-sep [then-sep "|"] term
              . the-cases)
      (list
@@ -779,10 +779,11 @@ therefore keep our overview succinct and gloss over most details.
                 (list (if (= i 0) first-sep then-sep)
                       " & "
                       c
-                      (if (= i (sub1 (length the-cases))) "" "\\")))
+                      (if (= i (sub1 (length the-cases))) "" "\\\\")))
              )))
    (define (frac x y)
-     @list{\frac{@x}{@y}}))
+     @list{\frac{@x}{@y}})
+   (define where "\\text{ where }"))
 
 @asection{
  @atitle{Formal semantics for part of Typed Racket's type system}
@@ -791,21 +792,20 @@ therefore keep our overview succinct and gloss over most details.
  @|typedracket| as follows:
 
  @$${
-  @cases["𝔻"]{
-   @acase{\mathsf{num}\ \mathit{c} ∈ ℂ^∞}
-   @acase{\mathsf{chr}\ \mathit{ch} ∈ ℍ}
-   @acase{\mathsf{str}\ \mathit{s} ∈ 𝕊}
-   @acase{\mathsf{sym}\ \mathit{sym} ∈ 𝕐}
-   @acase{\mathsf{f} ∈ 𝔽}@; Functions
-   @acase{\mathsf{pair}(d, d') \text{ where } d,d' ∈ 𝔻}
-   @acase{\mathsf{vec}(d₁, …, dₙ) \text{ where } dᵢ ∈ 𝔻, n ∈ ℕ}
-   @acase{\mathsf{null}}
-   @acase{\mathsf{void}}
-   @acase{\mathsf{true} ∈ 𝟙}
-   @acase{\mathsf{false} ∈ 𝟙}
-   @acase{\mathsf{struct}(f₁ = d₁, …, fₙ = dₙ)
-    \text{ where } fᵢ ∈ ℱ, dᵢ ∈ 𝔻}
-  }
+  @cases["𝔻"
+         @acase{\mathsf{num}\ \mathit{c} ∈ ℂ^∞}
+         @acase{\mathsf{chr}\ \mathit{ch} ∈ ℍ}
+         @acase{\mathsf{str}\ \mathit{s} ∈ 𝕊}
+         @acase{\mathsf{sym}\ \mathit{sym} ∈ 𝕐}
+         @acase{\mathsf{f} ∈ 𝔽}@; Functions
+         @acase{\mathsf{pair}(d, d') \text{ where } d,d' ∈ 𝔻}
+         @acase{\mathsf{vec}(d₁, …, dₙ) \text{ where } dᵢ ∈ 𝔻, n ∈ ℕ}
+         @acase{\mathsf{null}}
+         @acase{\mathsf{void}}
+         @acase{\mathsf{true} ∈ 𝟙}
+         @acase{\mathsf{false} ∈ 𝟙}
+         @acase{\mathsf{struct}(f₁ = d₁, …, fₙ = dₙ)
+            @where fᵢ ∈ ℱ, dᵢ ∈ 𝔻}]
  }
 
  where @${ℂ^∞} is the subset of complex numbers that can be represented in
