@@ -758,32 +758,43 @@ therefore keep our overview succinct and gloss over most details.
 }
 
 @(begin
-   (define (array #:valign [valign 'mid] colspec . lines)
+   (define (aligned #:valign [valign 'mid] . lines)
      (define valign-letter (case valign [(top) "t"] [(mid) "m"] [(bot) "b"]))
      @list{
- \begin{array}[@valign-letter]{@colspec}
+ \begin{aligned}[@valign-letter]
  @lines
- \end{array}
+ \end{aligned}
 }
      )
 
    (define acase list)
-   (define (cases #:first-sep [first-sep "\\vphantom{x} :="]
-             #:then-sep [then-sep "|"] term
-             . the-cases)
-     (list
-      term
-      (array #:valign 'top "rl"
-             @(for/list ([c (in-list the-cases)]
-                         [i (in-naturals)])
-                (list (if (= i 0) first-sep then-sep)
-                      " & "
-                      c
-                      (if (= i (sub1 (length the-cases))) "" "\\\\")))
-             )))
-   (define (frac x y)
+   (define cases
+     (λ (#:first-sep [first-sep "\\vphantom{x}\\mathbin{:=}\\vphantom{x}"]
+         #:then-sep [then-sep "|\\;\\ "] term
+         . the-cases)
+       (list
+        term
+        (aligned #:valign 'top @; cl
+                 @(for/list ([c (in-list the-cases)]
+                             [i (in-naturals)])
+                    (list (if (= i 0) first-sep then-sep)
+                          " & "
+                          c
+                          (if (= i (sub1 (length the-cases))) "" "\\\\")))
+                 ))))
+   (define (frac x . y)
      @list{\frac{@x}{@y}})
-   (define where "\\text{ where }"))
+   (define where @${\text{ where }})
+   (define textif @${\text{ if }})
+   (define quad @${\quad})
+
+   (define (cat x . y)
+     (if (null? y)
+         @list{\mathsf{@x}}
+         @list{\mathsf{@x}\ @y}))
+   (define ℂ∞ @${\overline{ℂ}})
+   (define u𝕋 @${𝕋})
+   (define (τ x) @${τ(\textit{@x})}))
 
 @asection{
  @atitle{Formal semantics for part of Typed Racket's type system}
@@ -793,27 +804,28 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @cases["𝔻"
-         @acase{\mathsf{num}\ \mathit{c} ∈ ℂ^∞}
-         @acase{\mathsf{chr}\ \mathit{ch} ∈ ℍ}
-         @acase{\mathsf{str}\ \mathit{s} ∈ 𝕊}
-         @acase{\mathsf{sym}\ \mathit{sym} ∈ 𝕐}
-         @acase{\mathsf{f} ∈ 𝔽}@; Functions
-         @acase{\mathsf{pair}(d, d') \text{ where } d,d' ∈ 𝔻}
-         @acase{\mathsf{vec}(d₁, …, dₙ) \text{ where } dᵢ ∈ 𝔻, n ∈ ℕ}
-         @acase{\mathsf{null}}
-         @acase{\mathsf{void}}
-         @acase{\mathsf{true} ∈ 𝟙}
-         @acase{\mathsf{false} ∈ 𝟙}
-         @acase{\mathsf{struct}(f₁ = d₁, …, fₙ = dₙ)
+         @acase{@cat["num"]{c} ∈ @ℂ∞}
+         @acase{@cat["chr"]{h} ∈ ℍ}
+         @acase{@cat["str"]{s} ∈ 𝕊}
+         @acase{@cat["sym"]{y} ∈ 𝕐}
+         @acase{@cat["fun"]{f} ∈ 𝔽}
+         @acase{@cat["pair"](d, d') @where d,d' ∈ 𝔻}
+         @acase{@cat["vec"](d₁, …, dₙ) @where dᵢ ∈ 𝔻, n ∈ ℕ}
+         @acase{@cat["null"]}
+         @acase{@cat["void"]}
+         @acase{@cat["true"] ∈ 𝟙}
+         @acase{@cat["false"] ∈ 𝟙}
+         @acase{@cat["struct"](f₁ = d₁, …, fₙ = dₙ)
             @where fᵢ ∈ ℱ, dᵢ ∈ 𝔻}]
  }
 
- where @${ℂ^∞} is the subset of complex numbers that can be represented in
+ where @ℂ∞ is the subset of complex numbers that can be represented in
  Racket, extended with a few values like floating-point infinities and ``not a
  number'' special values@note{More precisely Racket can represent complex
   rationals with arbitrary precision (i.e. numbers of the form @${@frac["a" "b"]
-   + @frac["c" "d"]} where @${a,b,c,d ∈ ℕ} and are small enough to be
-  represented without running out of memory), as well as single-precision and
+   + @frac["c" "d"]i} where @${a,b,c,d ∈ ℤ ∧ b,d ≠ 0} and have a small enough
+  magnitude to be represented without running out of memory), as well as
+  complex numbers where both components are either single-precision or
   double-precision IEEE floating-point numbers, including special values like
   positive and negative infinity (for double-precision floats: @racket[+inf.0]
   and @racket[-inf.0]), positive and negative zero (@racket[+0.0] and
@@ -827,15 +839,25 @@ therefore keep our overview succinct and gloss over most details.
  @${𝕊} is the set of strings based on characters present in @${ℍ}.@htodo{is
   this a free monoid or something?}
 
- @${Y} is the set of symbols that can be manipulated in Racket. It includes
+ @${𝕐} is the set of symbols that can be manipulated in Racket. It includes
  interned symbols (which are identified by their string representation), and
- @racket[#:doc '(lib "scribblings/reference/reference.scrbl")]{uninterned}
+ @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{uninterned}
  symbols which are different from all other symbols, including those with the
  same string representation@note{We will not consider
-  @racket[#:doc '(lib "scribblings/reference/reference.scrbl")]{unreadable
+  @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{unreadable
    symbols}, whose behaviour is inbetween@htodo{This sentence sounds weird}.}.
 
-                                                                             
+ @${𝔽} is the universe of Racket functions. A function @${f ∈ 𝔽} is a partial
+ function from tuples of arguments to tuples of return values.
+
+ @$${f : 𝔻ⁿ ↛ 𝔻ⁿ}
+
+ @${ℕ} is the set of natural integers.
+
+ @${𝟙} is the universe of booleans, which only contains the values
+ @${@cat["true"]} and @${@cat["false"]}.
+
+ @${ℱ} is the universe of field names.
 
  We voluntarily omit some more exotic data types such as
  @tech[#:doc '(lib "scribblings/guide/guide.scrbl")]{byte strings} (indexed
@@ -848,17 +870,110 @@ therefore keep our overview succinct and gloss over most details.
  mutable strings and pairs, which exist in @|typedracket| for backwards
  compatibility, but which are seldom used in practice.
 
- @todo{value-belongs-to-type relationship}
+ @todo{Value-belongs-to-type relationship:}
+
+ Values belong to their singleton type. We define a type inhabited by a single
+ value @${v} with the notation @${τ(v) ∈ @u𝕋}, where @u𝕋 is the universe of
+ types.
+
+ @$${
+  @aligned{
+   @cat["num"]{c} & ∈ τ(@cat["num"]{c}) \\
+   @cat["chr"]{h} & ∈ τ(@cat["chr"]{h}) \\
+   @cat["str"]{s} & ∈ τ(@cat["str"]{s}) \\
+   @cat["sym"]{y} & ∈ τ(@cat["sym"]{y}) \\
+   @cat["true"] & ∈ τ(@cat["true"]) \\
+   @cat["false"] & ∈ τ(@cat["false"]) \\
+   @cat["null"] & ∈ τ(\textit{Null}) \\
+   @cat["void"] & ∈ τ(\textit{Void})
+  }
+ }
+
+ Values also belong to their wider type, which we note as
+ @;
+ @${τ(\textit{Typename})}.
+
+ @$${
+  @aligned{
+   @cat["num"]{c} &∈ τ(\textit{Number}) &⊂ @τ{Any} \\
+   @cat["chr"]{h} &∈ τ(\textit{Char}) &⊂ @τ{Any} \\
+   @cat["str"]{s} &∈ τ(\textit{String}) &⊂ @τ{Any} \\
+   @cat["sym"]{y} &∈ τ(\textit{Symbol}) &⊂ @τ{Any} \\
+   @cat["true"] &∈ τ(\textit{Boolean}) &⊂ @τ{Any} \\
+   @cat["false"] &∈ τ(\textit{Boolean}) &⊂ @τ{Any} \\
+   @cat["null"] &∈ τ(\textit{Listof\ Nothing}) &⊂ @τ{Any}
+  }
+ }
+
+ @$${
+  @aligned{
+   @cat["pair"](a, b) &∈ τ(\textit{Pairof A B}) & @textif a ∈ τ(A) ∧ b ∈ τ(B) \\
+  }
+ }
+
+ There are a few intermediate types between singleton types for individual
+ numbers and
+ @;
+ @${τ(\textit{Number})}. We show a few of these below. The other types which are
+ part of @racket[typedracket]'s numeric tower are defined in the same way, and
+ are omitted here for conciseness.
+
+ @$${
+  @aligned{
+   @cat["num"]{c} &∈ τ(\textit{Positive-Integer}) & @textif c ∈ ℕ ∧ c > 0 \\
+   @cat["num"]{c} &∈ τ(\textit{Nonnegative-Integer}) & @textif c ∈ ℕ ∧ c ≥ 0 \\
+   @cat["num"]{c} &∈ τ(\textit{Nonpositive-Integer}) & @textif c ∈ ℕ ∧ c ≤ 0 \\
+   @cat["num"]{0} &∈ τ(\textit{Zero}) & \\
+   @cat["num"]{1} &∈ τ(\textit{One}) &
+  }
+ }
+
+ Functions types are inhabited by functions which accept arguments of the
+ correct type, and return a tuple of values belonging to the expected result
+ type. We do not take into consideration the possible side effects of the
+ function here, partly because our compiler-writing framework seldom uses
+ mutation (at the run-time phase of the program).
+
+ @$${
+  @aligned{
+   &@cat["fun"]{f} ∈ τ(τ₁, …, τₙ → τ'₁, …, τ'ₘ)\\
+   &@|quad|@textif
+   vᵢ ∈ τᵢ ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (τ'₁, …, τ'ₘ) \\
+   &@|quad|@where
+   (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ
+  }
+ }
+
+ @todo{if or iff for the function's type above?}
+
+ @todo{other function types}
+
+ @todo{dotted function types (variadic with ellipsis)}
+
+ @htodo{something else I forgot?}
 
  The association with types and values given above naturally yields the
- subtyping relationship @tr<: explicited below:
+ subtyping relationship @tr≤: explicited below:
 
-  @$${
-  @array["rl"]{
-   n ∈ ℂ ⇒ τ(n) & \mathrel{<:_\mathit{tr}} Number\\
-   s ∈ \mathsf{symbols} ⇒ τ(s) & \mathrel{<:_\mathit{tr}} Symbol \\
-   Number & \mathrel{<:_\mathit{tr}} Any \\
-   A & \mathrel{<:_\mathit{tr}} (U\ A\ B\ …)
+ @$${
+  @aligned{
+   τ(@cat["num"]{n}) & @tr≤: @τ{Number} & \\
+   τ(@cat["chr"]{h}) & @tr≤: @τ{Char} & \\
+   τ(@cat["str"]{s}) & @tr≤: @τ{String} & \\
+   τ(@cat["sym"]{y}) & @tr≤: @τ{Symbol} & \\
+   τ(@cat["true"]) & @tr≤: @τ{Boolean} & \\
+   τ(@cat["false"]) & @tr≤: @τ{Boolean} & \\[1ex]
+   τ(A) & @tr≤: τ(U\ A\ B\ …) & \\
+   τ(A₁ … Aₙ → B₁ … Bₘ) & @tr≤: τ(A'₁ … A'ₙ → B'₁ … B'ₘ) &
+   @textif A'ᵢ @tr≤: Aᵢ ∧ Bᵢ @tr≤: B'ᵢ \\
+   … & @tr≤: … & \\[1ex]
+   @τ{Number} & @tr≤: @τ{Any} & \\
+   @τ{Char} & @tr≤: @τ{Any} & \\
+   @τ{String} & @tr≤: @τ{Any} & \\
+   @τ{Symbol} & @tr≤: @τ{Any} & \\
+   @τ{Boolean} & @tr≤: @τ{Any} & \\
+   @τ{Null} & @tr≤: @τ{Any} & \\
+   @τ{Void} & @tr≤: @τ{Any} &
   }
  }
 }

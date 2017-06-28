@@ -14,7 +14,8 @@
          (rename-out [note* note])
          define-footnote ;; TODO: does not use the (superscript …)
          (all-from-out "abbreviations.rkt")
-         (all-from-out scribble-math)
+         (except-out (all-from-out scribble-math) $ $$)
+         (rename-out [$* $] [$$* $$])
          version-text
          aappendix
          tex-header
@@ -27,7 +28,8 @@
          usetech
          hr
          lastname
-         tr<:)
+         tr<:
+         tr≤:)
 
 (require racket/stxparam
          racket/splicing
@@ -442,4 +444,28 @@ EOTEX
 (define lastname list)
 
 ;; Math stuff
-(define tr<: ($ "\\mathrel{<:_\\mathit{tr}}"))
+(define (clean-$ e)
+  (cond [(pair? e) (cons (clean-$ (car e)) (clean-$ (cdr e)))]
+        [(traverse-element? e)
+         (traverse-element (λ (a b)
+                             (clean-$ ((traverse-element-traverse e) a b))))]
+        [(match e
+           [(element (style (or "math" "texMathInline" "texMathDisplay")
+                            _)
+                     content)
+            #t]
+           [_ #f])
+         (clean-$ (element-content e))]
+        [(element? e)
+         (element (element-style e)
+                  (clean-$ (element-content e)))]
+        [else e]))
+
+(define ($* . elts)
+  (apply $ (clean-$ elts)))
+
+(define ($$* . elts)
+  (apply $$ (clean-$ elts)))
+
+(define tr<: ($* "\\mathrel{<:_\\mathit{tr}}"))
+(define tr≤: ($* "\\mathrel{≤:_\\mathit{tr}}"))
