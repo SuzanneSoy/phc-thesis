@@ -985,7 +985,7 @@ therefore keep our overview succinct and gloss over most details.
    vᵢ ∈ τᵢ ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (τ'₁, …, τ'ₘ) \\
    &@|quad|@where
    (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ\\[1ex]
-
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    &@cat["fun"]{f} ∈ τ(∀ \textit{tvar} (τ₁, …, τₙ → τ'₁, …, τ'ₘ))\\
    &@|quad|@where τ(∀ \textit{tvar₁} … \textit{tvarₖ} (τ₁, …, τₙ → τ'₁, …, τ'ₘ)) ∈ @u𝕋
    &@|quad|@where υ⁺ = υ ∪ \{\textit{tvar₁} … \textit{tvarₖ}\}
