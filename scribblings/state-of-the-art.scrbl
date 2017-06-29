@@ -9,6 +9,8 @@
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{State of the art}
 
+@htodo{sablecc, treecc, pipelines}
+
 @asection{
  @atitle[#:tag "related-type-expander"]{Extending the type system via macros}
 

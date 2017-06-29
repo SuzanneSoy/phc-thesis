@@ -780,7 +780,7 @@ therefore keep our overview succinct and gloss over most details.
                     (list (if (= i 0) first-sep then-sep)
                           " & "
                           c
-                          (if (= i (sub1 (length the-cases))) "" "\\\\")))
+                          (if (= i (sub1 (length the-cases))) "" "\\\\\n")))
                  ))))
    (define (frac x . y)
      @list{\frac{@x}{@y}})
@@ -793,7 +793,9 @@ therefore keep our overview succinct and gloss over most details.
          @list{\mathsf{@x}}
          @list{\mathsf{@x}\ @y}))
    (define ℂ∞ @${\overline{ℂ}})
-   (define u𝕋 @${𝕋})
+   (define u𝕋 @${𝕋_υ})
+   (define nu @${υ})
+   (define u𝕋∅ @${𝕋_∅})
    (define (τ x) @${τ(\textit{@x})}))
 
 @asection{
@@ -850,7 +852,7 @@ therefore keep our overview succinct and gloss over most details.
  @${𝔽} is the universe of Racket functions. A function @${f ∈ 𝔽} is a partial
  function from tuples of arguments to tuples of return values.
 
- @$${f : 𝔻ⁿ ↛ 𝔻ⁿ}
+ @$${𝔽 = 𝔻ⁿ ↛ 𝔻ᵐ @where n,m ∈ ℕ}
 
  @${ℕ} is the set of natural integers.
 
@@ -872,9 +874,24 @@ therefore keep our overview succinct and gloss over most details.
 
  @todo{Value-belongs-to-type relationship:}
 
+ We define a universe of types @u𝕋 parameterized by @${υ ⊆ 𝕧}, which indicates
+ the set of free variables which may occur in the type. We note individual
+ types as @${τ(\textit{Type})}. Unless otherwise specified, @${τ(\textit{Type})
+  ∈ @u𝕋 ∀ υ}. @todo{The previous sentences are a bit fuzzy.} The universe of
+ types with no free variables is @${@u𝕋∅ ⊆ 𝒫(𝔻)}.
+
+ @$${
+  \begin{gathered}
+   \textit{tvar} ∈ υ ⇒ τ(\textit{tvar}) ∈ @u𝕋 \\
+   @u𝕋∅ ⊆ 𝒫(𝔻)
+  \end{gathered}
+ }
+
+
  Values belong to their singleton type. We define a type inhabited by a single
- value @${v} with the notation @${τ(v) ∈ @u𝕋}, where @u𝕋 is the universe of
- types.
+ value @${v} with the notation @${τ(@cat["cat"]{v})}, where @${@cat["cat"]{}}
+ indicates the ``category'' of the value (whether it is a number, a string, a
+ function, a boolean…).
 
  @$${
   @aligned{
@@ -889,7 +906,7 @@ therefore keep our overview succinct and gloss over most details.
   }
  }
 
- Values also belong to their wider type, which we note as
+ These simple values also belong to their wider type, which we note as
  @;
  @${τ(\textit{Typename})}.
 
@@ -901,15 +918,42 @@ therefore keep our overview succinct and gloss over most details.
    @cat["sym"]{y} &∈ τ(\textit{Symbol}) &⊂ @τ{Any} \\
    @cat["true"] &∈ τ(\textit{Boolean}) &⊂ @τ{Any} \\
    @cat["false"] &∈ τ(\textit{Boolean}) &⊂ @τ{Any} \\
-   @cat["null"] &∈ τ(\textit{Listof\ Nothing}) &⊂ @τ{Any}
+   @cat["null"] & &⊂ @τ{Any} \\
+   @cat["void"] & &⊂ @τ{Any}
   }
  }
 
+ We give the type of pairs and vector values below:
+
  @$${
   @aligned{
-   @cat["pair"](a, b) &∈ τ(\textit{Pairof A B}) & @textif a ∈ τ(A) ∧ b ∈ τ(B) \\
+   @cat["pair"](a, b) &∈ τ(\textit{Pairof A B}) &&@textif a ∈ τ(A) ∧ b ∈ τ(B) \\
+   @cat["vec"](a₁, …, aₙ) &∈ τ(\textit{Vector A₁ … Aₙ}) &&@textif aᵢ ∈ τ(Aᵢ)
   }
  }
+
+ The type @${τ(\textit{List}\ A₁\ …\ Aₙ)} is a shorthand for describing the
+ type of linked lists of pairs of fixed length:
+
+ @$${
+  @aligned{
+   τ(\textit{List}\ A₁\ A₂\ …\ Aₙ)
+   &= τ(\textit{Pairof}\ A₁\ (List\ A₂\ …\ Aₙ)) \\
+   τ(\textit{List}) &= τ(Null)
+  }
+ }
+
+ More general types exist for linked lists of pairs and vectors of unknown
+ length:
+
+ @$${
+  @aligned{
+   @cat["null"] &∈ τ(\textit{Listof}\ \textit{A})\ ∀\ A \\
+   @cat["pair"](a, b) &∈ τ(\textit{Listof}\ A)
+   && @textif a ∈ τ(A) ∧ b ∈ τ(\textit{Listof}\ A) \\
+   @cat["vec"](a₁, …, aₙ) &∈ τ(\textit{Vectorof}\ A) && @textif aᵢ ∈ τ(A)
+  }
+ } 
 
  There are a few intermediate types between singleton types for individual
  numbers and
@@ -920,9 +964,9 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
-   @cat["num"]{c} &∈ τ(\textit{Positive-Integer}) & @textif c ∈ ℕ ∧ c > 0 \\
-   @cat["num"]{c} &∈ τ(\textit{Nonnegative-Integer}) & @textif c ∈ ℕ ∧ c ≥ 0 \\
-   @cat["num"]{c} &∈ τ(\textit{Nonpositive-Integer}) & @textif c ∈ ℕ ∧ c ≤ 0 \\
+   @cat["num"]{c} &∈ τ(\textit{Positive-Integer}) && @textif c ∈ ℕ ∧ c > 0 \\
+   @cat["num"]{c} &∈ τ(\textit{Nonnegative-Integer}) && @textif c ∈ ℕ ∧ c ≥ 0 \\
+   @cat["num"]{c} &∈ τ(\textit{Nonpositive-Integer}) && @textif c ∈ ℕ ∧ c ≤ 0 \\
    @cat["num"]{0} &∈ τ(\textit{Zero}) & \\
    @cat["num"]{1} &∈ τ(\textit{One}) &
   }
@@ -940,15 +984,34 @@ therefore keep our overview succinct and gloss over most details.
    &@|quad|@textif
    vᵢ ∈ τᵢ ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (τ'₁, …, τ'ₘ) \\
    &@|quad|@where
-   (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ
+   (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ\\[1ex]
+
+   &@cat["fun"]{f} ∈ τ(∀ \textit{tvar} (τ₁, …, τₙ → τ'₁, …, τ'ₘ))\\
+   &@|quad|@where τ(∀ \textit{tvar₁} … \textit{tvarₖ} (τ₁, …, τₙ → τ'₁, …, τ'ₘ)) ∈ @u𝕋
+   &@|quad|@where υ⁺ = υ ∪ \{\textit{tvar₁} … \textit{tvarₖ}\}
+   &@|quad|@textif τᵢ, τ'ⱼ ∈ 𝕋_{υ⁺} @;TODO: make @u𝕋 take an argument
+   &@|quad|@textif
+   ∀ \textit{instᵢ} ∈ @u𝕋, vⱼ ∈ σ(τⱼ)
+   ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (σ(τ'₁), …, σ(τ'ₘ)) \\
+   &@|quad|@where σ(τ) = τ[\textit{tvarᵢ} ↦ \textit{instᵢ} …]
   }
  }
+
+ where the notation @${τ[a₁ ↦ b₁ … aₙ ↦ bₙ]} indicates the substitution within
+ @${τ} of all occurrences of @${aᵢ} with the corresponding @${bᵢ}. The
+ substitutions are performed in parallel.
 
  @todo{if or iff for the function's type above?}
 
  @todo{other function types}
 
  @todo{dotted function types (variadic with ellipsis)}
+
+ @todo{Vectorof, Listof}
+
+ @todo{Intersections}
+
+ @todo{is the notation for tuples of values returned by functions okay?}
 
  @htodo{something else I forgot?}
 
@@ -957,6 +1020,8 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
+   @τ{T} & @tr≤: @τ{T}\ ∀\ T & \\
+   @τ{Nothing} & @tr≤: @τ{T}\ ∀\ T & \\
    τ(@cat["num"]{n}) & @tr≤: @τ{Number} & \\
    τ(@cat["chr"]{h}) & @tr≤: @τ{Char} & \\
    τ(@cat["str"]{s}) & @tr≤: @τ{String} & \\
@@ -964,16 +1029,10 @@ therefore keep our overview succinct and gloss over most details.
    τ(@cat["true"]) & @tr≤: @τ{Boolean} & \\
    τ(@cat["false"]) & @tr≤: @τ{Boolean} & \\[1ex]
    τ(A) & @tr≤: τ(U\ A\ B\ …) & \\
-   τ(A₁ … Aₙ → B₁ … Bₘ) & @tr≤: τ(A'₁ … A'ₙ → B'₁ … B'ₘ) &
-   @textif A'ᵢ @tr≤: Aᵢ ∧ Bᵢ @tr≤: B'ᵢ \\
+   τ(A₁ … Aₙ → B₁ … Bₘ) & @tr≤: τ(A'₁ … A'ₙ → B'₁ … B'ₘ) & \\
+   & @textif A'ᵢ @tr≤: Aᵢ ∧ Bᵢ @tr≤: B'ᵢ & \\
    … & @tr≤: … & \\[1ex]
-   @τ{Number} & @tr≤: @τ{Any} & \\
-   @τ{Char} & @tr≤: @τ{Any} & \\
-   @τ{String} & @tr≤: @τ{Any} & \\
-   @τ{Symbol} & @tr≤: @τ{Any} & \\
-   @τ{Boolean} & @tr≤: @τ{Any} & \\
-   @τ{Null} & @tr≤: @τ{Any} & \\
-   @τ{Void} & @tr≤: @τ{Any} &
+   @τ{T} & @tr≤: @τ{Any}\ ∀\ T &
   }
  }
 }
