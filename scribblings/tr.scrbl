@@ -457,7 +457,7 @@ therefore keep our overview succinct and gloss over most details.
  @asection{
   @atitle[#:tag "tr-presentation-functions"]{Functions}
    
-  @|Typedracket| supports rich function types, to support some of the flexible
+  @|Typedracket| provides rich function types, to support some of the flexible
   use patterns allowed by Racket.
 
   The simple function type below indicates that the function expects two
@@ -526,6 +526,69 @@ therefore keep our overview succinct and gloss over most details.
   @racket[A] and @racket[B].
 
   @racketblock[(∀ (A B) (→ A B (Pairof A B)))]
+
+  @|Typedracket| supports polymorphic functions with multiple polymorphic type
+  variables, as the one shown above. Furthermore, it allows one of the
+  polymorphic variables to be followed by ellipses, indicating a variable-arity
+  polymorphic type@~cite["tobin-hochstadt_typed_2010"]. The dotted polymorphic
+  type variable can be instantiated with a tuple of types, and will be replaced
+  with that tuple where it appears. For example, the type
+
+  @racketblock[(∀ (A B ...) (→ (List A A B ...) Void))]
+
+  can be instantiated with @racket[Number String Boolean], which would yield
+  the type for a function accepting a list of four elements: two numbers, a
+  string and a boolean.
+
+  @racketblock[(→ (List Number Number String Boolean) Void)]
+
+  Dotted polymorphic type variables can only appear in some places. A dotted
+  type variable can be used as the tail of a @racket[List] type, so
+  @racket[(List Number B ...)] (a @racket[String] followed by any number of
+  @racket[B]s) is a valid type, but @racket[(List B ... String)] (any number of
+  @racket[B]s followed by a @racket[String]) is not. A dotted type variable can
+  also be used to describe the type of a variadic function, as long as it
+  appears after all other arguments, so @racket[(→ String B ... Void)] (a
+  function taking a @racket[String], any number of @racket[B]s, and returning
+  @racket[Void]) is a valid type, but @racket[(→ String B ... Void)] (a function
+  taking any number of @racket[B]s, and a @racket[String], and returning
+  @racket[Void]) is not. Finally, a dotted type variable can be used to
+  represent the last element of the tuple of returned values, for functions
+  which return multiple values (which are described below).@htodo{multiple
+   values is described after, not cool.}
+
+  When the context makes it unclear whether an ellipsis @${…} indicates a
+  dotted type variable, or is used to indicate a metasyntactic repetition at the
+  level of mathematical formulas, we will write the first using @${τ₁ … τₙ},
+  explicitly indicating the first and last elements, or using @${\overline{τ}}
+  
+  @todo{and we will write the second using @${\textit{tvar}\ @$ooo}}
+
+  @todo{and we will write the second using @${\textit{tvar}\ \textit{ddd}}}
+
+  @todo{and we will write the second using @${\textit{tvar}\ ⋯}}
+
+  @todo{and we will write the second using @${\textit{tvar}\ ⋰}}
+
+  @todo{and we will write the second using @${\textit{tvar}\ ⋱}}
+
+  @todo{and we will write the second using @${\textit{tvar}\ ⋮}}
+
+  @todo{and we will write the second using @${\textit{tvar}\ _{***}}}
+
+  @todo{and we will write the second using @${\textit{tvar}\ _{\circ\circ\circ}}.}
+
+  Functions in Racket can return one or several values. When the number of
+  values returned is different from one, the result tuple can be destructured
+  using special functions such as @racket[(call-with-values _f _g)], which
+  passes each value returned by @racket[_f] as a distinct argument to
+  @racket[_g]. The special form @racket[(let-values ([(_v₁ … _vₙ) _e]) _body)]
+  binds each value returned by @racket[_e] to the corresponding @racket[_vᵢ]
+  (the expression @racket[_e] must produce exactly @racket[n] values). The type
+  of a function returning multiple values can be expressed using the following
+  notation:
+
+  @racket[(→ In₁ … Inₙ (Values Out₁ … Outₘ))]
 
   @htodo{Something on which types can be inferred and which can't (for now).}
 
@@ -878,12 +941,12 @@ therefore keep our overview succinct and gloss over most details.
  the set of free variables which may occur in the type. We note individual
  types as @${τ(\textit{Type})}. Unless otherwise specified, @${τ(\textit{Type})
   ∈ @u𝕋 ∀ υ}. @todo{The previous sentences are a bit fuzzy.} The universe of
- types with no free variables is @${@u𝕋∅ ⊆ 𝒫(𝔻)}.
+ types with no free variables is @${@u𝕋∅ ⊆ \mathcal{P}(𝔻)}.
 
  @$${
   \begin{gathered}
    \textit{tvar} ∈ υ ⇒ τ(\textit{tvar}) ∈ @u𝕋 \\
-   @u𝕋∅ ⊆ 𝒫(𝔻)
+   @u𝕋∅ ⊆ \mathcal{P}(𝔻)
   \end{gathered}
  }
 
@@ -937,8 +1000,8 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
-   τ(\textit{List}\ A₁\ A₂\ …\ Aₙ)
-   &= τ(\textit{Pairof}\ A₁\ (List\ A₂\ …\ Aₙ)) \\
+   τ(\textit{List}\ A\ \overline{B})
+   &= τ(\textit{Pairof}\ A₁\ (List\ \overline{B})) \\
    τ(\textit{List}) &= τ(Null)
   }
  }
@@ -982,17 +1045,21 @@ therefore keep our overview succinct and gloss over most details.
   @aligned{
    &@cat["fun"]{f} ∈ τ(τ₁, …, τₙ → τ'₁, …, τ'ₘ)\\
    &@|quad|@textif
-   vᵢ ∈ τᵢ ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (τ'₁, …, τ'ₘ) \\
+   vᵢ ∈ τᵢ ∀ i ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (τ'₁, …, τ'ₘ) \\
    &@|quad|@where
    (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ\\[1ex]
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   &@cat["fun"]{f} ∈ τ(∀ \textit{tvar} (τ₁, …, τₙ → τ'₁, …, τ'ₘ))\\
-   &@|quad|@where τ(∀ \textit{tvar₁} … \textit{tvarₖ} (τ₁, …, τₙ → τ'₁, …, τ'ₘ)) ∈ @u𝕋 \\
+   &@cat["fun"]{f} ∈ τ(∀\ \textit{tvar}\ (τ₁, …, τₙ → τ'₁, …, τ'ₘ))\\
+   &@|quad|@where
+   τ(∀\ \textit{tvar₁}\ …\ \textit{tvarₖ}\ (τ₁, …, τₙ → τ'₁, …, τ'ₘ)) ∈ @u𝕋 \\
    &@|quad|@where υ⁺ = υ ∪ \{\textit{tvar₁} … \textit{tvarₖ}\} \\
    &@|quad|@textif τᵢ, τ'ⱼ ∈ 𝕋_{υ⁺} \\ @;TODO: make @u𝕋 take an argument
    &@|quad|@textif
-   ∀ \textit{instᵢ} ∈ @u𝕋, vⱼ ∈ σ(τⱼ)
-   ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (σ(τ'₁), …, σ(τ'ₘ)) \\
+   @aligned[#:valign 'top]{
+    ∀ \textit{instᵢ} ∈ @u𝕋, vⱼ ∈ σ(τⱼ) ∀ i
+    ⇒ &(v₁, …, vₙ) ∈ dom(f) \\
+    &∧ f(v₁, …, vₙ) ∈ (σ(τ'₁), …, σ(τ'ₘ))
+   } \\
    &@|quad|@where σ(τ) = τ[\textit{tvarᵢ} ↦ \textit{instᵢ} …]
   }
  }

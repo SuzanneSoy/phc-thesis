@@ -29,7 +29,8 @@
          hr
          lastname
          tr<:
-         tr≤:)
+         tr≤:
+         $ooo)
 
 (require racket/stxparam
          racket/splicing
@@ -469,3 +470,34 @@ EOTEX
 
 (define tr<: ($* "\\mathrel{<:_\\mathit{tr}}"))
 (define tr≤: ($* "\\mathrel{≤:_\\mathit{tr}}"))
+(define $ooo ($* "\\textit{ooo}"))
+
+(define htmldiff-css-experiment #<<EOCSS
+.version:after {
+    display:block;
+    content: ".";
+    color: blue;
+    background: blue;
+    width: 1rem;
+    position: fixed;
+    right: 1rem;
+    height: 284427px;
+    opacity: 0.15;
+    z-index: 1
+}
+
+.changed:after {
+    content: ".";
+    color: orange;
+    background: orange;
+    width: 1rem;
+    position: absolute;
+    right: 1rem;
+    z-index: 100;
+}
+
+.changed {
+    background: orange;
+}
+EOCSS
+  )
