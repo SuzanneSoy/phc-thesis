@@ -561,22 +561,26 @@ therefore keep our overview succinct and gloss over most details.
   dotted type variable, or is used to indicate a metasyntactic repetition at the
   level of mathematical formulas, we will write the first using @${τ₁ … τₙ},
   explicitly indicating the first and last elements, or using @${\overline{τ}}
-  
   @todo{and we will write the second using @${\textit{tvar}\ @$ooo}}
 
-  @todo{and we will write the second using @${\textit{tvar}\ \textit{ddd}}}
+  @;{
+   @todo{and we will write the second using @${\textit{tvar}\ \textit{ooo}}}
 
-  @todo{and we will write the second using @${\textit{tvar}\ ⋯}}
+   @todo{and we will write the second using @${\textit{tvar}\ \textit{ddd}}}
 
-  @todo{and we will write the second using @${\textit{tvar}\ ⋰}}
+   @todo{and we will write the second using @${\textit{tvar}\ ⋯}}
 
-  @todo{and we will write the second using @${\textit{tvar}\ ⋱}}
+   @todo{and we will write the second using @${\textit{tvar}\ ⋰}}
 
-  @todo{and we will write the second using @${\textit{tvar}\ ⋮}}
+   @todo{and we will write the second using @${\textit{tvar}\ ⋱}}
 
-  @todo{and we will write the second using @${\textit{tvar}\ _{***}}}
+   @todo{and we will write the second using @${\textit{tvar}\ ⋮}}
 
-  @todo{and we will write the second using @${\textit{tvar}\ _{\circ\circ\circ}}.}
+   @todo{and we will write the second using @${\textit{tvar}\ _{***}}}
+
+   @todo{and we will write the second using
+    @${\textit{tvar}\ _{\circ\circ\circ}}.}
+  }
 
   Functions in Racket can return one or several values. When the number of
   values returned is different from one, the result tuple can be destructured
@@ -859,7 +863,12 @@ therefore keep our overview succinct and gloss over most details.
    (define tvarset @${V})
    (define u𝕋 @${𝕋_@tvarset})
    (define u𝕋∅ @${𝕋_∅})
-   (define (τ x) @${τ(\textit{@x})}))
+   (define (τ x) @${τ(\textit{@x})})
+
+   (define (τrule v t #:& [& #t])
+     (if &
+         @${@v & ∈ τ(@t)}
+         @${@v ∈ τ(@t)})))
 
 @asection{
  @atitle{Formal semantics for part of Typed Racket's type system}
@@ -959,14 +968,14 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
-   @cat["num"]{c} & ∈ τ(@cat["num"]{c}) \\
-   @cat["chr"]{h} & ∈ τ(@cat["chr"]{h}) \\
-   @cat["str"]{s} & ∈ τ(@cat["str"]{s}) \\
-   @cat["sym"]{y} & ∈ τ(@cat["sym"]{y}) \\
-   @cat["true"] & ∈ τ(@cat["true"]) \\
-   @cat["false"] & ∈ τ(@cat["false"]) \\
-   @cat["null"] & ∈ τ(\textit{Null}) \\
-   @cat["void"] & ∈ τ(\textit{Void})
+   @τrule[@cat["num"]{c} @cat["num"]{c}] \\
+   @τrule[@cat["chr"]{h} @cat["chr"]{h}] \\
+   @τrule[@cat["str"]{s} @cat["str"]{s}] \\
+   @τrule[@cat["sym"]{y} @cat["sym"]{y}] \\
+   @τrule[@cat["true"] @cat["true"]] \\
+   @τrule[@cat["false"] @cat["false"]] \\
+   @τrule[@cat["null"] @${\textit{Null}}] \\
+   @τrule[@cat["void"] @${\textit{Void}}]
   }
  }
 
@@ -976,12 +985,12 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
-   @cat["num"]{c} &∈ τ(\textit{Number}) &⊂ @τ{Any} \\
-   @cat["chr"]{h} &∈ τ(\textit{Char}) &⊂ @τ{Any} \\
-   @cat["str"]{s} &∈ τ(\textit{String}) &⊂ @τ{Any} \\
-   @cat["sym"]{y} &∈ τ(\textit{Symbol}) &⊂ @τ{Any} \\
-   @cat["true"] &∈ τ(\textit{Boolean}) &⊂ @τ{Any} \\
-   @cat["false"] &∈ τ(\textit{Boolean}) &⊂ @τ{Any} \\
+   @τrule[@cat["num"]{c} @${\textit{Number}}] &⊂ @τ{Any} \\
+   @τrule[@cat["chr"]{h} @${\textit{Char}}] &⊂ @τ{Any} \\
+   @τrule[@cat["str"]{s} @${\textit{String}}] &⊂ @τ{Any} \\
+   @τrule[@cat["sym"]{y} @${\textit{Symbol}}] &⊂ @τ{Any} \\
+   @τrule[@cat["true"] @${\textit{Boolean}}] &⊂ @τ{Any} \\
+   @τrule[@cat["false"] @${\textit{Boolean}}] &⊂ @τ{Any} \\
    @cat["null"] & &⊂ @τ{Any} \\
    @cat["void"] & &⊂ @τ{Any}
   }
@@ -991,8 +1000,10 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
-   @cat["pair"](a, b) &∈ τ(\textit{Pairof A B}) &&@textif a ∈ τ(A) ∧ b ∈ τ(B) \\
-   @cat["vec"](a₁, …, aₙ) &∈ τ(\textit{Vector A₁ … Aₙ}) &&@textif aᵢ ∈ τ(Aᵢ)
+   @τrule[@${@cat["pair"](a, b)} @${\textit{Pairof A B}}]
+   &&@textif a ∈ τ(A) ∧ b ∈ τ(B) \\
+   @τrule[@${@cat["vec"](a₁, …, aₙ)} @${\textit{Vector A₁ … Aₙ}}]
+   &&@textif aᵢ ∈ τ(Aᵢ)\ ∀ i
   }
  }
 
@@ -1013,10 +1024,11 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
-   @cat["null"] &∈ τ(\textit{Listof}\ \textit{A})\ ∀\ A \\
-   @cat["pair"](a, b) &∈ τ(\textit{Listof}\ A)
+   @τrule[@cat["null"] @${\textit{Listof}\ A}]\ ∀\ A \\
+   @τrule[@${@cat["pair"](a, b)} @${\textit{Listof}\ A}]
    && @textif a ∈ τ(A) ∧ b ∈ τ(\textit{Listof}\ A) \\
-   @cat["vec"](a₁, …, aₙ) &∈ τ(\textit{Vectorof}\ A) && @textif aᵢ ∈ τ(A)
+   @τrule[@${@cat["vec"](a₁, …, aₙ)} @${\textit{Vectorof}\ A}]
+   && @textif aᵢ ∈ τ(A)
   }
  } 
 
@@ -1029,11 +1041,14 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
-   @cat["num"]{c} &∈ τ(\textit{Positive-Integer}) && @textif c ∈ ℕ ∧ c > 0 \\
-   @cat["num"]{c} &∈ τ(\textit{Nonnegative-Integer}) && @textif c ∈ ℕ ∧ c ≥ 0 \\
-   @cat["num"]{c} &∈ τ(\textit{Nonpositive-Integer}) && @textif c ∈ ℕ ∧ c ≤ 0 \\
-   @cat["num"]{0} &∈ τ(\textit{Zero}) & \\
-   @cat["num"]{1} &∈ τ(\textit{One}) &
+   @τrule[@cat["num"]{c} @${\textit{Positive-Integer}}]
+   && @textif c ∈ ℕ ∧ c > 0 \\
+   @τrule[@cat["num"]{c} @${\textit{Nonnegative-Integer}}]
+   && @textif c ∈ ℕ ∧ c ≥ 0 \\
+   @τrule[@cat["num"]{c} @${\textit{Nonpositive-Integer}}]
+   && @textif c ∈ ℕ ∧ c ≤ 0 \\
+   @τrule[@cat["num"]{0} @${\textit{Zero}}] \\
+   @τrule[@cat["num"]{1} @${\textit{One}}] &
   }
  }
 
@@ -1045,12 +1060,12 @@ therefore keep our overview succinct and gloss over most details.
 
  @$${
   @aligned{
-   &@cat["fun"]{f} ∈ τ(τ₁, …, τₙ → τ'₁, …, τ'ₘ)\\
+   &@τrule[#:& #f @cat["fun"]{f} @${τ₁, …, τₙ → (\textit{Values} τ'₁, …, τ'ₘ)}]
+   \\
    &@|quad|@textif
    vᵢ ∈ τᵢ ∀ i ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (τ'₁, …, τ'ₘ) \\
    &@|quad|@where
-   (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ\\[1ex]
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ\\
   }
  }
 
@@ -1067,15 +1082,16 @@ therefore keep our overview succinct and gloss over most details.
  @$${
   @aligned{
    &@cat["fun"]{f} ∈ t = τ(∀\ \textit{tvar₁}\ …\ \textit{tvarₖ}
-   \ (τ₁, …, τₙ → τ'₁, …, τ'ₘ))\\
+   \ (τ₁ … τₙ → (Values τ'₁ … τ'ₘ)))\\
    &@|quad|@where @tvarset = \operatorname{boundtvars}(t) \\
-   &@|quad|@where @|tvarset|⁺ = @tvarset ∪ \{\textit{tvar₁} … \textit{tvarₖ}\} \\
-   &@|quad|@textif τᵢ, τ'ⱼ ∈ 𝕋_{@|tvarset|⁺} \\ @;TODO: make @u𝕋 take an argument
+   &@|quad|@where @|tvarset|⁺ = @tvarset ∪ \{\textit{tvar₁} … \textit{tvarₖ}\}
+   \\
+   &@|quad|@textif τᵢ, τ'ⱼ ∈ 𝕋_{@|tvarset|⁺} \\
+   @;TODO: make @u𝕋 take an argument
    &@|quad|@textif
    @aligned[#:valign 'top]{
-    ∀ \textit{instᵢ} ∈ @|u𝕋|\ vⱼ ∈ σ(τⱼ) ∀ j
-    ⇒ &(v₁, …, vₙ) ∈ dom(f) \\
-    &∧ f(v₁, …, vₙ) ∈ (σ(τ'₁), …, σ(τ'ₘ))
+    ∀ \textit{inst₁}, …, \textit{instₖ} ∈ @|u𝕋|, f
+    ∈ τ(σ(τ₁)\ …\ σ(τₙ) → (Values\ σ(τ'₁)\ …\ σ(τ'ₘ)))
    } \\
    &@|quad|@where σ(τ) = τ[\textit{tvarᵢ} ↦ \textit{instᵢ} …]
   }
@@ -1085,11 +1101,11 @@ therefore keep our overview succinct and gloss over most details.
  @${τ} of all occurrences of @${aᵢ} with the corresponding @${bᵢ}. The
  substitutions are performed in parallel.
 
- @todo{if or iff for the function's type above?}
+ @todo{if or iff for the function's types above?}
 
  @todo{other function types}
 
- @todo{dotted function types (variadic with ellipsis)}
+ @todo{dotted function types (variadic polymorphic types)}
 
  @todo{Vectorof, Listof}
 
