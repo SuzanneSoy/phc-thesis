@@ -856,8 +856,8 @@ therefore keep our overview succinct and gloss over most details.
          @list{\mathsf{@x}}
          @list{\mathsf{@x}\ @y}))
    (define ℂ∞ @${\overline{ℂ}})
-   (define u𝕋 @${𝕋_υ})
-   (define nu @${υ})
+   (define tvarset @${V})
+   (define u𝕋 @${𝕋_@tvarset})
    (define u𝕋∅ @${𝕋_∅})
    (define (τ x) @${τ(\textit{@x})}))
 
@@ -937,15 +937,16 @@ therefore keep our overview succinct and gloss over most details.
 
  @todo{Value-belongs-to-type relationship:}
 
- We define a universe of types @u𝕋 parameterized by @${υ ⊆ 𝕧}, which indicates
- the set of free variables which may occur in the type. We note individual
- types as @${τ(\textit{Type})}. Unless otherwise specified, @${τ(\textit{Type})
-  ∈ @u𝕋 ∀ υ}. @todo{The previous sentences are a bit fuzzy.} The universe of
- types with no free variables is @${@u𝕋∅ ⊆ \mathcal{P}(𝔻)}.
+ We define a universe of types @u𝕋 parameterized by @${@tvarset ⊆ 𝕧}, which
+ indicates the set of free variables which may occur in the type. We note
+ individual types as @${τ(\textit{Type})}, where @${Type} is the name of the
+ type being considered. Unless otherwise specified, @${τ(\textit{Type}) ∈
+  @|u𝕋|\ ∀ @tvarset}. @todo{The previous sentences are a bit fuzzy.} The
+ universe of types with no free variables is @${@u𝕋∅ ⊆ \mathcal{P}(𝔻)}.
 
  @$${
   \begin{gathered}
-   \textit{tvar} ∈ υ ⇒ τ(\textit{tvar}) ∈ @u𝕋 \\
+   \textit{tvar} ∈ @tvarset ⇒ τ(\textit{tvar}) ∈ @u𝕋 \\
    @u𝕋∅ ⊆ \mathcal{P}(𝔻)
   \end{gathered}
  }
@@ -1002,6 +1003,7 @@ therefore keep our overview succinct and gloss over most details.
   @aligned{
    τ(\textit{List}\ A\ \overline{B})
    &= τ(\textit{Pairof}\ A₁\ (List\ \overline{B})) \\
+   @where \text{$\overline{B} is a placeholder for any number of types$}
    τ(\textit{List}) &= τ(Null)
   }
  }
@@ -1049,14 +1051,29 @@ therefore keep our overview succinct and gloss over most details.
    &@|quad|@where
    (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ\\[1ex]
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   &@cat["fun"]{f} ∈ τ(∀\ \textit{tvar}\ (τ₁, …, τₙ → τ'₁, …, τ'ₘ))\\
-   &@|quad|@where
-   τ(∀\ \textit{tvar₁}\ …\ \textit{tvarₖ}\ (τ₁, …, τₙ → τ'₁, …, τ'ₘ)) ∈ @u𝕋 \\
-   &@|quad|@where υ⁺ = υ ∪ \{\textit{tvar₁} … \textit{tvarₖ}\} \\
-   &@|quad|@textif τᵢ, τ'ⱼ ∈ 𝕋_{υ⁺} \\ @;TODO: make @u𝕋 take an argument
+  }
+ }
+
+ For polymorphic functions, we define a @${\operatorname{freetvars}(t)}
+ operator, which returns the set of bound variables accessible within a given
+ type @todo{This is backwards: we did not define well what it means for a bound
+ variable to be accessible.}
+ 
+ @$${t ∈ @u𝕋 ⇒ boundvars(t) = @tvarset}
+
+ @todo{We should not have the @${@textif τᵢ, τ'ⱼ ∈ 𝕋_{@|tvarset|⁺}} clause
+  below, instead we should define the notion of well-scopedness of a type.}
+ 
+ @$${
+  @aligned{
+   &@cat["fun"]{f} ∈ t = τ(∀\ \textit{tvar₁}\ …\ \textit{tvarₖ}
+   \ (τ₁, …, τₙ → τ'₁, …, τ'ₘ))\\
+   &@|quad|@where @tvarset = \operatorname{boundtvars}(t) \\
+   &@|quad|@where @|tvarset|⁺ = @tvarset ∪ \{\textit{tvar₁} … \textit{tvarₖ}\} \\
+   &@|quad|@textif τᵢ, τ'ⱼ ∈ 𝕋_{@|tvarset|⁺} \\ @;TODO: make @u𝕋 take an argument
    &@|quad|@textif
    @aligned[#:valign 'top]{
-    ∀ \textit{instᵢ} ∈ @u𝕋, vⱼ ∈ σ(τⱼ) ∀ i
+    ∀ \textit{instᵢ} ∈ @|u𝕋|\ vⱼ ∈ σ(τⱼ) ∀ j
     ⇒ &(v₁, …, vₙ) ∈ dom(f) \\
     &∧ f(v₁, …, vₙ) ∈ (σ(τ'₁), …, σ(τ'ₘ))
    } \\
@@ -1079,6 +1096,11 @@ therefore keep our overview succinct and gloss over most details.
  @todo{Intersections}
 
  @todo{is the notation for tuples of values returned by functions okay?}
+
+ @todo{A function cannot forge a value of type @racket[A], where @racket[A] is
+  a polymorphic type variable. It must return an input value with the desired
+  type (or exit with an error, in which case the function's actual return type
+  is @racket[Nothing]).}
 
  @htodo{something else I forgot?}
 
