@@ -825,36 +825,6 @@ therefore keep our overview succinct and gloss over most details.
 }
 
 @(begin
-   (define (aligned #:valign [valign 'mid] . lines)
-     (define valign-letter (case valign [(top) "t"] [(mid) "m"] [(bot) "b"]))
-     @list{
- \begin{aligned}[@valign-letter]
- @lines
- \end{aligned}
-}
-     )
-
-   (define acase list)
-   (define cases
-     (λ (#:first-sep [first-sep "\\vphantom{x}\\mathbin{:=}\\vphantom{x}"]
-         #:then-sep [then-sep "|\\;\\ "] term
-         . the-cases)
-       (list
-        term
-        (aligned #:valign 'top @; cl
-                 @(for/list ([c (in-list the-cases)]
-                             [i (in-naturals)])
-                    (list (if (= i 0) first-sep then-sep)
-                          " & "
-                          c
-                          (if (= i (sub1 (length the-cases))) "" "\\\\\n")))
-                 ))))
-   (define (frac x . y)
-     @list{\frac{@x}{@y}})
-   (define where @${\text{ where }})
-   (define textif @${\text{ if }})
-   (define quad @${\quad})
-
    (define (cat x . y)
      (if (null? y)
          @list{\mathsf{@x}}
@@ -870,274 +840,276 @@ therefore keep our overview succinct and gloss over most details.
          @${@v & ∈ τ(@t)}
          @${@v ∈ τ(@t)})))
 
-@asection{
- @atitle{Formal semantics for part of Typed Racket's type system}
+@htodo{
+ @asection{
+  @atitle{Formal semantics for part of Typed Racket's type system}
 
- We define the universe of values that can be created manipulated with
- @|typedracket| as follows:
+  We define the universe of values that can be created manipulated with
+  @|typedracket| as follows:
 
- @$${
-  @cases["𝔻"
-         @acase{@cat["num"]{c} ∈ @ℂ∞}
-         @acase{@cat["chr"]{h} ∈ ℍ}
-         @acase{@cat["str"]{s} ∈ 𝕊}
-         @acase{@cat["sym"]{y} ∈ 𝕐}
-         @acase{@cat["fun"]{f} ∈ 𝔽}
-         @acase{@cat["pair"](d, d') @where d,d' ∈ 𝔻}
-         @acase{@cat["vec"](d₁, …, dₙ) @where dᵢ ∈ 𝔻, n ∈ ℕ}
-         @acase{@cat["null"]}
-         @acase{@cat["void"]}
-         @acase{@cat["true"] ∈ 𝟙}
-         @acase{@cat["false"] ∈ 𝟙}
-         @acase{@cat["struct"](f₁ = d₁, …, fₙ = dₙ)
-            @where fᵢ ∈ ℱ, dᵢ ∈ 𝔻}]
- }
+  @$${
+   @cases["𝔻"
+          @acase{@cat["num"]{c} ∈ @ℂ∞}
+          @acase{@cat["chr"]{h} ∈ ℍ}
+          @acase{@cat["str"]{s} ∈ 𝕊}
+          @acase{@cat["sym"]{y} ∈ 𝕐}
+          @acase{@cat["fun"]{f} ∈ 𝔽}
+          @acase{@cat["pair"](d, d') @where d,d' ∈ 𝔻}
+          @acase{@cat["vec"](d₁, …, dₙ) @where dᵢ ∈ 𝔻, n ∈ ℕ}
+          @acase{@cat["null"]}
+          @acase{@cat["void"]}
+          @acase{@cat["true"] ∈ 𝟙}
+          @acase{@cat["false"] ∈ 𝟙}
+          @acase{@cat["struct"](f₁ = d₁, …, fₙ = dₙ)
+              @where fᵢ ∈ ℱ, dᵢ ∈ 𝔻}]
+  }
 
- where @ℂ∞ is the subset of complex numbers that can be represented in
- Racket, extended with a few values like floating-point infinities and ``not a
- number'' special values@note{More precisely Racket can represent complex
-  rationals with arbitrary precision (i.e. numbers of the form @${@frac["a" "b"]
-   + @frac["c" "d"]i} where @${a,b,c,d ∈ ℤ ∧ b,d ≠ 0} and have a small enough
-  magnitude to be represented without running out of memory), as well as
-  complex numbers where both components are either single-precision or
-  double-precision IEEE floating-point numbers, including special values like
-  positive and negative infinity (for double-precision floats: @racket[+inf.0]
-  and @racket[-inf.0]), positive and negative zero (@racket[+0.0] and
-  @racket[-0.0]) and positive and negative ``not a number'' values
-  (@racket[+nan.0] and @racket[-nan.0]).}.
+  where @ℂ∞ is the subset of complex numbers that can be represented in
+  Racket, extended with a few values like floating-point infinities and ``not a
+  number'' special values@note{More precisely Racket can represent complex
+   rationals with arbitrary precision (i.e. numbers of the form
+   @${@frac["a" "b"] + @frac["c" "d"]i} where @${a,b,c,d ∈ ℤ ∧ b,d ≠ 0} and have
+   a small enough magnitude to be represented without running out of memory), as
+   well as complex numbers where both components are either single-precision or
+   double-precision IEEE floating-point numbers, including special values like
+   positive and negative infinity (for double-precision floats: @racket[+inf.0]
+   and @racket[-inf.0]), positive and negative zero (@racket[+0.0] and
+   @racket[-0.0]) and positive and negative ``not a number'' values
+   (@racket[+nan.0] and @racket[-nan.0]).}.
 
- @${ℍ} is the set of characters that can be represented in Racket@note{That
-  is, all the Unicode code points in the ranges 0 – d7ff@subscript{16} and
-  e000@subscript{16} – 10ffff@subscript{16}}.
+  @${ℍ} is the set of characters that can be represented in Racket@note{That
+   is, all the Unicode code points in the ranges 0 – d7ff@subscript{16} and
+   e000@subscript{16} – 10ffff@subscript{16}}.
 
- @${𝕊} is the set of strings based on characters present in @${ℍ}.@htodo{is
-  this a free monoid or something?}
+  @${𝕊} is the set of strings based on characters present in @${ℍ}.@htodo{is
+   this a free monoid or something?}
 
- @${𝕐} is the set of symbols that can be manipulated in Racket. It includes
- interned symbols (which are identified by their string representation), and
- @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{uninterned}
- symbols which are different from all other symbols, including those with the
- same string representation@note{We will not consider
-  @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{unreadable
-   symbols}, whose behaviour is inbetween@htodo{This sentence sounds weird}.}.
+  @${𝕐} is the set of symbols that can be manipulated in Racket. It includes
+  interned symbols (which are identified by their string representation), and
+  @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{uninterned}
+  symbols which are different from all other symbols, including those with the
+  same string representation@note{We will not consider
+   @tech[#:doc '(lib "scribblings/reference/reference.scrbl")]{unreadable
+    symbols}, whose behaviour is inbetween@htodo{This sentence sounds weird}.}.
 
- @${𝔽} is the universe of Racket functions. A function @${f ∈ 𝔽} is a partial
- function from tuples of arguments to tuples of return values.
+  @${𝔽} is the universe of Racket functions. A function @${f ∈ 𝔽} is a partial
+  function from tuples of arguments to tuples of return values.
 
- @$${𝔽 = 𝔻ⁿ ↛ 𝔻ᵐ @where n,m ∈ ℕ}
+  @$${𝔽 = 𝔻ⁿ ↛ 𝔻ᵐ @where n,m ∈ ℕ}
 
- @${ℕ} is the set of natural integers.
+  @${ℕ} is the set of natural integers.
 
- @${𝟙} is the universe of booleans, which only contains the values
- @${@cat["true"]} and @${@cat["false"]}.
+  @${𝟙} is the universe of booleans, which only contains the values
+  @${@cat["true"]} and @${@cat["false"]}.
 
- @${ℱ} is the universe of field names.
+  @${ℱ} is the universe of field names.
 
- We voluntarily omit some more exotic data types such as
- @tech[#:doc '(lib "scribblings/guide/guide.scrbl")]{byte strings} (indexed
- strings of bytes, compared to the indexed strings of unicode characters
- presented above),
- @tech[#:key "regexp" #:doc '(lib "scribblings/guide/guide.scrbl")]{regular
-  expressions} and preexisting opaque structure types from Racket's standard
- library (@racket[Subprocess], for example, which represent a running
- subprocess on which a few actions are available). We also do not consider
- mutable strings and pairs, which exist in @|typedracket| for backwards
- compatibility, but which are seldom used in practice.
+  We voluntarily omit some more exotic data types such as
+  @tech[#:doc '(lib "scribblings/guide/guide.scrbl")]{byte strings} (indexed
+  strings of bytes, compared to the indexed strings of unicode characters
+  presented above),
+  @tech[#:key "regexp" #:doc '(lib "scribblings/guide/guide.scrbl")]{regular
+   expressions} and preexisting opaque structure types from Racket's standard
+  library (@racket[Subprocess], for example, which represent a running
+  subprocess on which a few actions are available). We also do not consider
+  mutable strings and pairs, which exist in @|typedracket| for backwards
+  compatibility, but which are seldom used in practice.
 
- @todo{Value-belongs-to-type relationship:}
+  @todo{Value-belongs-to-type relationship:}
 
- We define a universe of types @u𝕋 parameterized by @${@tvarset ⊆ 𝕧}, which
- indicates the set of free variables which may occur in the type. We note
- individual types as @${τ(\textit{Type})}, where @${Type} is the name of the
- type being considered. Unless otherwise specified, @${τ(\textit{Type}) ∈
-  @|u𝕋|\ ∀ @tvarset}. @todo{The previous sentences are a bit fuzzy.} The
- universe of types with no free variables is @${@u𝕋∅ ⊆ \mathcal{P}(𝔻)}.
+  We define a universe of types @u𝕋 parameterized by @${@tvarset ⊆ 𝕧}, which
+  indicates the set of free variables which may occur in the type. We note
+  individual types as @${τ(\textit{Type})}, where @${Type} is the name of the
+  type being considered. Unless otherwise specified, @${τ(\textit{Type}) ∈
+   @|u𝕋|\ ∀ @tvarset}. @todo{The previous sentences are a bit fuzzy.} The
+  universe of types with no free variables is @${@u𝕋∅ ⊆ \mathcal{P}(𝔻)}.
 
- @$${
-  \begin{gathered}
+  @$${
+   \begin{gathered}
    \textit{tvar} ∈ @tvarset ⇒ τ(\textit{tvar}) ∈ @u𝕋 \\
    @u𝕋∅ ⊆ \mathcal{P}(𝔻)
-  \end{gathered}
- }
-
-
- Values belong to their singleton type. We define a type inhabited by a single
- value @${v} with the notation @${τ(@cat["cat"]{v})}, where @${@cat["cat"]{}}
- indicates the ``category'' of the value (whether it is a number, a string, a
- function, a boolean…).
-
- @$${
-  @aligned{
-   @τrule[@cat["num"]{c} @cat["num"]{c}] \\
-   @τrule[@cat["chr"]{h} @cat["chr"]{h}] \\
-   @τrule[@cat["str"]{s} @cat["str"]{s}] \\
-   @τrule[@cat["sym"]{y} @cat["sym"]{y}] \\
-   @τrule[@cat["true"] @cat["true"]] \\
-   @τrule[@cat["false"] @cat["false"]] \\
-   @τrule[@cat["null"] @${\textit{Null}}] \\
-   @τrule[@cat["void"] @${\textit{Void}}]
+   \end{gathered}
   }
- }
 
- These simple values also belong to their wider type, which we note as
- @;
- @${τ(\textit{Typename})}.
 
- @$${
-  @aligned{
-   @τrule[@cat["num"]{c} @${\textit{Number}}] &⊂ @τ{Any} \\
-   @τrule[@cat["chr"]{h} @${\textit{Char}}] &⊂ @τ{Any} \\
-   @τrule[@cat["str"]{s} @${\textit{String}}] &⊂ @τ{Any} \\
-   @τrule[@cat["sym"]{y} @${\textit{Symbol}}] &⊂ @τ{Any} \\
-   @τrule[@cat["true"] @${\textit{Boolean}}] &⊂ @τ{Any} \\
-   @τrule[@cat["false"] @${\textit{Boolean}}] &⊂ @τ{Any} \\
-   @cat["null"] & &⊂ @τ{Any} \\
-   @cat["void"] & &⊂ @τ{Any}
+  Values belong to their singleton type. We define a type inhabited by a single
+  value @${v} with the notation @${τ(@cat["cat"]{v})}, where @${@cat["cat"]{}}
+  indicates the ``category'' of the value (whether it is a number, a string, a
+  function, a boolean…).
+
+  @$${
+   @aligned{
+    @τrule[@cat["num"]{c} @cat["num"]{c}] \\
+    @τrule[@cat["chr"]{h} @cat["chr"]{h}] \\
+    @τrule[@cat["str"]{s} @cat["str"]{s}] \\
+    @τrule[@cat["sym"]{y} @cat["sym"]{y}] \\
+    @τrule[@cat["true"] @cat["true"]] \\
+    @τrule[@cat["false"] @cat["false"]] \\
+    @τrule[@cat["null"] @${\textit{Null}}] \\
+    @τrule[@cat["void"] @${\textit{Void}}]
+   }
   }
- }
 
- We give the type of pairs and vector values below:
+  These simple values also belong to their wider type, which we note as
+  @;
+  @${τ(\textit{Typename})}.
 
- @$${
-  @aligned{
-   @τrule[@${@cat["pair"](a, b)} @${\textit{Pairof A B}}]
-   &&@textif a ∈ τ(A) ∧ b ∈ τ(B) \\
-   @τrule[@${@cat["vec"](a₁, …, aₙ)} @${\textit{Vector A₁ … Aₙ}}]
-   &&@textif aᵢ ∈ τ(Aᵢ)\ ∀ i
+  @$${
+   @aligned{
+    @τrule[@cat["num"]{c} @${\textit{Number}}] &⊂ @τ{Any} \\
+    @τrule[@cat["chr"]{h} @${\textit{Char}}] &⊂ @τ{Any} \\
+    @τrule[@cat["str"]{s} @${\textit{String}}] &⊂ @τ{Any} \\
+    @τrule[@cat["sym"]{y} @${\textit{Symbol}}] &⊂ @τ{Any} \\
+    @τrule[@cat["true"] @${\textit{Boolean}}] &⊂ @τ{Any} \\
+    @τrule[@cat["false"] @${\textit{Boolean}}] &⊂ @τ{Any} \\
+    @cat["null"] & &⊂ @τ{Any} \\
+    @cat["void"] & &⊂ @τ{Any}
+   }
   }
- }
 
- The type @${τ(\textit{List}\ A₁\ …\ Aₙ)} is a shorthand for describing the
- type of linked lists of pairs of fixed length:
+  We give the type of pairs and vector values below:
 
- @$${
-  @aligned{
-   τ(\textit{List}\ A\ \overline{B})
-   &= τ(\textit{Pairof}\ A₁\ (List\ \overline{B})) \\
-   @where \text{$\overline{B} is a placeholder for any number of types$}
-   τ(\textit{List}) &= τ(Null)
+  @$${
+   @aligned{
+    @τrule[@${@cat["pair"](a, b)} @${\textit{Pairof A B}}]
+    &&@textif a ∈ τ(A) ∧ b ∈ τ(B) \\
+    @τrule[@${@cat["vec"](a₁, …, aₙ)} @${\textit{Vector A₁ … Aₙ}}]
+    &&@textif aᵢ ∈ τ(Aᵢ)\ ∀ i
+   }
   }
- }
 
- More general types exist for linked lists of pairs and vectors of unknown
- length:
+  The type @${τ(\textit{List}\ A₁\ …\ Aₙ)} is a shorthand for describing the
+  type of linked lists of pairs of fixed length:
 
- @$${
-  @aligned{
-   @τrule[@cat["null"] @${\textit{Listof}\ A}]\ ∀\ A \\
-   @τrule[@${@cat["pair"](a, b)} @${\textit{Listof}\ A}]
-   && @textif a ∈ τ(A) ∧ b ∈ τ(\textit{Listof}\ A) \\
-   @τrule[@${@cat["vec"](a₁, …, aₙ)} @${\textit{Vectorof}\ A}]
-   && @textif aᵢ ∈ τ(A)
+  @$${
+   @aligned{
+    τ(\textit{List}\ A\ \overline{B})
+    &= τ(\textit{Pairof}\ A₁\ (List\ \overline{B})) \\
+    @where \text{$\overline{B} is a placeholder for any number of types$}
+    τ(\textit{List}) &= τ(Null)
+   }
   }
- } 
 
- There are a few intermediate types between singleton types for individual
- numbers and
- @;
- @${τ(\textit{Number})}. We show a few of these below. The other types which are
- part of @racket[typedracket]'s numeric tower are defined in the same way, and
- are omitted here for conciseness.
+  More general types exist for linked lists of pairs and vectors of unknown
+  length:
 
- @$${
-  @aligned{
-   @τrule[@cat["num"]{c} @${\textit{Positive-Integer}}]
-   && @textif c ∈ ℕ ∧ c > 0 \\
-   @τrule[@cat["num"]{c} @${\textit{Nonnegative-Integer}}]
-   && @textif c ∈ ℕ ∧ c ≥ 0 \\
-   @τrule[@cat["num"]{c} @${\textit{Nonpositive-Integer}}]
-   && @textif c ∈ ℕ ∧ c ≤ 0 \\
-   @τrule[@cat["num"]{0} @${\textit{Zero}}] \\
-   @τrule[@cat["num"]{1} @${\textit{One}}] &
+  @$${
+   @aligned{
+    @τrule[@cat["null"] @${\textit{Listof}\ A}]\ ∀\ A \\
+    @τrule[@${@cat["pair"](a, b)} @${\textit{Listof}\ A}]
+    && @textif a ∈ τ(A) ∧ b ∈ τ(\textit{Listof}\ A) \\
+    @τrule[@${@cat["vec"](a₁, …, aₙ)} @${\textit{Vectorof}\ A}]
+    && @textif aᵢ ∈ τ(A)
+   }
+  } 
+
+  There are a few intermediate types between singleton types for individual
+  numbers and
+  @;
+  @${τ(\textit{Number})}. We show a few of these below. The other types which
+  are part of @racket[typedracket]'s numeric tower are defined in the same way,
+  and are omitted here for conciseness.
+
+  @$${
+   @aligned{
+    @τrule[@cat["num"]{c} @${\textit{Positive-Integer}}]
+    && @textif c ∈ ℕ ∧ c > 0 \\
+    @τrule[@cat["num"]{c} @${\textit{Nonnegative-Integer}}]
+    && @textif c ∈ ℕ ∧ c ≥ 0 \\
+    @τrule[@cat["num"]{c} @${\textit{Nonpositive-Integer}}]
+    && @textif c ∈ ℕ ∧ c ≤ 0 \\
+    @τrule[@cat["num"]{0} @${\textit{Zero}}] \\
+    @τrule[@cat["num"]{1} @${\textit{One}}] &
+   }
   }
- }
 
- Functions types are inhabited by functions which accept arguments of the
- correct type, and return a tuple of values belonging to the expected result
- type. We do not take into consideration the possible side effects of the
- function here, partly because our compiler-writing framework seldom uses
- mutation (at the run-time phase of the program).
+  Functions types are inhabited by functions which accept arguments of the
+  correct type, and return a tuple of values belonging to the expected result
+  type. We do not take into consideration the possible side effects of the
+  function here, partly because our compiler-writing framework seldom uses
+  mutation (at the run-time phase of the program).
 
- @$${
-  @aligned{
-   &@τrule[#:& #f @cat["fun"]{f} @${τ₁, …, τₙ → (\textit{Values} τ'₁, …, τ'ₘ)}]
-   \\
-   &@|quad|@textif
-   vᵢ ∈ τᵢ ∀ i ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (τ'₁, …, τ'ₘ) \\
-   &@|quad|@where
-   (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ\\
+  @$${
+   @aligned{
+    &@τrule[#:& #f @cat["fun"]{f} @${τ₁, …, τₙ → (\textit{Values} τ'₁, …, τ'ₘ)}]
+    \\
+    &@|quad|@textif
+    vᵢ ∈ τᵢ ∀ i ⇒ (v₁, …, vₙ) ∈ dom(f) ∧ f(v₁, …, vₙ) ∈ (τ'₁, …, τ'ₘ) \\
+    &@|quad|@where
+    (o₁, …, oₘ) ∈ (τ'₁, …, τ'ₘ) @textif oᵢ ∈ τ'ᵢ\\
+   }
   }
- }
 
- For polymorphic functions, we define a @${\operatorname{freetvars}(t)}
- operator, which returns the set of bound variables accessible within a given
- type @todo{This is backwards: we did not define well what it means for a bound
- variable to be accessible.}
+  For polymorphic functions, we define a @${\operatorname{freetvars}(t)}
+  operator, which returns the set of bound variables accessible within a given
+  type @todo{This is backwards: we did not define well what it means for a bound
+   variable to be accessible.}
  
- @$${t ∈ @u𝕋 ⇒ boundvars(t) = @tvarset}
+  @$${t ∈ @u𝕋 ⇒ boundvars(t) = @tvarset}
 
- @todo{We should not have the @${@textif τᵢ, τ'ⱼ ∈ 𝕋_{@|tvarset|⁺}} clause
-  below, instead we should define the notion of well-scopedness of a type.}
+  @todo{We should not have the @${@textif τᵢ, τ'ⱼ ∈ 𝕋_{@|tvarset|⁺}} clause
+   below, instead we should define the notion of well-scopedness of a type.}
  
- @$${
-  @aligned{
-   &@cat["fun"]{f} ∈ t = τ(∀\ \textit{tvar₁}\ …\ \textit{tvarₖ}
-   \ (τ₁ … τₙ → (Values τ'₁ … τ'ₘ)))\\
-   &@|quad|@where @tvarset = \operatorname{boundtvars}(t) \\
-   &@|quad|@where @|tvarset|⁺ = @tvarset ∪ \{\textit{tvar₁} … \textit{tvarₖ}\}
-   \\
-   &@|quad|@textif τᵢ, τ'ⱼ ∈ 𝕋_{@|tvarset|⁺} \\
-   @;TODO: make @u𝕋 take an argument
-   &@|quad|@textif
-   @aligned[#:valign 'top]{
-    ∀ \textit{inst₁}, …, \textit{instₖ} ∈ @|u𝕋|, f
-    ∈ τ(σ(τ₁)\ …\ σ(τₙ) → (Values\ σ(τ'₁)\ …\ σ(τ'ₘ)))
-   } \\
-   &@|quad|@where σ(τ) = τ[\textit{tvarᵢ} ↦ \textit{instᵢ} …]
+  @$${
+   @aligned{
+    &@cat["fun"]{f} ∈ t = τ(∀\ \textit{tvar₁}\ …\ \textit{tvarₖ}
+    \ (τ₁ … τₙ → (Values τ'₁ … τ'ₘ)))\\
+    &@|quad|@where @tvarset = \operatorname{boundtvars}(t) \\
+    &@|quad|@where @|tvarset|⁺ = @tvarset ∪ \{\textit{tvar₁} … \textit{tvarₖ}\}
+    \\
+    &@|quad|@textif τᵢ, τ'ⱼ ∈ 𝕋_{@|tvarset|⁺} \\
+    @;TODO: make @u𝕋 take an argument
+    &@|quad|@textif
+    @aligned[#:valign 'top]{
+     ∀ \textit{inst₁}, …, \textit{instₖ} ∈ @|u𝕋|, f
+     ∈ τ(σ(τ₁)\ …\ σ(τₙ) → (Values\ σ(τ'₁)\ …\ σ(τ'ₘ)))
+     } \\
+    &@|quad|@where σ(τ) = τ[\textit{tvarᵢ} ↦ \textit{instᵢ} …]
+   }
   }
- }
 
- where the notation @${τ[a₁ ↦ b₁ … aₙ ↦ bₙ]} indicates the substitution within
- @${τ} of all occurrences of @${aᵢ} with the corresponding @${bᵢ}. The
- substitutions are performed in parallel.
+  where the notation @${τ[a₁ ↦ b₁ … aₙ ↦ bₙ]} indicates the substitution within
+  @${τ} of all occurrences of @${aᵢ} with the corresponding @${bᵢ}. The
+  substitutions are performed in parallel.
 
- @todo{if or iff for the function's types above?}
+  @todo{if or iff for the function's types above?}
 
- @todo{other function types}
+  @todo{other function types}
 
- @todo{dotted function types (variadic polymorphic types)}
+  @todo{dotted function types (variadic polymorphic types)}
 
- @todo{Vectorof, Listof}
+  @todo{Vectorof, Listof}
 
- @todo{Intersections}
+  @todo{Intersections}
 
- @todo{is the notation for tuples of values returned by functions okay?}
+  @todo{is the notation for tuples of values returned by functions okay?}
 
- @todo{A function cannot forge a value of type @racket[A], where @racket[A] is
-  a polymorphic type variable. It must return an input value with the desired
-  type (or exit with an error, in which case the function's actual return type
-  is @racket[Nothing]).}
+  @todo{A function cannot forge a value of type @racket[A], where @racket[A] is
+   a polymorphic type variable. It must return an input value with the desired
+   type (or exit with an error, in which case the function's actual return type
+   is @racket[Nothing]).}
 
- @htodo{something else I forgot?}
+  @htodo{something else I forgot?}
 
- The association with types and values given above naturally yields the
- subtyping relationship @tr≤: explicited below:
+  The association with types and values given above naturally yields the
+  subtyping relationship @tr≤: explicited below:
 
- @$${
-  @aligned{
-   @τ{T} & @tr≤: @τ{T}\ ∀\ T & \\
-   @τ{Nothing} & @tr≤: @τ{T}\ ∀\ T & \\
-   τ(@cat["num"]{n}) & @tr≤: @τ{Number} & \\
-   τ(@cat["chr"]{h}) & @tr≤: @τ{Char} & \\
-   τ(@cat["str"]{s}) & @tr≤: @τ{String} & \\
-   τ(@cat["sym"]{y}) & @tr≤: @τ{Symbol} & \\
-   τ(@cat["true"]) & @tr≤: @τ{Boolean} & \\
-   τ(@cat["false"]) & @tr≤: @τ{Boolean} & \\[1ex]
-   τ(A) & @tr≤: τ(U\ A\ B\ …) & \\
-   τ(A₁ … Aₙ → B₁ … Bₘ) & @tr≤: τ(A'₁ … A'ₙ → B'₁ … B'ₘ) & \\
-   & @textif A'ᵢ @tr≤: Aᵢ ∧ Bᵢ @tr≤: B'ᵢ & \\
-   … & @tr≤: … & \\[1ex]
-   @τ{T} & @tr≤: @τ{Any}\ ∀\ T &
+  @$${
+   @aligned{
+    @τ{T} & @tr≤: @τ{T}\ ∀\ T & \\
+    @τ{Nothing} & @tr≤: @τ{T}\ ∀\ T & \\
+    τ(@cat["num"]{n}) & @tr≤: @τ{Number} & \\
+    τ(@cat["chr"]{h}) & @tr≤: @τ{Char} & \\
+    τ(@cat["str"]{s}) & @tr≤: @τ{String} & \\
+    τ(@cat["sym"]{y}) & @tr≤: @τ{Symbol} & \\
+    τ(@cat["true"]) & @tr≤: @τ{Boolean} & \\
+    τ(@cat["false"]) & @tr≤: @τ{Boolean} & \\[1ex]
+    τ(A) & @tr≤: τ(U\ A\ B\ …) & \\
+    τ(A₁ … Aₙ → B₁ … Bₘ) & @tr≤: τ(A'₁ … A'ₙ → B'₁ … B'ₘ) & \\
+    & @textif A'ᵢ @tr≤: Aᵢ ∧ Bᵢ @tr≤: B'ᵢ & \\
+    … & @tr≤: … & \\[1ex]
+    @τ{T} & @tr≤: @τ{Any}\ ∀\ T &
+   }
   }
  }
 }

@@ -159,7 +159,7 @@
     @csharp and Java, sub-structs and union types in @|typedracket|,
     polymorphic variants in @CAML
     @~cite[#:precision @list{chap. 6, sec. Polymorphic Variants}
-           ]{minsky2013real}}
+           "minsky2013real"]}
  @; https://realworldocaml.org/v1/en/html/variants.html
         
  @; See also: use of exceptions as dynamically extensible sum types:

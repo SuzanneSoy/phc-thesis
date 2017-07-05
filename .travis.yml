@@ -47,6 +47,12 @@ jobs:
       - latex newunicodechar.ins
       - mkdir -p "$latex_home/tex/latex/newunicodechar"
       - mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
+      - curl -L -o mathpartir.dtx http://mirrors.ctan.org/macros/latex/contrib/mathpartir/mathpartir.dtx
+      - curl -L -o mathpartir.ins http://mirrors.ctan.org/macros/latex/contrib/mathpartir/mathpartir.ins
+      - latex mathpartir.ins
+      - mkdir -p "$latex_home/tex/latex/mathpartir"
+      - mv mathpartir.sty "$latex_home/tex/latex/mathpartir"
+      - echo "Finished installing extra latex packages."
       - raco pkg install --deps search-auto -j 2
       - raco test -x -p "$(basename "$TRAVIS_BUILD_DIR")"
       - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$TRAVIS_BUILD_DIR")";

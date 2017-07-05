@@ -1,4 +1,4 @@
-#lang racket
+#lang at-exp racket
 
 (provide (rename-out [my-title title])
          (rename-out [my-author+email author+email])
@@ -30,7 +30,16 @@
          lastname
          tr<:
          tr≤:
-         $ooo)
+         $ooo
+         $inferrule
+         textsc
+         aligned
+         acase
+         cases
+         frac
+         textif
+         where
+         quad)
 
 (require racket/stxparam
          racket/splicing
@@ -472,6 +481,21 @@ EOTEX
 (define tr≤: ($* "\\mathrel{≤:_\\mathit{tr}}"))
 (define $ooo ($* "\\textit{ooo}"))
 
+(define ($inferrule from* to* [label '()])
+  (elem #:style
+        (style #f (list (tex-addition
+                         (string->bytes/utf-8
+                          "\\usepackage{mathpartir}"))))
+        ($* (cond-element [html "\\frac{\\begin{gathered}"]
+                          [else "\\inferrule{"])
+            from*
+            (cond-element [html "\\end{gathered}}{\\begin{gathered}"]
+                          [else "}{"])
+            to*
+            (cond-element [html "\\end{gathered}}"]
+                          [else "}"])
+            label)))
+
 (define htmldiff-css-experiment #<<EOCSS
 .version:after {
     display:block;
@@ -501,3 +525,45 @@ EOTEX
 }
 EOCSS
   )
+
+(define (textsc str)
+  ($* (cond-element
+       [html (list "{\\rm "
+                   (for/list ([c (in-string str)])
+                     (if (char-upper-case? c)
+                         (string c)
+                         (list "{\\small "
+                               (string (char-upcase c))
+                               "}")))
+                   "}")]
+       [else (list "\\text{\\textsc{" str "}}")])))
+
+(define (aligned #:valign [valign 'mid] . lines)
+  (define valign-letter (case valign [(top) "t"] [(mid) "m"] [(bot) "b"]))
+  @list{
+ \begin{aligned}[@valign-letter]
+ @lines
+ \end{aligned}
+}
+  )
+
+(define acase list)
+(define cases
+  (λ (#:first-sep [first-sep "\\vphantom{x}\\mathbin{:=}\\vphantom{x}"]
+      #:then-sep [then-sep "|\\;\\ "] term
+      . the-cases)
+    (list
+     term
+     (aligned #:valign 'top @; cl
+              @(for/list ([c (in-list the-cases)]
+                          [i (in-naturals)])
+                 (list (if (= i 0) first-sep then-sep)
+                       " & "
+                       c
+                       (if (= i (sub1 (length the-cases))) "" "\\\\\n")))
+              ))))
+(define (frac x . y)
+  @list{\frac{@x}{@y}})
+(define where @${\text{ where }})
+(define textif @${\text{ if }})
+(define quad @${\quad})
