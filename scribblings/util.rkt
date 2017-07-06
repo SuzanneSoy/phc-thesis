@@ -37,8 +37,9 @@
          acase
          cases
          frac
-         textif
          where
+         textif
+         otherwise
          quad)
 
 (require racket/stxparam
@@ -573,4 +574,5 @@ EOCSS
   @list{\frac{@x}{@y}})
 (define where @${\text{ where }})
 (define textif @${\text{ if }})
+(define otherwise @${\text{ otherwise }})
 (define quad @${\quad})

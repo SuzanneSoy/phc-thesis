@@ -64,6 +64,7 @@
                             (add1 a)))
                   1))
 
+@;{
 @aappendix{
  @include-asection[(lib "phc-graph/scribblings/phc-graph-implementation.scrbl")]
  @include-asection[(lib "phc-adt/scribblings/phc-adt-implementation.scrbl")]
@@ -71,6 +72,7 @@
  @include-asection[(submod (lib "multi-id/multi-id.hl.rkt") doc)]
  @include-asection[
  (lib "type-expander/scribblings/type-expander-implementation.scrbl")]
+}
 }
 
 @;{
