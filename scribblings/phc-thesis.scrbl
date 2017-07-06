@@ -38,6 +38,7 @@
 @include-asection{introduction.scrbl}
 @include-asection{state-of-the-art.scrbl}
 @include-asection{initial-examples.scrbl}
+@include-asection{tr.scrbl}
 @include-asection{tr-te-adt.scrbl}
 @asection{ @atitle{Typed nanopass}
  @asection{@atitle[#:tag "typed-nanotrees-chap"]{Typed nanopass on trees}}

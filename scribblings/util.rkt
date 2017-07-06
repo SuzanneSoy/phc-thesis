@@ -149,6 +149,10 @@
   height: auto !important;
   clear: right;
   margin-bottom: 1em !important;
+}
+
+.MathJax_Display {
+  margin: 2em 0 !important;
 }"))))))
 (define my-title
   ;; TODO: use this for the other wrapped procs in this file
@@ -530,11 +534,14 @@ EOCSS
   ($* (cond-element
        [html (list "{\\rm "
                    (for/list ([c (in-string str)])
-                     (if (char-upper-case? c)
-                         (string c)
-                         (list "{\\small "
-                               (string (char-upcase c))
-                               "}")))
+                     (cond
+                       [(char=? c #\-)
+                        "\\text{-}"]
+                       [(char-upper-case? c)
+                        (string c)]
+                       [else (list "{\\small "
+                                   (string (char-upcase c))
+                                   "}")]))
                    "}")]
        [else (list "\\text{\\textsc{" str "}}")])))
 

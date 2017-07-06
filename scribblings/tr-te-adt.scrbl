@@ -5,8 +5,7 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{Type systems and Algebraic Datatypes}
+       #:version (version-text)]{Extensible type system and algebraic datatypes}
 
-@include-asection{tr.scrbl}
 @include-asection{te.scrbl}
 @include-asection{adt.scrbl}
