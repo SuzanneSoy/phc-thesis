@@ -2,6 +2,7 @@
 
 @require["util.rkt"
          "adt-utils.rkt"
+         scriblib/render-cond
          (for-label (only-meta-in 0 typed/racket))]
 @(use-mathjax)
 
@@ -32,19 +33,23 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 @$${
  @$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\
-    φ_r = applyfilter(@ctor[@κ Τ]|\overline{@ctor[@κ Τ]}, τ, o)}
+    φ_r = applyfilter(@ctor[@κ ⊤]|\overline{@ctor[@κ ⊤]}, τ, o)}
  @${Γ ⊢ (@ctor-pred[@κ] e) : Boolean ; φ_r ; ∅}
  @${@textsc{T-Ctor-Pred}}
  ]
 }
 
+@(define & @cond-element[[latex "\\savedamp"] [else "&"]])
+@(define nl @cond-element[[latex "\\csname @arraycr\\endcsname"] [else "\\\\"]])
+
 @$${
+ @cond-element[[latex @list{\let\savedamp&}] [else ""]]
  @$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\ τ <: @ctor[@κ @${τ'}] \\
-   o_r = @"\\left\\{" \begin{aligned}
-   @πctor-val(π(x)) & @textif o = π(x) \\
-   ∅ & @otherwise
-   \end{aligned}\right. \\
+   o_r = @"\\left\\{" \begin{array}{rl}
+   @πctor-val(π(x)) @& @textif o = π(x) @nl
+   ∅ @& @otherwise
+   \end{array}\right. \\
   φ_r = applyfilter(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val}, τ, o)}
  @${Γ ⊢ (@ctor-val[@κ] e) : τ' ; φ_r ; o_r}
  @${@textsc{T-Ctor-Val}}
@@ -71,12 +76,13 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 }
 
 @$${
+ @cond-element[[latex @list{\let\savedamp&}] [else ""]]
  @$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\ τ <: @record[@repeated{@|ɐ|ᵢ : τᵢ}] \\
-   o_r = @"\\left\\{" \begin{aligned}
-   @πɐ{@|ɐ|ⱼ}(π(x)) & @textif o = π(x) \\
-   ∅ & @otherwise
-   \end{aligned}\right. \\
+   o_r = @"\\left\\{" \begin{array}{rl}
+   @πɐ{@|ɐ|ⱼ}(π(x)) @& @textif o = π(x) @nl
+   ∅ @& @otherwise
+   \end{array}\right. \\
    φ_r = applyfilter(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}}, τ, o)}
  @${Γ ⊢ e.@|ɐ|ⱼ : τ' ; φ_r ; o_r}
  @${@textsc{T-Record-Get}}

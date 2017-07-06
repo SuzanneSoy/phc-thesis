@@ -9,7 +9,6 @@
        #:version (version-text)]{Types}
 
 @$${σ,τ ⩴ …
- @P @ctor[@κ τ]
- @;{@P @ctorTop[τ]}
+ @P @ctor[@κ τ] @;{@P @ctorTop[τ]}
  @P @record[@repeated{@|ɐ|ᵢ : τᵢ}]}
 
