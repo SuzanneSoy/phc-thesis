@@ -51,7 +51,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    ∅ @& @otherwise
    \end{array}\right. \\
   φ_r = applyfilter(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val}, τ, o)}
- @${Γ ⊢ (@ctor-val[@κ] e) : τ' ; φ_r ; o_r}
+ @${Γ ⊢ (@ctor-val[@κ]\ e) : τ' ; φ_r ; o_r}
  @${@textsc{T-Ctor-Val}}
  ]
 }
