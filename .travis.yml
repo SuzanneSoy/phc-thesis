@@ -38,7 +38,7 @@ jobs:
           - texlive-latex-extra
           - texlive-latex3
           # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
-          texlive-latex-recommended
+          - texlive-latex-recommended
           - latex-xcolor
       install:
       - if test "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id`; then travis_terminate 1; fi
