@@ -126,7 +126,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    τ_{r} <: @record[@repeated{@|ɐ|ᵢ : τ'ᵢ}] \\
    @|ɐ|ⱼ : τ'ⱼ ∈ @repeatset{@|ɐ|ᵢ : τ'ᵢ}
   }
- @${Γ ⊢ @opwith[@${e_{r}} @|ɐ| @${e_{v}}]
+ @${Γ ⊢ @opwithout[@${e_{r}} @|ɐ|]
    : @record[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}}]
    ; ϵ|⊥ ; ∅}
  @${@textsc{T-Record-Without}}
