@@ -127,4 +127,13 @@ shorthand for the above lambda functions.
  Elements:
 
  @$${e ⩴ … @P @atc[e @repeated{@ρc}] @P @atf[e @repeated{@ρf}]}
+
+ @include-asection["adt-e.scrbl"]
+ @include-asection["adt-v.scrbl"]
+ @include-asection["adt-ectx.scrbl"]
+ @include-asection["adt-ty.scrbl"]
+ @include-asection["adt-sub.scrbl"]
+ @include-asection["adt-pe.scrbl"]
+ @include-asection["adt-trules.scrbl"]
+ @include-asection["adt-opsem.scrbl"]
 }
