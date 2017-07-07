@@ -58,7 +58,8 @@ jobs:
       - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$TRAVIS_BUILD_DIR")";
       - rm -fr doc/
       - raco scribble --dest doc/phc-thesis --html --dest-name index --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl
-      - make > make.log
+      - (while sleep 10; do free -m || echo "."; done) &
+      - make
       - tail -n 500 make.log
       - find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
       - find doc -name '*.html' -type f -print0 | xargs -0 sed -i -e 's|https://download\.racket-lang\.org/docs/6\.9/html/|https://docs.racket-lang.org/|g'
