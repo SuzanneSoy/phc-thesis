@@ -110,30 +110,14 @@ The same applies to the accessor for a constructor's encapsulated value:
 As a convenience, we will write @ctor[κ], @ctor-pred[κ] and @ctor-val[κ] as a
 shorthand for the above lambda functions.
 
-
-
-
 @asection{
  @atitle{With row polymorphism}
-
- Types:
-
- @$${σ,τ ⩴ …
-  @P (∀_c (@repeated{@ρc}) τ)
-  @P (∀_c (@repeated{@ρf}) τ)
-  @P @variant[@repeated{@ctor[@|κ|ᵢ τᵢ]} @ρc]
-  @P @record[@repeated{@|ɐ|ᵢ : τᵢ} @ρf]}
-
- Elements:
-
- @$${e ⩴ … @P @atc[e @repeated{@ρc}] @P @atf[e @repeated{@ρf}]}
-
- @include-asection["adt-e.scrbl"]
- @include-asection["adt-v.scrbl"]
- @include-asection["adt-ectx.scrbl"]
- @include-asection["adt-ty.scrbl"]
- @include-asection["adt-sub.scrbl"]
- @include-asection["adt-pe.scrbl"]
- @include-asection["adt-trules.scrbl"]
- @include-asection["adt-opsem.scrbl"]
+ @include-asection["adt-row-e.scrbl"]
+ @include-asection["adt-row-v.scrbl"]
+ @include-asection["adt-row-ectx.scrbl"]
+ @include-asection["adt-row-ty.scrbl"]
+ @include-asection["adt-row-sub.scrbl"]
+ @include-asection["adt-row-pe.scrbl"]
+ @include-asection["adt-row-trules.scrbl"]
+ @include-asection["adt-row-opsem.scrbl"]
 }

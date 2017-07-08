@@ -6,7 +6,9 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{Evaluation contexts}
+       #:version (version-text)]{Evaluation contexts (with ρ)}
+
+@todo{Does this need any change when adding row typing?}
 
 @$${
  @cases["E" #:first-sep "⩴"

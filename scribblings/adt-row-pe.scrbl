@@ -6,7 +6,9 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{Path elements}
+       #:version (version-text)]{Path elements (with ρ)}
+
+@todo{Does this need any change when adding row typing?}
 
 @$${pe ⩴ … @P @πctor-val @P @|ɐ|}
 

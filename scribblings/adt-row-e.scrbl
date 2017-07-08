@@ -6,7 +6,7 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{Expressions}
+       #:version (version-text)]{Expressions (with ρ)}
 
 @$${
  @cases["e" #:first-sep "⩴"
@@ -18,7 +18,11 @@
         @acase{(@record-pred[@repeated{@|ɐ|ᵢ}] e)}
         @acase{e.@|ɐ|}
         @acase{@opwith[e @|ɐ| e]}
-        @acase{@opwithout[e @|ɐ|]}]
+        @acase{@opwithout[e @|ɐ|]}
+        @acase{@Λc[@${(@repeated{@ρc})} e]}@; new
+        @acase{@Λf[@${(@repeated{@ρf})} e]}@; new
+        @acase{@atc[e @repeated{@ρc}]}@; new
+        @acase{@atf[e @repeated{@ρf}]}]@; new
 }
 
 @;{

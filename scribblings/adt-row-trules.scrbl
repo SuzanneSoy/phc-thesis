@@ -7,11 +7,10 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{Typing rules}
+       #:version (version-text)]{Typing rules (with ρ)}
 
 @todo{Should the filter be something else than @${ϵ|ϵ} or is the filter inferred
  via other rules when the ``function'' does not do anything special?}
-
 
 @$${
  @$inferrule[
@@ -21,7 +20,7 @@
  ]
 }
 
-@${\mathop{applyfilter}} is defined
+@${\mathop{\textit{applyfilter}}} is defined
 in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 
 @htodo{their second (p. 75) definition of applyfilter does not clearly state
@@ -33,7 +32,8 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 @$${
  @$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\
-    φ_r = applyfilter(@ctor[@κ ⊤]|\overline{@ctor[@κ ⊤]}, τ, o)}
+   φ_r
+   = \mathop{\textit{applyfilter}}(@ctor[@κ ⊤]|\overline{@ctor[@κ ⊤]}, τ, o)}
  @${Γ ⊢ (@ctor-pred[@κ] e) : Boolean ; φ_r ; ∅}
  @${@textsc{T-Ctor-Pred}}
  ]
@@ -50,7 +50,9 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    @πctor-val(π(x)) @& @textif o = π(x) @nl
    ∅ @& @otherwise
    \end{array}\right. \\
-  φ_r = applyfilter(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val}, τ, o)}
+   φ_r
+   = \mathop{\textit{applyfilter}}(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val},
+   τ, o)}
  @${Γ ⊢ (@ctor-val[@κ]\ e) : τ' ; φ_r ; o_r}
  @${@textsc{T-Ctor-Val}}
  ]
@@ -68,7 +70,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 @$${
  @$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\
-   φ_r = applyfilter(@record[@repeated{@|ɐ|ᵢ : ⊤}]
+   φ_r = \mathop{\textit{applyfilter}}(@record[@repeated{@|ɐ|ᵢ : ⊤}]
    |\overline{@record[@repeated{@|ɐ|ᵢ : ⊤}]}, τ, o)}
  @${Γ ⊢ (@record-pred[@repeated{@|ɐ|ᵢ}] e) : Boolean ; φ_r ; ∅}
  @${@textsc{T-Record-Pred}}
@@ -78,14 +80,16 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 @$${
  @cond-element[[latex @list{\let\savedamp&}] [else ""]]
  @$inferrule[
- @${Γ ⊢ e : τ ; φ ; o \\ τ <: @record[@repeated{@|ɐ|ᵢ : τᵢ}] \\
+ @${Γ ⊢ e : τ ; φ ; o \\ τ <: @record[@repeated{@|ɐ|ᵢ : τᵢ} @ρf] \\ @; changed
    o_r = @"\\left\\{" \begin{array}{rl}
    @πɐ{@|ɐ|ⱼ}(π(x)) @& @textif o = π(x) @nl
    ∅ @& @otherwise
    \end{array}\right. \\
-   φ_r = applyfilter(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}}, τ, o)}
+   φ_r
+   = \mathop{\textit{applyfilter}}(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}},
+   τ, o)}
  @${Γ ⊢ e.@|ɐ|ⱼ : τ' ; φ_r ; o_r}
- @${@textsc{T-Record-Get}}
+ @${@textsc{T-Record-GetField}}
  ]
 }
 
@@ -93,27 +97,36 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
  @$inferrule[
  @${
    Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
-   τ_{r} <: @record[@repeated{@|ɐ|ᵢ : τ'ᵢ}] \\
+   τ_{r} <: @record[@repeated{@|ɐ|ᵢ : τ'ᵢ} @${@ρf - \{@repeated{@|ɐ|'ⱼ}\}}]\\@;c
    Γ ⊢ e_{v} : τ_{v} ; φ_{v} ; o_{v} \\
-   @|ɐ| ∉ \{@|ɐ|ᵢ\}
+   @|ɐ| ∉ \{@|ɐ|ᵢ\} \\
+   @|ɐ| ∈ \{@repeated{@|ɐ|'ⱼ}\}
   }
  @${Γ ⊢ @opwith[@${e_{r}} @|ɐ| @${e_{v}}]
-   : @record[@repeated{@|ɐ|ᵢ : τ'ᵢ} @${@|ɐ| : τ_{v}}]
+   : @record[@repeated{@|ɐ|ᵢ : τ'ᵢ}
+             @${@|ɐ| : τ_{v}}
+             @${@ρf - \{@repeated{@|ɐ|'ⱼ}\}}]@;changed
    ; ϵ|⊥ ; ∅}
  @${@textsc{T-Record-With}_1}
  ]
 }
 
+TODO: removing fields on the ρ should not matter if the fields are present in
+the main part of the record (as they are implicitly not in the ρ, because they
+are in the main part).
+
 @$${
  @$inferrule[
  @${
    Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
-   τ_{r} <: @record[@repeated{@|ɐ|ᵢ : τ'ᵢ}] \\
+   τ_{r} <: @record[@repeated{@|ɐ|ᵢ : τ'ᵢ} @ρf] \\@;changed
    Γ ⊢ e_{v} : τ_{v} ; φ_{v} ; o_{v} \\
    @|ɐ|ⱼ : τ'ⱼ ∈ @repeatset{@|ɐ|ᵢ : τ'ᵢ}
   }
  @${Γ ⊢ @opwith[@${e_{r}} @|ɐⱼ| @${e_{v}}]
-   : @record[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}} @${@|ɐ|ⱼ : τ_{v}}]
+   : @record[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}}
+             @${@|ɐ|ⱼ : τ_{v}}
+             @ρf]@;changed
    ; ϵ|⊥ ; ∅}
  @${@textsc{T-Record-With}_2}
  ]
@@ -123,11 +136,12 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
  @$inferrule[
  @${
    Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
-   τ_{r} <: @record[@repeated{@|ɐ|ᵢ : τ'ᵢ}] \\
+   τ_{r} <: @record[@repeated{@|ɐ|ᵢ : τ'ᵢ} @ρf] \\
    @|ɐ|ⱼ : τ'ⱼ ∈ @repeatset{@|ɐ|ᵢ : τ'ᵢ}
   }
  @${Γ ⊢ @opwithout[@${e_{r}} @|ɐ|]
-   : @record[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}}]
+   : @record[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}}
+             @${@ρf - @|ɐ|}]
    ; ϵ|⊥ ; ∅}
  @${@textsc{T-Record-Without}}
  ]

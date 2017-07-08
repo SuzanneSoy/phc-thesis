@@ -6,9 +6,72 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{Types}
+       #:version (version-text)]{Types (with ρ)}
 
 @$${σ,τ ⩴ …
- @P @ctor[@κ τ] @;{@P @ctorTop[τ]}
- @P @record[@repeated{@|ɐ|ᵢ : τᵢ}]}
+ @P @ctor[@κ τ] @; same
+ @P @variant[@repeated{@ctor[@|κ|ᵢ τᵢ]} @ρc] @; new/changed
+ @P @record[@repeated{@|ɐ|ᵢ : τᵢ} @repeatset{-@|ɐ|ᵢ} @${@ρf - @repeatset{@|ɐ|ⱼ}}] @; changed
+ @P (∀_c (@repeated{@ρc}) τ) @; new
+ @P (∀_f (@repeated{@ρf}) τ) @; new
+}
 
+@; new↓
+
+Type validity judgements (for well-scopedness):
+
+@todo{Just as TR distinguishes regular @${@repeated{α}} and dotted @${α
+  \mathbf{…}} type variables, we should distinguish @${@repeated{α}}, @${α
+  \mathbf{…}}, @ρc and @ρf variables (so four different notations.}
+
+@$${
+ @$inferrule[
+ @${Δ ∪ \{ @ρc \} ⊢ τ}
+ @${Δ ⊢ (∀_c (@ρc) τ)}
+ @${@textsc{TE-CAll}}
+ ]
+}
+
+@$${
+ @$inferrule[
+ @${Δ ∪ \{ @ρf \} ⊢ τ}
+ @${Δ ⊢ (∀_f (@ρf) τ)}
+ @${@textsc{TE-FAll}}
+ ]
+}
+
+@;{TODO: if we extend rows with subtraction, we may need to allow it either in
+ function types or within bodies too.
+   
+ @$${
+  @$inferrule[
+ @${Δ ∪ \{ @ρc \} ⊢ τ}
+ @${Δ ⊢ ???}
+ @${@textsc{TE-CFun}}
+ ]
+ }
+
+ @$${
+  @$inferrule[
+ @${Δ ∪ \{ @ρf \} ⊢ τ}
+ @${Δ ⊢ ???}
+ @${@textsc{TE-FFun}}
+ ]
+ }
+}
+
+@$${
+ @$inferrule[
+ @${@ρc ∈ Δ \\ @repeated{Δ ⊢ τᵢ}}
+ @${Δ ⊢ @variant[@repeated{@ctor[@|κ|ᵢ τᵢ]} @ρc]}
+ @${@textsc{TE-CVariant}}
+ ]
+}
+
+@$${
+ @$inferrule[
+ @${@ρf ∈ Δ \\ @repeated{Δ ⊢ τᵢ}}
+ @${Δ ⊢ @record[@repeated{@|ɐ|ᵢ : τᵢ} @ρf]}
+ @${@textsc{TE-FRecord}}
+ ]
+}

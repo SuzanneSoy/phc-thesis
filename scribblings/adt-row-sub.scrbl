@@ -6,7 +6,7 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{Subtyping}
+       #:version (version-text)]{Subtyping (with ρ)}
 
 @;{
  @$${

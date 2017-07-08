@@ -6,7 +6,10 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
-       #:version (version-text)]{Operational Semantics}
+       #:version (version-text)]{Operational Semantics (with ρ)}
+
+@todo{Does this need any change when adding row typing (they don't add any
+ rules in @~cite["tobin-hochstadt_typed_2010"])?}
 
 @$${
  @$inferrule[
@@ -71,9 +74,9 @@ indexed by a constructor label or a field label, like @${@ctor-pred[@κ]},
 @$${
  @aligned{
   δ(@record-pred[@repeated{@|ɐ|ᵢ}], v) &= \#t
-  if v = @record[@repeated{@|ɐ|ⱼ = vⱼ}] ∧ @repeatset{@|ɐ|ⱼ} = @repeatset{@|ɐ|ᵢ}
+  @textif v = @record[@repeated{@|ɐ|ⱼ = vⱼ}] ∧ @repeatset{@|ɐ|ⱼ} = @repeatset{@|ɐ|ᵢ}
   \\
-  δ(@record-pred[@repeated{@|ɐ|ᵢ}], v) &= \#f otherwise
+  δ(@record-pred[@repeated{@|ɐ|ᵢ}], v) &= \#f \text{ otherwise}
   }
 }
 

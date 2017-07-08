@@ -40,6 +40,8 @@
 @(define ρf @${\rho_{f}})
 @(define-syntax atc (defop "@${}_{\\textbf{c}}$"))
 @(define-syntax atf (defop "@${}_{\\textbf{f}}$"))
+@(define-syntax Λc (defop "Λ${}_{\\textbf{c}}$"))
+@(define-syntax Λf (defop "Λ${}_{\\textbf{f}}$"))
 @(define-syntax-rule (ctor-pred c)
    @${@(stringify c)\mathbf{?}})
 @(define-syntax-rule (record-pred f*)
