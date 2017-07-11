@@ -17,13 +17,15 @@
 @(define-for-syntax (defop op)
    (syntax-parser
      [(_ :stringify ...)
-      #`@${(@(add-between (list (string-append "\\textbf{" #,op "}")
+      #`@${(@(add-between (list @textbf{@#,op}
                                 #,@(syntax->list #'(→str ...)))
                           "\\ "))}]))
 @(define-syntax stringify
    (syntax-parser
      [(_ :stringify)
-      #'→str]))
+      #'→str]
+     [(_ :stringify ...)
+      #'(add-between (list →str ...) "\\ ")]))
 
 @(define-syntax ctor (defop "ctor"))
 @(define κ @${κ})
@@ -38,17 +40,19 @@
 @(define |P| @${\ |\ })
 @(define ρc @${\rho_{c}})
 @(define ρf @${\rho_{f}})
-@(define-syntax atc (defop "@${}_{\\textbf{c}}$"))
+@(define-syntax atc (defop "@${}_{\\textbf{c}}$"));; TODO text vs math!!!
 @(define-syntax atf (defop "@${}_{\\textbf{f}}$"))
 @(define-syntax Λc (defop "Λ${}_{\\textbf{c}}$"))
 @(define-syntax Λf (defop "Λ${}_{\\textbf{f}}$"))
 @(define-syntax-rule (ctor-pred c)
    @${@(stringify c)\mathbf{?}})
-@(define-syntax-rule (record-pred f*)
-   @${(\textbf{record?}\ @(stringify f*))})
+@(define-syntax-rule (record-pred . f*)
+   @${(@textbf{record?}\ @(stringify . f*))})
+@(define-syntax-rule (record-pred* . f*)
+   @${(@textbf{record$\mathbf{*}$?}\ @(stringify . f*))});; TODO text vs math!!!
 @(define-syntax-rule (opwith rec a v)
-   @list{@(stringify rec) \textbf{ with } @(stringify a) = @(stringify v)})
+   @list{@(stringify rec) @textbf[" with "] @(stringify a) = @(stringify v)})
 @(define-syntax-rule (opwithout rec a)
-   @list{@(stringify rec) \textbf{ without } @(stringify a)})
-@(define πctor-val @${\textbf{getval}})
+   @list{@(stringify rec) @textbf[" without "] @(stringify a)})
+@(define πctor-val @${@textbf{getval}})
 @(define (πɐ . ɐ) @${\mathbf{@ɐ}})

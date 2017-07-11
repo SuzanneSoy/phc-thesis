@@ -9,7 +9,7 @@
        #:version (version-text)]{Types (with ρ)}
 
 @$${σ,τ ⩴ …
- @P @ctor[@κ τ] @; same
+ @|P| @ctor[@κ τ] @; same
  @P @variant[@repeated{@ctor[@|κ|ᵢ τᵢ]} @ρc] @; new/changed
  @P @record[@repeated{@|ɐ|ᵢ : τᵢ} @repeatset{-@|ɐ|ᵢ} @${@ρf - @repeatset{@|ɐ|ⱼ}}] @; changed
  @P (∀_c (@repeated{@ρc}) τ) @; new

@@ -35,7 +35,7 @@ indexed by a constructor label or a field label, like @${@ctor-pred[@κ]},
 @$${
  @aligned{
   δ(@ctor-pred[@κ], v) &= \#t &@textif v =  @ctor[@κ @${v'}] \\
-  δ(@ctor-pred[@κ], v) &= \#f & \text{ otherwise} \\
+  δ(@ctor-pred[@κ], v) &= \#f & @text[" otherwise"] \\
  }
 }
 
@@ -76,7 +76,7 @@ indexed by a constructor label or a field label, like @${@ctor-pred[@κ]},
   δ(@record-pred[@repeated{@|ɐ|ᵢ}], v) &= \#t
   @textif v = @record[@repeated{@|ɐ|ⱼ = vⱼ}] ∧ @repeatset{@|ɐ|ⱼ} = @repeatset{@|ɐ|ᵢ}
   \\
-  δ(@record-pred[@repeated{@|ɐ|ᵢ}], v) &= \#f \text{ otherwise}
+  δ(@record-pred[@repeated{@|ɐ|ᵢ}], v) &= \#f @text[" otherwise"]
   }
 }
 

@@ -7,6 +7,7 @@
 @(use-mathjax)
 
 @title[#:style (with-html5 manual-doc-style)
+       #:tag "adt-row-trules"
        #:version (version-text)]{Typing rules (with ρ)}
 
 @todo{Should the filter be something else than @${ϵ|ϵ} or is the filter inferred
@@ -20,7 +21,7 @@
  ]
 }
 
-@${\mathop{\textit{applyfilter}}} is defined
+@${\mathop{@textit{applyfilter}}} is defined
 in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 
 @htodo{their second (p. 75) definition of applyfilter does not clearly state
@@ -33,7 +34,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
  @$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\
    φ_r
-   = \mathop{\textit{applyfilter}}(@ctor[@κ ⊤]|\overline{@ctor[@κ ⊤]}, τ, o)}
+   = \mathop{@textit{applyfilter}}(@ctor[@κ ⊤]|\overline{@ctor[@κ ⊤]}, τ, o)}
  @${Γ ⊢ (@ctor-pred[@κ] e) : Boolean ; φ_r ; ∅}
  @${@textsc{T-Ctor-Pred}}
  ]
@@ -51,7 +52,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    ∅ @& @otherwise
    \end{array}\right. \\
    φ_r
-   = \mathop{\textit{applyfilter}}(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val},
+   = \mathop{@textit{applyfilter}}(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val},
    τ, o)}
  @${Γ ⊢ (@ctor-val[@κ]\ e) : τ' ; φ_r ; o_r}
  @${@textsc{T-Ctor-Val}}
@@ -70,7 +71,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 @$${
  @$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\
-   φ_r = \mathop{\textit{applyfilter}}(@record[@repeated{@|ɐ|ᵢ : ⊤}]
+   φ_r = \mathop{@textit{applyfilter}}(@record[@repeated{@|ɐ|ᵢ : ⊤}]
    |\overline{@record[@repeated{@|ɐ|ᵢ : ⊤}]}, τ, o)}
  @${Γ ⊢ (@record-pred[@repeated{@|ɐ|ᵢ}] e) : Boolean ; φ_r ; ∅}
  @${@textsc{T-Record-Pred}}
@@ -86,7 +87,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    ∅ @& @otherwise
    \end{array}\right. \\
    φ_r
-   = \mathop{\textit{applyfilter}}(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}},
+   = \mathop{@textit{applyfilter}}(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}},
    τ, o)}
  @${Γ ⊢ e.@|ɐ|ⱼ : τ' ; φ_r ; o_r}
  @${@textsc{T-Record-GetField}}

@@ -36,7 +36,7 @@ constants, i.e. they are written literally in the program source.
 @;{
  Primitive operations:
 
- @$${c ⩴ … @P \textit{ctor-val}}
+ @$${c ⩴ … @P @textit{ctor-val}}
 }
 
 We further define variants as a subset of the unions allowed by @|typedracket|
@@ -57,59 +57,6 @@ values of two function types present in the same union).
  \end{gathered}
 }
 
-Notes: the polymorphic builder function for the @κ constructor which
-intuitively corresponds to @ctor[κ] can be written as the η-expansion of the
-@ctor[κ e] operator:
-
-@$${(Λ (α) (λ ([x : α]) @ctor[κ x]))}
-
-The same applies to the predicate form of constructors:
-
-@$${(λ ([x : ⊤]) (@ctor-pred[κ] x))}
-
-The same applies to the accessor for a constructor's encapsulated value:
-
-@$${(Λ (α) (λ ([x : @ctor[κ α]]) (@ctor-val[κ] α))}
-
-@todo{Write their types here too.}
-
-As a convenience, we will write @ctor[κ], @ctor-pred[κ] and @ctor-val[κ] as a
-shorthand for the above lambda functions.
-
-
-The polymorphic builder function for a record which
-intuitively corresponds to @record[@repeated{ɐ}] can be written as the
-η-expansion of the @record[@repeated{ɐ = e}] operator:
-
-@$${(Λ (@repeated{αᵢ}) (λ (@repeated{[xᵢ : αᵢ]}) @record[@repeated{ɐᵢ = xᵢ}]))}
-
-The same applies to the predicate form of records:
-
-@;{
- @$${
-  @aligned{
-   &(λ ([x : ⊤])\\
-   &\quad(Λ (@repeated{αᵢ})\\
-   &\qquad(λ (@repeated{[pᵢ : (⊤ \xrightarrow[∅]{αᵢ|\overline{αᵢ}} Boolean)]})\\
-   &\qquad\quad(@record-pred[@repeated{@|ɐ|ᵢ ? pᵢ}] x))}\\
- }
-}
-
-@$${
- @aligned{
-  &(λ ([x : ⊤])\\
-  &\quad(@record-pred[@repeated{@|ɐ|ᵢ}] x))}\\
-}
-
-The same applies to the accessor for a constructor's encapsulated value:
-
-@$${(Λ (α) (λ ([x : @ctor[κ α]]) (@ctor-val[κ] α))}
-
-@todo{Write their types here too.}
-
-As a convenience, we will write @ctor[κ], @ctor-pred[κ] and @ctor-val[κ] as a
-shorthand for the above lambda functions.
-
 @asection{
  @atitle{With row polymorphism}
  @include-asection["adt-row-e.scrbl"]
@@ -120,4 +67,5 @@ shorthand for the above lambda functions.
  @include-asection["adt-row-pe.scrbl"]
  @include-asection["adt-row-trules.scrbl"]
  @include-asection["adt-row-opsem.scrbl"]
+ @include-asection["adt-row-shorthands.scrbl"]
 }

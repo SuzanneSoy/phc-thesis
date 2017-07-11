@@ -14,8 +14,9 @@
          (rename-out [note* note])
          define-footnote ;; TODO: does not use the (superscript …)
          (all-from-out "abbreviations.rkt")
-         (except-out (all-from-out scribble-math) $ $$)
-         (rename-out [$* $] [$$* $$])
+         (all-from-out scribble-math)
+         $
+         $$
          version-text
          aappendix
          tex-header
@@ -36,11 +37,18 @@
          aligned
          acase
          cases
+         intertext
+         cases*
          frac
          where
          textif
          otherwise
-         quad)
+         quad
+         mathtext
+         textbf
+         textit
+         textrm
+         text)
 
 (require racket/stxparam
          racket/splicing
@@ -53,13 +61,13 @@
          scribble-enhanced/math
          scribble/latex-properties
          scribble/decode
-         scribble-math
+         (except-in scribble-math $ $$)
          phc-toolkit/untyped/meta-struct
          "abbreviations.rkt"
+         "util0.rkt"
          (for-syntax syntax/parse)
          scribble/html-properties
-         scribble/latex-properties
-         scribble-math)
+         scribble/latex-properties)
 
 (use-mathjax)
 
@@ -458,48 +466,24 @@ EOTEX
 
 (define lastname list)
 
-;; Math stuff
-(define (clean-$ e)
-  (cond [(pair? e) (cons (clean-$ (car e)) (clean-$ (cdr e)))]
-        [(traverse-element? e)
-         (traverse-element (λ (a b)
-                             (clean-$ ((traverse-element-traverse e) a b))))]
-        [(match e
-           [(element (style (or "math" "texMathInline" "texMathDisplay")
-                            _)
-                     content)
-            #t]
-           [_ #f])
-         (clean-$ (element-content e))]
-        [(element? e)
-         (element (element-style e)
-                  (clean-$ (element-content e)))]
-        [else e]))
-
-(define ($* . elts)
-  (apply $ (clean-$ elts)))
-
-(define ($$* . elts)
-  (apply $$ (clean-$ elts)))
-
-(define tr<: ($* "\\mathrel{<:_\\mathit{tr}}"))
-(define tr≤: ($* "\\mathrel{≤:_\\mathit{tr}}"))
-(define $ooo ($* "\\textit{ooo}"))
+(define tr<: ($ "\\mathrel{<:_\\mathit{tr}}"))
+(define tr≤: ($ "\\mathrel{≤:_\\mathit{tr}}"))
+(define $ooo ($ (mathtext "\\textit{ooo}")))
 
 (define ($inferrule from* to* [label '()])
   (elem #:style
         (style #f (list (tex-addition
                          (string->bytes/utf-8
                           "\\usepackage{mathpartir}"))))
-        ($* (cond-element [html "\\frac{\\begin{gathered}"]
-                          [else "\\inferrule{"])
-            from*
-            (cond-element [html "\\end{gathered}}{\\begin{gathered}"]
-                          [else "}{"])
-            to*
-            (cond-element [html "\\end{gathered}}"]
-                          [else "}"])
-            label)))
+        ($ (cond-element [html "\\frac{\\begin{gathered}"]
+                         [else "\\inferrule{"])
+           from*
+           (cond-element [html "\\end{gathered}}{\\begin{gathered}"]
+                         [else "}{"])
+           to*
+           (cond-element [html "\\end{gathered}}"]
+                         [else "}"])
+           label)))
 
 (define htmldiff-css-experiment #<<EOCSS
 .version:after {
@@ -532,19 +516,19 @@ EOCSS
   )
 
 (define (textsc str)
-  ($* (cond-element
-       [html (list "{\\rm "
-                   (for/list ([c (in-string str)])
-                     (cond
-                       [(char=? c #\-)
-                        "\\text{-}"]
-                       [(char-upper-case? c)
-                        (string c)]
-                       [else (list "{\\small "
-                                   (string (char-upcase c))
-                                   "}")]))
-                   "}")]
-       [else (list "\\text{\\textsc{" str "}}")])))
+  ($ (cond-element
+      [html (list "{\\rm "
+                  (for/list ([c (in-string str)])
+                    (cond
+                      [(char=? c #\-)
+                       (mathtext "\\text{-}")]
+                      [(char-upper-case? c)
+                       (string c)]
+                      [else (list "{\\small "
+                                  (string (char-upcase c))
+                                  "}")]))
+                  "}")]
+      [else (list (mathtext "\\text{\\textsc{" str "}}"))])))
 
 (define (aligned #:valign [valign 'mid] . lines)
   (define valign-letter (case valign [(top) "t"] [(mid) "m"] [(bot) "b"]))
@@ -558,21 +542,75 @@ EOCSS
 (define acase list)
 (define cases
   (λ (#:first-sep [first-sep "\\vphantom{x}\\mathbin{:=}\\vphantom{x}"]
-      #:then-sep [then-sep "|\\;\\ "] term
+      #:then-sep [then-sep "|\\;\\ "]
+      term
       . the-cases)
-    (list
-     term
-     (aligned #:valign 'top @; cl
-              @(for/list ([c (in-list the-cases)]
-                          [i (in-naturals)])
-                 (list (if (= i 0) first-sep then-sep)
-                       " & "
-                       c
-                       (if (= i (sub1 (length the-cases))) "" "\\\\\n")))
-              ))))
+    ($$ (list
+         term
+         (aligned #:valign 'top @; cl
+                  @(for/list ([c (in-list the-cases)]
+                              [i (in-naturals)])
+                     (list (if (= i 0) first-sep then-sep)
+                           " & "
+                           c
+                           (if (= i (sub1 (length the-cases))) "" "\\\\\n")))
+                  )))))
+(require (for-syntax racket/base
+                     racket/contract/base
+                     syntax/parse
+                     syntax/parse/experimental/template))
+(define (intertext . l) (list (mathtext "\\text{" l "}")))
+(define-syntax cases*
+  (syntax-parser
+    #:literals (acase intertext)
+    [(_ term
+        {~optional {~seq #:first-sep first-sep}}
+        {~optional {~seq #:then-sep then-sep}}
+        {~optional (intertext . intertext₀)}
+        (~seq {~and acaseᵢ₀ [acase . _]}
+              {~and acaseᵢⱼ [acase . _]} ...
+              [intertext . intertextᵢ])
+        ...
+        {~and acaseₙ₀ [acase . _]}
+        {~and acaseₙⱼ [acase . _]} ...)
+     #:with (tmpᵢ ...) (generate-temporaries #'((acaseᵢⱼ ...) ...))
+     (quasitemplate
+      (#,(if ((or/c 'expression list?) (syntax-local-context)) #'list #'begin)
+       (define (vcenter lst)
+         @cond-element[[html (list "\\vcenter{" lst "}")]
+                       [else (list "\\begin{array}{l}" lst "\\end{array}")]])
+       (define phantom
+         @$${\hphantom{@vcenter{@(list (?@ acaseᵢ₀ "\\\\"
+                                           (?@ acaseᵢⱼ "\\\\") ...)
+                                       ...
+                                       (?? (?@ acaseₙ₀
+                                               (?@ acaseₙⱼ "\\\\") ...)))}}})
+       (define tmpᵢ @cases[term
+                           (?? (?@ #:first-sep first-sep))
+                           (?? (?@ #:then-sep then-sep))
+                           (list "\\rlap{" acaseᵢ₀ "}" phantom)
+                           acaseᵢⱼ
+                           ...])
+       ...
+       (?? (define tmpₙ @cases[term
+                               (?? (?@ #:first-sep first-sep))
+                               (?? (?@ #:then-sep then-sep))
+                               (list "\\rlap{" acaseₙ₀ "}" phantom)
+                               acaseₙⱼ
+                               ...]))
+       (?? (?@ . intertext₀))
+       (?@ tmpᵢ . intertextᵢ)
+       ...
+       tmpₙ
+       ))]))
+
 (define (frac x . y)
   @list{\frac{@x}{@y}})
-(define where @${\text{ where }})
-(define textif @${\text{ if }})
-(define otherwise @${\text{ otherwise }})
-(define quad @${\quad})
+(define where (mathtext @${\text{ where }}))
+(define textif (mathtext @${\text{ if }}))
+(define otherwise (mathtext @${\text{ otherwise }}))
+(define quad (mathtext @${\quad}))
+(define (textbf . l) (mathtext "\\textbf{" l "}"))
+(define (textit . l) (mathtext "\\textit{" l "}"))
+(define (textrm . l) (mathtext "\\textrm{" l "}"))
+(define (text . l) (mathtext "\\text{" l "}"))
