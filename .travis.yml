@@ -41,8 +41,6 @@ jobs:
           - texlive-latex-recommended
           - latex-xcolor
       install:
-      - nvm install v8.1 # works with v8.1.4
-      - npm install mathjax-node
       - if test "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id`; then travis_terminate 1; fi
       - rm -f ~/.racket/travis_build_id
       - echo "LaTeX extra packages:"
@@ -67,6 +65,8 @@ jobs:
       - find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
       - find doc -name '*.html' -type f -print0 | xargs -0 sed -i -e 's|https://download\.racket-lang\.org/docs/6\.9/html/|https://docs.racket-lang.org/|g'
       - find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
+      - nvm install v8.1 # works with v8.1.4
+      - npm install mathjax-node
       - node < run-mathjax-offline.node.js
       - mv doc/phc-thesis/index2.html doc/phc-thesis/index.html
       - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi

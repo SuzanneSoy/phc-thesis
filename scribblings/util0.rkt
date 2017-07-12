@@ -8,7 +8,6 @@
          scribble-math/katex-convert-unicode)
 
 (provide mathtext
-         clean-$
          (rename-out [$* $]
                      [$$* $$]))
 
@@ -17,14 +16,16 @@
   (apply elem #:style (style "mathText"
                              (list (tex-addition #"\\def\\mathText#1{#1}")
                                    'exact-chars))
-         l))
+         (clean-$ l #f)))
 
 ;; Math stuff
-(define (clean-$ e)
-  (cond [(pair? e) (cons (clean-$ (car e)) (clean-$ (cdr e)))]
+(define (clean-$ e mathmode?)
+  (cond [(pair? e) (cons (clean-$ (car e) mathmode?)
+                         (clean-$ (cdr e) mathmode?))]
         [(traverse-element? e)
          (traverse-element (λ (a b)
-                             (clean-$ ((traverse-element-traverse e) a b))))]
+                             (clean-$ ((traverse-element-traverse e) a b)
+                                      mathmode?)))]
         [(match e
            [(element (style (or "math" "texMathInline" "texMathDisplay") _)
                      content)
@@ -34,9 +35,6 @@
          ;; been cleaned when the e was created. Plus we risk re-escaping
          ;; things within \text{…}.
          (element-content e)]
-        [(match e [(element (style "mathWrapper" _) _) #t]
-           [_ #f])
-         (clean-$ (element-content e))]
         [(match e
            [(element (style "mathText" _)
                      content)
@@ -50,20 +48,15 @@
          (element-content e)]
         [(element? e)
          (element (element-style e)
-                  (clean-$ (element-content e)))]
+                  (clean-$ (element-content e)
+                           mathmode?))]
         [(string? e)
          ;; TODO: do this only when compiling to HTML.
-         (katex-convert-unicode e)]
+         (katex-convert-unicode e mathmode?)]
         [else e]))
 
-(define (math-wrapper $m)
-  (element (style "mathWrapper"
-                  (list (tex-addition #"\\def\\mathWrapper#1{#1}")
-                        (css-addition #".mathWrapper { font-size: medium; }")))
-           $m))
-
 (define ($* . elts)
-  (math-wrapper (apply $ (clean-$ elts))))
+  (apply $ (clean-$ elts #t)))
 
 (define ($$* . elts)
-  (math-wrapper (apply $$ (clean-$ elts))))
+  (apply $$ (clean-$ elts #t)))
