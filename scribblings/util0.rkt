@@ -3,6 +3,7 @@
 (require scribble/manual
          scribble/core
          scribble/latex-properties
+         scribble/html-properties
          scribble-math
          scribble-math/katex-convert-unicode)
 
@@ -25,16 +26,17 @@
          (traverse-element (λ (a b)
                              (clean-$ ((traverse-element-traverse e) a b))))]
         [(match e
-           [(element (style (or "math" "texMathInline" "texMathDisplay")
-                            _)
+           [(element (style (or "math" "texMathInline" "texMathDisplay") _)
                      content)
             #t]
            [_ #f])
          ;; No need to go down recursively, as the contents should already have
          ;; been cleaned when the e was created. Plus we risk re-escaping
          ;; things within \text{…}.
-         #;(clean-$ (element-content e))
          (element-content e)]
+        [(match e [(element (style "mathWrapper" _) _) #t]
+           [_ #f])
+         (clean-$ (element-content e))]
         [(match e
            [(element (style "mathText" _)
                      content)
@@ -54,8 +56,14 @@
          (katex-convert-unicode e)]
         [else e]))
 
+(define (math-wrapper $m)
+  (element (style "mathWrapper"
+                  (list (tex-addition #"\\def\\mathWrapper#1{#1}")
+                        (css-addition #".mathWrapper { font-size: medium; }")))
+           $m))
+
 (define ($* . elts)
-  (apply $ (clean-$ elts)))
+  (math-wrapper (apply $ (clean-$ elts))))
 
 (define ($$* . elts)
-  (apply $$ (clean-$ elts)))
+  (math-wrapper (apply $$ (clean-$ elts))))

@@ -577,14 +577,13 @@ EOCSS
      (quasitemplate
       (#,(if ((or/c 'expression list?) (syntax-local-context)) #'list #'begin)
        (define (vcenter lst)
-         @cond-element[[html (list "\\vcenter{" lst "}")]
-                       [else (list "\\begin{array}{l}" lst "\\end{array}")]])
+         (list "\\begin{array}{l}"
+               (add-between (for/list ([e lst]) (list "\\!" e "\\!")) "\\\\")
+               "\\end{array}"))
        (define phantom
-         @$${\hphantom{@vcenter{@(list (?@ acaseᵢ₀ "\\\\"
-                                           (?@ acaseᵢⱼ "\\\\") ...)
+         @$${\hphantom{@vcenter{@(list (?@ acaseᵢ₀ acaseᵢⱼ ...)
                                        ...
-                                       (?? (?@ acaseₙ₀
-                                               (?@ acaseₙⱼ "\\\\") ...)))}}})
+                                       (?? (?@ acaseₙ₀ acaseₙⱼ ...)))}}})
        (define tmpᵢ @cases[term
                            (?? (?@ #:first-sep first-sep))
                            (?? (?@ #:then-sep then-sep))
