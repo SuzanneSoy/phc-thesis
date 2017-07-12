@@ -4,4 +4,6 @@
 .DS_Store
 compiled/
 /doc/
-/make.log
+/pdf.log
+/html.log
+/commit.log
