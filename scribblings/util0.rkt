@@ -34,7 +34,9 @@
          ;; No need to go down recursively, as the contents should already have
          ;; been cleaned when the e was created. Plus we risk re-escaping
          ;; things within \text{…}.
-         (element-content e)]
+         (if mathmode?
+             (element-content e)
+             (list "$" (element-content e) "$"))]
         [(match e
            [(element (style "mathText" _)
                      content)

@@ -542,15 +542,30 @@ EOCSS
 (define acase list)
 (define cases
   (λ (#:first-sep [first-sep "\\vphantom{x}\\mathbin{:=}\\vphantom{x}"]
-      #:then-sep [then-sep "|\\;\\ "]
+      #:then-sep [then-sep "\\mathrel{|}"]
       term
       . the-cases)
-    ($$ (list
+    (define first-sep* (list "{}" first-sep "{}"))
+    (define then-sep* (list "{}" then-sep "{}"))
+    @$${
+ \begin{qaligned}
+ @(add-between
+   (for/list ([c (in-list the-cases)]
+              [i (in-naturals)])
+     (list (if (= i 0) term '())
+           " & "
+           (if (= i 0) first-sep* then-sep*)
+           " & "
+           c))
+   "\\\\\n")
+ \end{qaligned}}
+    #;($$ (list
          term
-         (aligned #:valign 'top @; cl
+         (aligned #:valign 'top
                   @(for/list ([c (in-list the-cases)]
                               [i (in-naturals)])
-                     (list (if (= i 0) first-sep then-sep)
+                     (list (minwidth (list first-sep* then-sep*)
+                                     (if (= i 0) first-sep* then-sep*))
                            " & "
                            c
                            (if (= i (sub1 (length the-cases))) "" "\\\\\n")))
@@ -560,6 +575,13 @@ EOCSS
                      syntax/parse
                      syntax/parse/experimental/template))
 (define (intertext . l) (list (mathtext "\\text{" l "}")))
+(define (array<l>-no-extra-h-space lst)
+  (list "\\!\\begin{array}{l}"
+        (add-between lst "\\\\")
+        "\\end{array}\\!"))
+(define (minwidth phantoms realcontent)
+  (list "\\rlap{" realcontent "}"
+        @$${\hphantom{@array<l>-no-extra-h-space[phantoms]}}))
 (define-syntax cases*
   (syntax-parser
     #:literals (acase intertext)
@@ -576,25 +598,21 @@ EOCSS
      #:with (tmpᵢ ...) (generate-temporaries #'((acaseᵢⱼ ...) ...))
      (quasitemplate
       (#,(if ((or/c 'expression list?) (syntax-local-context)) #'list #'begin)
-       (define (vcenter lst)
-         (list "\\begin{array}{l}"
-               (add-between (for/list ([e lst]) (list "\\!" e "\\!")) "\\\\")
-               "\\end{array}"))
-       (define phantom
-         @$${\hphantom{@vcenter{@(list (?@ acaseᵢ₀ acaseᵢⱼ ...)
-                                       ...
-                                       (?? (?@ acaseₙ₀ acaseₙⱼ ...)))}}})
+       (define phantoms
+         (list (?@ acaseᵢ₀ acaseᵢⱼ ...)
+               ...
+               (?? (?@ acaseₙ₀ acaseₙⱼ ...))))
        (define tmpᵢ @cases[term
                            (?? (?@ #:first-sep first-sep))
                            (?? (?@ #:then-sep then-sep))
-                           (list "\\rlap{" acaseᵢ₀ "}" phantom)
+                           (minwidth phantoms acaseᵢ₀)
                            acaseᵢⱼ
                            ...])
        ...
        (?? (define tmpₙ @cases[term
                                (?? (?@ #:first-sep first-sep))
                                (?? (?@ #:then-sep then-sep))
-                               (list "\\rlap{" acaseₙ₀ "}" phantom)
+                               (minwidth phantoms acaseₙ₀)
                                acaseₙⱼ
                                ...]))
        (?? (?@ . intertext₀))

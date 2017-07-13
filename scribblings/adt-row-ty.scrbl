@@ -8,12 +8,16 @@
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Types (with ρ)}
 
-@$${σ,τ ⩴ …
- @|P| @ctor[@κ τ] @; same
- @P @variant[@repeated{@ctor[@|κ|ᵢ τᵢ]} @ρc] @; new/changed
- @P @record[@repeated{@|ɐ|ᵢ : τᵢ} @repeatset{-@|ɐ|ᵢ} @${@ρf - @repeatset{@|ɐ|ⱼ}}] @; changed
- @P (∀_c (@repeated{@ρc}) τ) @; new
- @P (∀_f (@repeated{@ρf}) τ) @; new
+@$${
+ @cases["σ,τ" #:first-sep "⩴"
+        @acase{…}
+        @acase{@ctor[@κ τ]} @; same
+        @acase{@variant[@repeated{@ctor[@|κ|ᵢ τᵢ]} @ρc]} @; new/changed
+        @acase{@record[@repeated{@|ɐ|ᵢ : τᵢ}
+                       @repeatset{-@|ɐ|ᵢ}
+                       @${@ρf - @repeatset{@|ɐ|ⱼ}}]} @; changed
+        @acase{@∀c[@${(@repeated{@ρc})} τ]} @; new
+        @acase{@∀f[@${(@repeated{@ρf})} τ]}] @; new
 }
 
 @; new↓
