@@ -67,6 +67,7 @@ jobs:
       - find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
       - nvm install v8.1 # works with v8.1.4
       - npm install mathjax-node
+      - patch -p1 < qaligned.patch
       - node < run-mathjax-offline.node.js
       - mv doc/phc-thesis/index2.html doc/phc-thesis/index.html
       - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
