@@ -840,6 +840,15 @@ therefore keep our overview succinct and gloss over most details.
          @${@v & ∈ τ(@t)}
          @${@v ∈ τ(@t)})))
 
+@include-asection["../from-dissertation-tobin-hochstadt/rules.scrbl"]
+
+@;{
+@asection{
+ @atitle{Formal semantics for part of Typed Racket's type system}
+  
+}
+}
+
 @htodo{
  @asection{
   @atitle{Formal semantics for part of Typed Racket's type system}

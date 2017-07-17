@@ -39,7 +39,7 @@ the value stored in an instance of a constructor.
  @list[]}
 
  @acase{…}
- @acase{@record[@repeated{@|ɐ|ᵢ = eᵢ}]}
+ @acase{@record[@repeated{@↦e[@${@|ɐ|ᵢ} eᵢ]}]}
  @acase{(@record-pred[@repeated{@|ɐ|ᵢ}]\ e)}
  @acase{(@record-pred*[@repeated{@|ɐ|ᵢ} @repeated{-@|ɐ|ⱼ}]\ e)}@;added
  @acase{e.@|ɐ|}

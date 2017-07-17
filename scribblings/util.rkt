@@ -152,7 +152,24 @@
 ;; TODO: merge the handling of unicode chars into scribble-math.
 (define m
   (list setup-math
-        (tex-header "\\renewcommand{\\rmdefault}{cmr}")
+        (tex-header #<<EOTEX
+ \renewcommand{\rmdefault}{cmr}
+ \newenvironment{qaligned}{%
+  \begin{array}[t]{@{}r@{}c@{}l@{}}%
+  }{%
+  \end{array}
+  }%
+  \def\overrightbracedarrow#1{%
+    \overset{\raisebox{-0.75pt}[\height][-0.75pt]{%
+      $\scriptscriptstyle{\{}$}}{\vphantom{#1}%
+    }%
+    \overrightarrow{#1}%
+    \overset{\raisebox{-0.75pt}[\height][-0.75pt]{%
+      $\scriptscriptstyle{\}}$}}{\vphantom{#1}%
+    }%
+  }%
+EOTEX
+                                         )
         (elem #:style (style #f (list (css-addition
                                        #".NoteBox {
   height: auto !important;
@@ -471,19 +488,20 @@ EOTEX
 (define $ooo ($ (mathtext "\\textit{ooo}")))
 
 (define ($inferrule from* to* [label '()])
-  (elem #:style
-        (style #f (list (tex-addition
-                         (string->bytes/utf-8
-                          "\\usepackage{mathpartir}"))))
-        ($ (cond-element [html "\\frac{\\begin{gathered}"]
-                         [else "\\inferrule{"])
-           from*
-           (cond-element [html "\\end{gathered}}{\\begin{gathered}"]
-                         [else "}{"])
-           to*
-           (cond-element [html "\\end{gathered}}"]
-                         [else "}"])
-           label)))
+  @$$[
+ (elem #:style
+       (style #f (list (tex-addition
+                        (string->bytes/utf-8
+                         "\\usepackage{mathpartir}"))))
+       ($ (cond-element [html "\\frac{\\begin{gathered}"]
+                        [else "\\inferrule{"])
+          from*
+          (cond-element [html "\\end{gathered}}{\\begin{gathered}"]
+                        [else "}{"])
+          to*
+          (cond-element [html "\\end{gathered}}"]
+                        [else "}"])
+          label))])
 
 (define htmldiff-css-experiment #<<EOCSS
 .version:after {
@@ -536,8 +554,7 @@ EOCSS
  \begin{aligned}[@valign-letter]
  @lines
  \end{aligned}
-}
-  )
+})
 
 (define acase list)
 (define cases
@@ -623,10 +640,10 @@ EOCSS
 
 (define (frac x . y)
   @list{\frac{@x}{@y}})
-(define where (mathtext @${\text{ where }}))
-(define textif (mathtext @${\text{ if }}))
-(define otherwise (mathtext @${\text{ otherwise }}))
-(define quad (mathtext @${\quad}))
+(define where @mathtext{\text{ where }})
+(define textif @mathtext{\text{ if }})
+(define otherwise @mathtext{\text{ otherwise }})
+(define quad @${\quad})
 (define (textbf . l) (mathtext "\\textbf{" l "}"))
 (define (textit . l) (mathtext "\\textit{" l "}"))
 (define (textrm . l) (mathtext "\\textrm{" l "}"))

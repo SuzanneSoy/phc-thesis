@@ -1,9 +1,11 @@
-anaphoric
+phc-thesis
 Copyright (c) 2016-2017 Georges Dupéron
 
 
 
-This package is in distributed under the Creative Commons CC0 license
+This package (with the exception of the files in the
+./from-dissertation-tobin-hochstadt/ folder)
+is in distributed under the Creative Commons CC0 license
 https://creativecommons.org/publicdomain/zero/1.0/, as specified by
 the LICENSE.txt file.
 

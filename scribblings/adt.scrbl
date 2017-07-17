@@ -69,3 +69,14 @@ values of two function types present in the same union).
  @include-asection["adt-row-opsem.scrbl"]
  @include-asection["adt-row-shorthands.scrbl"]
 }
+
+
+@todo{Argue that a type system with symbols, unique tokens (a way to create a
+ fresh "identity", like (cons 0 0) creates a fresh memory cell which is not eq?
+ to any other, past or future), untagged unions, pure case→ functions with the
+ usual polymorphism and row polymorphism (ranging over function cases, with
+ negation), i.e. a simplification / generalisation of our system, is more
+ "general" than @typedracket (i.e. Racket's existing types can be easily
+ encoded with ours), and show how other systems of variants and records can be
+ encoded with it (try the one from @CAML + the "backtick" cases of variants;
+ try to see if the one from tinybang is more general, less or different).}
