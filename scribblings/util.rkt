@@ -171,14 +171,14 @@
 EOTEX
                                          )
         (elem #:style (style #f (list (css-addition
-                                       #".NoteBox {
-  height: auto !important;
+                                       #"html .NoteBox {
+  height: auto;
   clear: right;
-  margin-bottom: 1em !important;
+  margin-bottom: 1em;
 }
 
-.MathJax_Display {
-  margin: 2em 0 !important;
+html .MathJax_Display, html div.MathJax_Preview {
+  margin: 2em 0;
 }"))))))
 (define my-title
   ;; TODO: use this for the other wrapped procs in this file

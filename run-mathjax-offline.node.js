@@ -71,7 +71,7 @@ jsdom.env('doc/phc-thesis/index.html', function(err, window) {
     }
   };
   // Fix the font size (mathjax-node cannot know easily the webpage's font size in advance).
-  var patchFontSizeCode = "(function() { var outer = document.createElement('div'); outer.style.width = '0px'; outer.style.height = '0px'; outer.style.overflow = 'hidden'; var d = document.createElement('div'); d.style.width = '2260ex'; outer.appendChild(d); document.body.appendChild(outer); window.setTimeout(function() { var sz = d.clientWidth / 1000; document.body.removeChild(outer); if (sz > 3) { var st = document.createElement('style'); st.appendChild(document.createTextNode('html .mjx-chtml { font-size: '+sz+'px; } html .mjx-chtml .mjx-chtml { font-size: inherit; }')); document.head.appendChild(st); } }, 0)})();";
+  var patchFontSizeCode = "(function() { var outer = document.createElement('div'); outer.style.width = '0px'; outer.style.height = '0px'; outer.style.overflow = 'hidden'; var d = document.createElement('div'); /* 1.18rem from scribble's stylesheet, times 118% in the MathJax-generated CSS. */ outer.style.fontSize = (1.18 * 1.18) + 'rem'; d.style.width = '1000em'; outer.appendChild(d); document.body.appendChild(outer); window.setTimeout(function() { var sz = d.clientWidth / 1000; document.body.removeChild(outer); if (sz > 3) { var st = document.createElement('style'); st.appendChild(document.createTextNode('html .mjx-chtml { font-size: '+sz+'px; } html .mjx-chtml .mjx-chtml { font-size: inherit; }')); document.head.appendChild(st); } }, 0)})();";
   var patchFontSize = window.document.createElement('script');
   patchFontSize.appendChild(window.document.createTextNode(patchFontSizeCode));
   patchFontSize.setAttribute('type', 'text/javascript');
