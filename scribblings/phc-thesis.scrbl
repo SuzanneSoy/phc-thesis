@@ -23,15 +23,23 @@
 @;@(version-text "Document version: " ".")
 
 @(cond-element
-  [html (list "Download a "
-              @hyperlink["../pdf/phc-thesis.pdf"]{PDF version}
-              " of this document.")]
+  [html @list{Download a @hyperlink["../pdf/phc-thesis.pdf"]{PDF version}
+    of this document.
+
+    Download a @hyperlink[(version-text "../phc-thesis-" ".zip")]{Zip archive}
+    of the HTML and PDF versions of this document.}]
   [latex
    (list "HTML version available at "
          @hyperlink["https://jsmaniac.github.io/phc-thesis/phc-thesis/"
                     ]{https://jsmaniac.github.io/phc-thesis/phc-thesis/}
                      ".")]
-  [else ""])
+  [else @list{HTML version: https://jsmaniac.github.io/phc-thesis/phc-thesis/
+
+    PDF version: https://jsmaniac.github.io/phc-thesis/pdf/phc-thesis.pdf
+
+    Zip archive of the HTML and PDF versions:
+    @(version-text "https://jsmaniac.github.io/phc-thesis/phc-thesis-"
+                   ".zip")}])
 
 @(table-of-contents)
 
