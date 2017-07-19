@@ -687,7 +687,7 @@ EOCSS
                                                        (file->bytes tikztag.sty)
                                                        #"\n\\makeatother\n"))))
                 (list "\\hphantom{\text{" @mathtext[txt] "}}"
-                      "\\tikztag{" @mathtext[txt] "}"))]
+                      "\\tikztag" (if starred? "*" "") "{" @mathtext[txt] "}"))]
    [else (list " (" txt ")")]))
 
 (define tag (tag** #f))
