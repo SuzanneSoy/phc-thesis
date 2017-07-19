@@ -45,7 +45,6 @@ jobs:
       - if test "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id`; then travis_terminate 1; fi
       - rm -f ~/.racket/travis_build_id
       # Do this before modifying anything in the build folder, to avoid the "x" marker indicating changes since last commit.
-      - zipfile_folder_name="$(racket -e '(begin (require phc-thesis/scribblings/util) (display (version-text "phc-thesis-" "")))')"
       - echo "LaTeX extra packages:"
       - latex_home=$(kpsewhich -var-value=TEXMFHOME)
       - curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
@@ -60,6 +59,7 @@ jobs:
       - mv mathpartir.sty "$latex_home/tex/latex/mathpartir"
       - echo "Finished installing extra latex packages."
       - raco pkg install --deps search-auto -j 2
+      - zipfile_folder_name="$(racket -e '(begin (require phc-thesis/scribblings/util) (display (version-text "phc-thesis-" "")))')"
       - raco test -x -p "$(basename "$TRAVIS_BUILD_DIR")"
       - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$TRAVIS_BUILD_DIR")";
       - rm -fr doc/

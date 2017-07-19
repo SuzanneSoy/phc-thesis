@@ -48,7 +48,11 @@
          textbf
          textit
          textrm
-         text)
+         text
+         &
+         nl
+         tag*
+         tag)
 
 (require racket/stxparam
          racket/splicing
@@ -494,14 +498,16 @@ EOTEX
                         (string->bytes/utf-8
                          "\\usepackage{mathpartir}"))))
        ($ (cond-element [html "\\frac{\\begin{gathered}"]
-                        [else "\\inferrule{"])
-          from*
+                        [else (string-append "\\ifcsname savedamp\\endcsname"
+                                             "\\else\\let\\savedamp&\\fi"
+                                             "\\inferrule{")])
+          (if (eq? from* -) "\\vphantom{x}" from*)
           (cond-element [html "\\end{gathered}}{\\begin{gathered}"]
                         [else "}{"])
-          to*
+          (if (eq? to* -) "\\vphantom{x}" to*)
           (cond-element [html "\\end{gathered}}"]
                         [else "}"])
-          label))])
+          "\\ " label))])
 
 (define htmldiff-css-experiment #<<EOCSS
 .version:after {
@@ -550,7 +556,7 @@ EOCSS
 
 (define (aligned #:valign [valign 'mid] . lines)
   (define valign-letter (case valign [(top) "t"] [(mid) "m"] [(bot) "b"]))
-  @list{
+  @$${
  \begin{aligned}[@valign-letter]
  @lines
  \end{aligned}
@@ -648,3 +654,41 @@ EOCSS
 (define (textit . l) (mathtext "\\textit{" l "}"))
 (define (textrm . l) (mathtext "\\textrm{" l "}"))
 (define (text . l) (mathtext "\\text{" l "}"))
+
+;; In some cases, LaTeX doesn't like the use of the regular & and \\ because
+;; they were redefined (mostly when placing arrays or cases within an inferrule.
+;; For now, we just use this simple workaround
+(define & @cond-element[[latex "\\savedamp"] [else "&"]])
+(define nl @cond-element[[latex "\\csname @arraycr\\endcsname"] [else "\\\\"]])
+
+(define-runtime-path tikztag.sty "../tikztag.sty")
+(define ((tag** starred?) . txt)
+  (cond-element
+   [html (list "\\hphantom{"
+               (text (if starred? "" "(")
+                     txt
+                     (if starred? "" ")"))
+               "}"
+               "\\tag*{"
+               (mathtext
+                ($ "\\llap{"
+                   (text (if starred? "" "(")
+                         txt
+                         (if starred? "" ")"))
+                   "}"))
+               "}")]
+   [latex (elem #:style (style #f (list (tex-addition
+                                         ;; The \n are important in case the
+                                         ;; file does not end with a newline
+                                         ;; but ends with a comment (it gobbles
+                                         ;; the \makeatother and the following
+                                         ;; commands if there are no \n.
+                                         (bytes-append #"\n\\makeatletter\n"
+                                                       (file->bytes tikztag.sty)
+                                                       #"\n\\makeatother\n"))))
+                (list "\\hphantom{\text{" @mathtext[txt] "}}"
+                      "\\tikztag{" @mathtext[txt] "}"))]
+   [else (list " (" txt ")")]))
+
+(define tag (tag** #f))
+(define tag* (tag** #t))

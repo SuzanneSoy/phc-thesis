@@ -109,7 +109,14 @@
 (define-syntax num-τ* (defop "num"))
 (define num-e @num-e*[n])
 (define num-v @num-v*[n])
-(define num-τ @num-τ*[n])
+(define-syntax num-τ
+  (syntax-parser
+    [(_ n) #'@num-τ*[n]]
+    [self:id #'@num-τ*[n]])) ;; n by default
+
+(define-syntax nullv (defop @${@textit{null}}))
+(define-syntax nulle (defop "null"))
+(define-syntax nullτ (defop "null"))
 
 (define-syntax true-e (defop "true"))
 (define-syntax true-v (defop @${@textit{true}}))
@@ -149,18 +156,39 @@
   @${@(stringify α) \mathbf{…}})
 @;(define-syntax →Values (defop "Values"))
 (define-syntax-rule (→Values v ...) (spaces (stringify v) ...))
-(define @emptypath @${ϵ} #;@${•})
+(define @emptypath @${ϵ})
 (define-syntax-rule (<: a b)
   @${⊢ @(stringify a) \mathrel{<:} @(stringify b)})
 
 (define-syntax-rule (<:R a b)
   @${⊢ @(stringify a) \mathrel{{<:}_R} @(stringify b)})
 
-@(define-syntax (Γ stx)
-   (syntax-case stx (⊢)
-     [(_ more ... ⊢ x τ φ+ φ- o)
-      #'@${@(add-between (list "Γ" (stringify more) ...) ", ") ⊢
+@(define-syntax Γ
+   (syntax-parser
+     #:literals (+) #:datum-literals (⊢)
+     [(_ {~and {~not +} more} ... {~optional {~seq + φ}} ⊢ x τ φ⁺ φ⁻ o)
+      #`@${@(add-between (list "Γ" (stringify more) ...) ", ")
+       @#,@(if (attribute φ) @list{+ @#'(stringify φ)} @list{}) ⊢
        @(stringify x)
        : @(stringify τ)
-       ; @(stringify φ+) / @(stringify φ-)
+       ; @(stringify φ⁺) / @(stringify φ⁻)
        ; @(stringify o)}]))
+@(define-syntax subst
+   (syntax-parser
+     [(_ {~seq from {~literal ↦} to} ...)
+      #'@$["[" (list (stringify from) "↦" (stringify to)) ... "]"]]))
+@(define-syntax substφo
+   (syntax-parser
+     [(_ from {~literal ↦} to)
+      #'@$["{|}_{{" (stringify from) "}↦{" (stringify to) "}}"]]))
+
+(define update "\\operatorname{update}")
+(define applyfilter "\\operatorname{applyfilter}")
+(define combinefilter "\\operatorname{combinefilter}")
+(define no-overlap "\\operatorname{no-overlap}")
+(define restrict "\\operatorname{restrict}")
+(define remove "\\operatorname{remove}")
+(define loc "\\mathit{loc}")
+(define (! . rest) (list "\\overline{" rest "}"))
+(define metatrue "\\mathrm{true}")
+(define metafalse "\\mathrm{false}")

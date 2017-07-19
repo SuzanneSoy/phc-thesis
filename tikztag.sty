@@ -1,0 +1,129 @@
+%%%%%%%%%%%%%%%%%%%% tikztag.sty %%%%%%%%%%%%%%%%%%%%
+% This code is released under the CC0 license (i.e. in the Public Domain
+% or under a very permissive license if your country does not recognise
+% dedications to the Public Domain.
+% Author: Georges Dupéron.
+%%%%%%%%%% \documentclass{article}
+%%%%%%%%%% \makeatletter
+\usepackage{amsmath, tikz, hyperref, lipsum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parse options into:
+%    \if@tikztag@star
+%    \if@tikztag@label@
+%    \@tikztag@label
+%    \if@tikztag@labeltext@
+%    \@tikztag@label
+\newif\if@tikztag@star@
+\newif\if@tikztag@label@
+\newif\if@tikztag@labeltext@
+\def\tikztag{\@ifstar\@tikztag@star\@tikztag@nostar}
+\def\@tikztag@star{\@tikztag@star@true\expandafter\@tikztag@common}
+\def\@tikztag@nostar{\@tikztag@star@false\expandafter\@tikztag@common}
+\def\@tikztag@common{\@ifnextchar[{%
+    \@tikztag@label@true\@tikztag@get@label%
+  }{%
+    \@tikztag@label@false\@tikztag%
+  }}
+\def\@tikztag@get@label[#1]{\def\@tikztag@label{#1}\expandafter\@tikztag@get@maybe@labeltext}
+\def\@tikztag@get@maybe@labeltext{\@ifnextchar[{%
+    \@tikztag@labeltext@true\@tikztag@get@labeltext%
+  }{%
+    \@tikztag@labeltext@false\@tikztag%
+  }}
+\def\@tikztag@get@labeltext[#1]{\def\@tikztag@labeltext{#1}\expandafter\@tikztag}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Implementation:
+\edef\tikztagnumber{0}
+\newcommand{\@tikztag}[1]{%
+  % place the marker:
+  \pgfmathtruncatemacro{\tikztagnumber}{\tikztagnumber+1}%
+  \xdef\tikztagnumber{\tikztagnumber}%
+  \tikz[remember picture]\coordinate(tikztagmarker\tikztagnumber){};%
+  % dispatch given the options
+  \if@tikztag@label@%
+    \if@tikztag@labeltext@%
+      \if@tikztag@star@%
+        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\expandafter\noexpand\@tikztag@labeltext}{\noexpand#1}{\tikztagnumber}{\noexpand\@firstoftwo}}%
+      \else%
+        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\expandafter\noexpand\@tikztag@labeltext}{(\noexpand#1)}{\tikztagnumber}{\noexpand\@firstoftwo}}%
+      \fi%
+    \else%
+      \if@tikztag@star@%
+        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\noexpand#1}{\noexpand#1}{\tikztagnumber}{\noexpand\@firstoftwo}}
+      \else
+        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\noexpand#1}{(\noexpand#1)}{\tikztagnumber}{\noexpand\@firstoftwo}}
+      \fi
+    \fi
+  \else
+    \if@tikztag@star@
+      \edef\@@tikztag{\noexpand\@@@tikztag{no label}{no label text}{\noexpand#1}{\tikztagnumber}{\noexpand\@secondoftwo}}
+    \else
+      \edef\@@tikztag{\noexpand\@@@tikztag{no label}{no label text}{(\noexpand#1)}{\tikztagnumber}{\noexpand\@secondoftwo}}
+    \fi
+  \fi
+  \@@tikztag
+}
+\newcommand{\@@@tikztag}[5]{%
+  \g@addto@macro\accumulatetikztag{\@@@@tikztag{#1}{#2}{#3}{#4}{#5}}%
+}
+% #1=label #2=label text #3=text #4=\tikztagnumber #5=\@firstoftwo or \@secondoftwo to use label or not
+\newcommand{\@@@@tikztag}[5]{%
+  \tikz[overlay,remember picture]%
+    \node[anchor=base east, inner xsep=0pt]%
+      at (tikztagmarker#4 -| current line right)%
+      {#3};%
+  #5{%
+    \tikz[overlay,remember picture]%
+      \node[anchor=base east, inner xsep=0pt]%
+        at (tikztagmarker#4 -| current line left)%
+        {\phantomsection\edef\@currentlabel{#2}\label{#1}};%
+  }{}
+}
+\def\inittikztag{%
+  \noindent\tikz[remember picture]\coordinate(current line left){};%
+  \tikz[overlay,remember picture]%
+    \coordinate[xshift=\linewidth] (current line right) at (current line left){};%
+  \xdef\accumulatetikztag{}%
+}%
+\def\posttikztag{\accumulatetikztag}%
+\let\@tikztag@old@texMathDisplay\texMathDisplay%
+\def\texMathDisplay#1{\inittikztag\@tikztag@old@texMathDisplay{#1\posttikztag}}%
+\newenvironment{taggableequationstar}{%
+  \inittikztag%
+  \begin{equation*}%
+}{%
+  \end{equation*}%
+  \posttikztag
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%\makeatother
+%%%%%%%%%%\begin{document}
+%%%%%%%%%%
+%%%%%%%%%%
+%%%%%%%%%%\lipsum[2]
+%%%%%%%%%%\begin{equation*}
+%%%%%%%%%%  \begin{array}{@{}r@{}c@{}l@{}}
+%%%%%%%%%%    a&bbbbb&c  \\
+%%%%%%%%%%    x&y&z      \\
+%%%%%%%%%%  \end{array}
+%%%%%%%%%%\end{equation*}
+%%%%%%%%%%\lipsum[2]
+%%%%%%%%%%\begin{taggableequationstar}
+%%%%%%%%%%  \begin{array}{@{}r@{}c@{}l@{}}
+%%%%%%%%%%    a&bbbbb&c \tikztag[eq:foo][abc]{a, b and c} \\
+%%%%%%%%%%    x&y&z     \tikztag[eq:bar]{other stuff}\\
+%%%%%%%%%%    x&y&z     \tikztag{more stuff}\\
+%%%%%%%%%%  \end{array}
+%%%%%%%%%%\end{taggableequationstar}
+%%%%%%%%%%Foo: \ref{eq:foo}. Bar: \ref{eq:bar}. Baz: \ref{eq:baz}. Quux: \ref{eq:quux}.
+%%%%%%%%%%\lipsum[2]
+%%%%%%%%%%\begin{taggableequationstar}
+%%%%%%%%%%  \begin{array}{@{}r@{}c@{}l@{}}
+%%%%%%%%%%    a&bbbbb&c \tikztag*[eq:baz][baz]{a, b and c (baz)} \\
+%%%%%%%%%%    x&y&z     \tikztag*[eq:quux]{other stuff 2}\\
+%%%%%%%%%%    x&y&z     \tikztag*{more stuff 2}\\
+%%%%%%%%%%  \end{array}
+%%%%%%%%%%\end{taggableequationstar}
+%%%%%%%%%%
+%%%%%%%%%%\end{document}
+%%%%%%%%%%%%%%%%%%%% end tikztag.sty %%%%%%%%%%%%%%%%%%%%

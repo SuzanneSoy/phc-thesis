@@ -12,7 +12,7 @@
 
 We extend the metafunctions for paths given
 in@~cite[#:precision "pp. 65 and 75" "tobin-hochstadt_typed_2010"]. The @${
- \mathop{update}} metafunction is used when using filters to restrict the type
+ @update} metafunction is used when using filters to restrict the type
 of a (subpart of a) local variable in the @tt{then} and @tt{else} branches of
 a conditional.
 
@@ -24,12 +24,12 @@ a conditional.
 
 @$${
  @aligned{
-  \mathop{update}(@record[@repeated{@|ɐ|ᵢ : τᵢ}ⁿ], υ_{π∷@|ɐ|ⱼ})
+  @update(@record[@repeated{@|ɐ|ᵢ : τᵢ}ⁿ], υ_{π∷@|ɐ|ⱼ})
   &= @record[@${@repeated{@|ɐ|ᵢ : τᵢ} ∖ \{@|ɐ|ⱼ : τⱼ\}}
-            @${@|ɐ|ⱼ : @${\mathop{update}(τⱼ, υ_π)}}]
+            @${@|ɐ|ⱼ : @${@update(τⱼ, υ_π)}}]
   \\
   &\quad @where @|ɐ|ⱼ : τⱼ ∈ @repeatset{@|ɐ|ᵢ : τᵢ}\\
-  \mathop{update}(@ctor[@κ τ], υ_{π∷@πctor-val})
-  &= @ctor[@κ @${\mathop{update}(τ, υ_π)}]
+  @update(@ctor[@κ τ], υ_{π∷@πctor-val})
+  &= @ctor[@κ @${@update(τ, υ_π)}]
  }
 }
