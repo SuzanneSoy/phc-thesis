@@ -14,8 +14,7 @@ cache:
     - ~/.racket
 
 before_install:
-- curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
-# - if $COV; then raco pkg install --deps search-auto doc-coverage cover cover-codecov; fi # or cover-coveralls
+ - true
 
 jobs:
   include:
@@ -23,6 +22,8 @@ jobs:
       install:
       # If [fastbuild] is on, skip directly to stage 2.
       - if test -e ~/.racket/travis_build_id && echo "$TRAVIS_COMMIT_MESSAGE" | grep -q -F "[fastbuild]"; then echo "$TRAVIS_BUILD_ID" && echo "$TRAVIS_BUILD_ID" > ~/.racket/travis_build_id && travis_terminate 0; fi
+      - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
+      # - if $COV; then raco pkg install --deps search-auto doc-coverage cover cover-codecov; fi # or cover-coveralls
       - mv ~/.racket ~/.racket-discard
       - mkdir ~/.racket
       - echo "$TRAVIS_BUILD_ID"
@@ -49,7 +50,8 @@ jobs:
       - if echo "$TRAVIS_COMMIT_MESSAGE" | grep -q -F "[keepcache]"; then cp -ai ~/.racket ~/.racket-stage1; fi
       - if test "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id`; then travis_terminate 1; fi
       - rm -f ~/.racket/travis_build_id
-      # Do this before modifying anything in the build folder, to avoid the "x" marker indicating changes since last commit.
+      - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
+      # - if $COV; then raco pkg install --deps search-auto doc-coverage cover cover-codecov; fi # or cover-coveralls
       - echo "LaTeX extra packages:"
       - latex_home=$(kpsewhich -var-value=TEXMFHOME)
       - curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
@@ -64,6 +66,7 @@ jobs:
       - mv mathpartir.sty "$latex_home/tex/latex/mathpartir"
       - echo "Finished installing extra latex packages."
       - raco pkg install --deps search-auto -j 2
+      # Do this before modifying anything else in the build folder, to avoid the "x" marker indicating changes since last commit.
       - zipfile_folder_name="$(racket -e '(begin (require phc-thesis/scribblings/util) (display (version-text "phc-thesis-" "")))')"
       - raco test -x -p "$(basename "$TRAVIS_BUILD_DIR")"
       - raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$TRAVIS_BUILD_DIR")";
