@@ -21,10 +21,14 @@ jobs:
   include:
     - stage: phase1
       install:
+      # If [fastbuild] is on, skip directly to stage 2.
+      - if test -e ~/.racket/travis_build_id && echo "$TRAVIS_COMMIT_MESSAGE" | grep -q -F "[fastbuild]"; then echo "$TRAVIS_BUILD_ID" && echo "$TRAVIS_BUILD_ID" > ~/.racket/travis_build_id && travis_terminate 0; fi
       - mv ~/.racket ~/.racket-discard
       - mkdir ~/.racket
       - echo "$TRAVIS_BUILD_ID"
       - echo "$TRAVIS_BUILD_ID" > ~/.racket/travis_build_id
+      # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
+      - raco pkg install --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
       - raco pkg install --deps search-auto -j 2 phc-adt # Start installing stuff, continue later to avoid timeout.
       script:
       - true
@@ -42,6 +46,7 @@ jobs:
           - pgf
           - latex-xcolor
       install:
+      - if echo "$TRAVIS_COMMIT_MESSAGE" | grep -q -F "[keepcache]"; then cp -ai ~/.racket ~/.racket-stage1; fi
       - if test "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id`; then travis_terminate 1; fi
       - rm -f ~/.racket/travis_build_id
       # Do this before modifying anything in the build folder, to avoid the "x" marker indicating changes since last commit.
@@ -79,7 +84,8 @@ jobs:
       - mv "${zipfile_folder_name}.zip" doc/
       - if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
       - mv ~/.racket ~/.racket-discard
-      - mkdir ~/.racket # clear the cache
+      # Keeping pre-existing cache from stage 1 for faster build with [fastbuild] option next time, or clear the cache.
+      - if echo "$TRAVIS_COMMIT_MESSAGE" | grep -q -F "[keepcache]"; then mv ~/.racket-stage1 ~/.racket; else mkdir ~/.racket; fi
       script:
       - true
 
