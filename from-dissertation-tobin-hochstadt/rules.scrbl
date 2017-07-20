@@ -54,10 +54,11 @@ their inclusion in the following semantics would needlessly complicate things.
 Expressions:
 
 @cases["e" #:first-sep "⩴"
-       @acase{x@tag*{variable}}
+       @acase{x @P y @P z@tag*{variable}}
        @acase{@num-e @tag*{number}}
        @acase{@true-e @tag*{booleans}}
        @acase{@false-e}
+       @acase{@null-e @tag*{null constant}}
        @acase{@primop @tag*{primitive operations}}
        @acase{@app[e @repeated{e}] @tag*{function application}}
        @acase{@ifop[e e e] @tag*{conditional}}
@@ -77,10 +78,10 @@ Primitive operations:
 @cases[@primop #:first-sep "⩴"
        @acase{@textit{add1}} ;; only here as an example
        @acase{@textit{number?}} ;; probably used in some explanation
-       @acase{@textit{cons?}}
+       @acase{@textit{cons?}@tag*{pair predicate}}
        @acase{@textit{null?}}
-       @acase{@textit{car}}
-       @acase{@textit{cdr}}
+       @acase{@textit{car}@tag*{first element of pair}}
+       @acase{@textit{cdr}@tag*{second element of pair}}
        @acase{…}]
 
 Values:
@@ -137,7 +138,7 @@ Types:
        @acase{@∀r[@${(@repeated{α} @polydotα[α])} @repeated{τ}]}
        @acase{@un[@repeated{τ}]}
        @acase{@consτ[τ τ]}
-       @acase{@nullτ}]
+       @acase{@null-τ}]
 
 @htodo{Add the rec types}
 
@@ -343,19 +344,19 @@ Typing rules:
             @${@textsc{T-Primop}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @true-v @true-τ ϵ ⊥ ∅]}
+            @${@Γ[⊢ @true-e @true-τ ϵ ⊥ ∅]}
             @${@textsc{T-True}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @false-v @false-τ ⊥ ϵ ∅]}
+            @${@Γ[⊢ @false-e @false-τ ⊥ ϵ ∅]}
             @${@textsc{T-False}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @num-v @num-τ ϵ ⊥ ∅]}
+            @${@Γ[⊢ @num-e @num-τ ϵ ⊥ ∅]}
             @${@textsc{T-Num}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @nullv @nullτ ⊥ ϵ ∅]}
+            @${@Γ[⊢ @null-e @null-τ ⊥ ϵ ∅]}
             @${@textsc{T-Null}}]
 
 
@@ -498,19 +499,19 @@ therefore should not need to be included in our @${\vphantom{
  @no-overlap(@num-τ[n], @num-τ[m]) &= @metatrue @textif n ≠ m \\
  @no-overlap(@num-τ, @true-τ) &= @metatrue \\
  @no-overlap(@num-τ, @false-τ) &= @metatrue \\
- @no-overlap(@num-τ, @nullτ) &= @metatrue \\
+ @no-overlap(@num-τ, @null-τ) &= @metatrue \\
  @no-overlap(@true-τ, @false-τ) &= @metatrue \\
- @no-overlap(@true-τ, @nullτ) &= @metatrue \\
- @no-overlap(@false-τ, @nullτ) &= @metatrue \\
+ @no-overlap(@true-τ, @null-τ) &= @metatrue \\
+ @no-overlap(@false-τ, @null-τ) &= @metatrue \\
  @no-overlap(@num-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
  @no-overlap(@true-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
  @no-overlap(@false-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
  @no-overlap(@consτ[τ τ′]) &= , @f→[(@repeated{τ}) @R]) &= @metatrue \\
- @no-overlap(@nullτ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
+ @no-overlap(@null-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
  @no-overlap(@num-τ, @consτ[τ τ′]) &= @metatrue \\
  @no-overlap(@true-τ, @consτ[τ τ′]) &= @metatrue \\
  @no-overlap(@false-τ, @consτ[τ τ′]) &= @metatrue \\
- @no-overlap(@nullτ, @consτ[τ τ′]) &= @metatrue \\
+ @no-overlap(@null-τ, @consτ[τ τ′]) &= @metatrue \\
  @no-overlap(@consτ[τ τ′], @consτ[σ σ′])
  &= @no-overlap(τ,σ) ∨ @no-overlap(τ′,σ′)\\
  @no-overlap((⋃ @repeatset{τ}), σ) &= ⋀@repeated{@no-overlap(τ,σ)}\\

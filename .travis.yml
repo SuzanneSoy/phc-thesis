@@ -28,7 +28,7 @@ jobs:
       - echo "$TRAVIS_BUILD_ID"
       - echo "$TRAVIS_BUILD_ID" > ~/.racket/travis_build_id
       # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
-      - raco pkg update --scope installation --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
+      - raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
       - raco pkg install --deps search-auto -j 2 phc-adt # Start installing stuff, continue later to avoid timeout.
       script:
       - true

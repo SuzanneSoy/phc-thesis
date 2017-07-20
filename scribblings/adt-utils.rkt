@@ -114,9 +114,9 @@
     [(_ n) #'@num-τ*[n]]
     [self:id #'@num-τ*[n]])) ;; n by default
 
-(define-syntax nullv (defop @${@textit{null}}))
-(define-syntax nulle (defop "null"))
-(define-syntax nullτ (defop "null"))
+(define-syntax null-v (defop @${@textit{null}}))
+(define-syntax null-e (defop "null"))
+(define-syntax null-τ (defop "null"))
 
 (define-syntax true-e (defop "true"))
 (define-syntax true-v (defop @${@textit{true}}))
