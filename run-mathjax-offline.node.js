@@ -77,7 +77,7 @@ jsdom.env('doc/phc-thesis/index.html', function(err, window) {
     }
   };
   // Remove the script which loads MathJax automatically, as it slows down things a lot when it re-renders the math.
-  var scriptsInHead = window.document.head.getElementByTagName('script');
+  var scriptsInHead = window.document.head.getElementsByTagName('script');
   for (var i = 0; i < scriptsInHead.length; i++) {
     var e = scriptsInHead.item(i);
     if (e.innerHTML.trim() == decodeURI("(function()%20%7Bdocument.write('%3Cscr'%20+%20'ipt%20type=%22text/javascript%22%20src=%22MathJax/MathJax.js?config=default%22%3E%3C/scr'%20+%20'ipt%3E');%7D)();")) {
