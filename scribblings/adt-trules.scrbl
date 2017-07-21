@@ -113,7 +113,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    Γ ⊢ e_{v} : τ_{v} ; φ_{v} ; o_{v} \\
    @|ɐ|ⱼ : τ'ⱼ ∈ @repeatset{@|ɐ|ᵢ : τ'ᵢ}
   }
- @${Γ ⊢ @opwith[@${e_{r}} @|ɐⱼ| @${e_{v}}]
+ @${Γ ⊢ @opwith[@${e_{r}} @${@|ɐ|ⱼ} @${e_{v}}]
    : @record[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}} @${@|ɐ|ⱼ : τ_{v}}]
    ; ϵ|⊥ ; ∅}
  @${@textsc{T-Record-With}_2}

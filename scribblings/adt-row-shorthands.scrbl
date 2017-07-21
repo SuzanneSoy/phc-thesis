@@ -46,10 +46,12 @@ the following types:
 
 
 The polymorphic builder function for a record which
-intuitively corresponds to @record[@repeated{ɐ}] can be written as the
-η-expansion of the @record[@repeated{ɐ = e}] operator:
+intuitively corresponds to @record[@repeated{@ɐ}] can be written as the
+η-expansion of the @record[@repeated{@ɐ = e}] operator:
 
-@$${(Λ (@repeated{αᵢ}) (λ (@repeated{[xᵢ : αᵢ]}) @record[@repeated{ɐᵢ = xᵢ}]))}
+@$${
+ (Λ (@repeated{αᵢ}) (λ (@repeated{[xᵢ : αᵢ]}) @record[@repeated{@|ɐ|ᵢ = xᵢ}]))
+}
 
 The same applies to the predicate form of records:
 

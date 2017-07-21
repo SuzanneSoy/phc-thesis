@@ -5,7 +5,7 @@
          scribble/latex-properties
          scribble/html-properties
          scribble-math
-         scribble-math/katex-convert-unicode)
+         scribble-math/mathjax-convert-unicode)
 
 (provide mathtext
          (rename-out [$* $]
@@ -54,7 +54,7 @@
                            mathmode?))]
         [(string? e)
          ;; TODO: do this only when compiling to HTML.
-         (katex-convert-unicode e mathmode?)]
+         (mathjax-convert-unicode e mathmode?)]
         [else e]))
 
 (define ($* . elts)

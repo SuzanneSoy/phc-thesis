@@ -157,6 +157,7 @@
 (define m
   (list setup-math
         (tex-header #<<EOTEX
+ \def\ifmathjax#1{}\def\iflatex#1{#1}
  \renewcommand{\rmdefault}{cmr}
  \newenvironment{qaligned}{%
   \begin{array}[t]{@{}r@{}c@{}l@{}}%
@@ -183,7 +184,8 @@ EOTEX
 
 html .MathJax_Display, html div.MathJax_Preview {
   margin: 2em 0;
-}"))))))
+}"))))
+        @${\def\ifmathjax#1{#1}\def\iflatex#1{}}))
 (define my-title
   ;; TODO: use this for the other wrapped procs in this file
   (make-keyword-procedure

@@ -32,6 +32,7 @@ jsdom.env('doc/phc-thesis/index.html', function(err, window) {
     return mm;
   };
   var mm = getmath();
+  var addedCSS = [];
   var processMathElement = function(i) {
     if (i >= mm.length) {
       process.stdout.write('\nSaving modified HTML file…\n');
@@ -53,11 +54,16 @@ jsdom.env('doc/phc-thesis/index.html', function(err, window) {
           mm[i].classList.add('math-initial-hidden');
 
           // Add the CSS to the document
-          var css = window.document.createElement('style');
-          css.setAttribute('type', 'text/css');
-          var csstxt = window.document.createTextNode(result.css);
-          css.appendChild(csstxt);
-          window.document.head.appendChild(css);
+          if (addedCSS.indexOf(result.css) == -1){
+            addedCSS.push(result.css);
+            // Inject font-display: block; to prevent the browsers from stalling while applying fonts each time a new one is loaded.
+            var css = result.css.split('@font-face {').join('@font-face {font-display: block; ');
+            var styleElt = window.document.createElement('style');
+            styleElt.setAttribute('type', 'text/css');
+            var styleTxt = window.document.createTextNode(css);
+            styleElt.appendChild(styleTxt);
+            window.document.head.appendChild(styleElt);
+          }
           
           // wrap the generated element in a class="MathJax_Preview" node
           preview = window.document.createElement((mm[i].tagName.toLowerCase() == 'div' ? 'div' : 'span'));
@@ -70,6 +76,14 @@ jsdom.env('doc/phc-thesis/index.html', function(err, window) {
       });
     }
   };
+  // Remove the script which loads MathJax automatically, as it slows down things a lot when it re-renders the math.
+  var scriptsInHead = window.document.head.getElementByTagName('script');
+  for (var i = 0; i < scriptsInHead.length; i++) {
+    var e = scriptsInHead.item(i);
+    if (e.innerHTML.trim() == decodeURI("(function()%20%7Bdocument.write('%3Cscr'%20+%20'ipt%20type=%22text/javascript%22%20src=%22MathJax/MathJax.js?config=default%22%3E%3C/scr'%20+%20'ipt%3E');%7D)();")) {
+      e.parentNode.removeChild(e);
+    }
+  }
   // Fix the font size (mathjax-node cannot know easily the webpage's font size in advance).
   var patchFontSizeCode = "(function() { var outer = document.createElement('div'); outer.style.width = '0px'; outer.style.height = '0px'; outer.style.overflow = 'hidden'; var d = document.createElement('div'); /* 1.18rem from scribble's stylesheet, times 118% in the MathJax-generated CSS. */ outer.style.fontSize = (1.18 * 1.18) + 'rem'; d.style.width = '1000em'; outer.appendChild(d); document.body.appendChild(outer); window.setTimeout(function() { var sz = d.clientWidth / 1000; document.body.removeChild(outer); if (sz > 3) { var st = document.createElement('style'); st.appendChild(document.createTextNode('html .mjx-chtml { font-size: '+sz+'px; } html .mjx-chtml .mjx-chtml { font-size: inherit; }')); document.head.appendChild(st); } }, 0)})();";
   var patchFontSize = window.document.createElement('script');

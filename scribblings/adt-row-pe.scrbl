@@ -22,7 +22,7 @@ a conditional.
  define it.}
 
 @todo{How should I note cleanly these removals / replacements which refer to
- an ɐ and its τ or @${v} inside the set of @${@|ɐ|ᵢ}?}
+ an @|ɐ| and its τ or @${v} inside the set of @${@|ɐ|ᵢ}?}
 
 @$${
  @aligned{
