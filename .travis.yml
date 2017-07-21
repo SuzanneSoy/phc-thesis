@@ -49,7 +49,7 @@ jobs:
           - latex-xcolor
       install:
       - if echo "$TRAVIS_COMMIT_MESSAGE" | grep -q -F "[keepcache]"; then cp -ai ~/.racket ~/.racket-stage1; fi
-      - if false && test "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id` && (test "fastbuild" != `cat ~/.racket/travis_build_id` || (echo "$TRAVIS_COMMIT_MESSAGE" | grep -q -F "[fastbuild]")); then travis_terminate 1; fi
+      - if test "$TRAVIS_BUILD_ID" != `cat ~/.racket/travis_build_id` && (test "fastbuild" != `cat ~/.racket/travis_build_id` || (echo "$TRAVIS_COMMIT_MESSAGE" | grep -q -F "[fastbuild]")); then travis_terminate 1; fi
       - rm -f ~/.racket/travis_build_id
       - curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
       # - if $COV; then raco pkg install --deps search-auto doc-coverage cover cover-codecov; fi # or cover-coveralls
