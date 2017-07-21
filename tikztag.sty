@@ -40,28 +40,29 @@
   \xdef\tikztagnumber{\tikztagnumber}%
   \tikz[remember picture]\coordinate(tikztagmarker\tikztagnumber){};%
   % dispatch given the options
+  \expandafter\gdef\csname @tikztag@tag@\tikztagnumber\endcsname{#1}%
   \if@tikztag@label@%
     \if@tikztag@labeltext@%
       \if@tikztag@star@%
-        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\expandafter\noexpand\@tikztag@labeltext}{\noexpand#1}{\tikztagnumber}{\noexpand\@firstoftwo}}%
+        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\expandafter\noexpand\@tikztag@labeltext}{\expandafter\noexpand\csname @tikztag@tag@\tikztagnumber\endcsname}{\tikztagnumber}{\noexpand\@firstoftwo}}%
       \else%
-        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\expandafter\noexpand\@tikztag@labeltext}{(\noexpand#1)}{\tikztagnumber}{\noexpand\@firstoftwo}}%
+        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\expandafter\noexpand\@tikztag@labeltext}{(\expandafter\noexpand\csname @tikztag@tag@\tikztagnumber\endcsname)}{\tikztagnumber}{\noexpand\@firstoftwo}}%
       \fi%
     \else%
       \if@tikztag@star@%
-        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\noexpand#1}{\noexpand#1}{\tikztagnumber}{\noexpand\@firstoftwo}}
-      \else
-        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\noexpand#1}{(\noexpand#1)}{\tikztagnumber}{\noexpand\@firstoftwo}}
-      \fi
-    \fi
-  \else
-    \if@tikztag@star@
-      \edef\@@tikztag{\noexpand\@@@tikztag{no label}{no label text}{\noexpand#1}{\tikztagnumber}{\noexpand\@secondoftwo}}
-    \else
-      \edef\@@tikztag{\noexpand\@@@tikztag{no label}{no label text}{(\noexpand#1)}{\tikztagnumber}{\noexpand\@secondoftwo}}
-    \fi
-  \fi
-  \@@tikztag
+        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\expandafter\noexpand\csname @tikztag@tag@\tikztagnumber\endcsname}{\expandafter\noexpand\csname @tikztag@tag@\tikztagnumber\endcsname}{\tikztagnumber}{\noexpand\@firstoftwo}}%
+      \else%
+        \edef\@@tikztag{\noexpand\@@@tikztag{\expandafter\noexpand\@tikztag@label}{\expandafter\noexpand\csname @tikztag@tag@\tikztagnumber\endcsname}{(\expandafter\noexpand\csname @tikztag@tag@\tikztagnumber\endcsname)}{\tikztagnumber}{\noexpand\@firstoftwo}}%
+      \fi%
+    \fi%
+  \else%
+    \if@tikztag@star@%
+      \edef\@@tikztag{\noexpand\@@@tikztag{no label}{no label text}{\expandafter\noexpand\csname @tikztag@tag@\tikztagnumber\endcsname}{\tikztagnumber}{\noexpand\@secondoftwo}}%
+      \else%
+      \edef\@@tikztag{\noexpand\@@@tikztag{no label}{no label text}{(\expandafter\noexpand\csname @tikztag@tag@\tikztagnumber\endcsname)}{\tikztagnumber}{\noexpand\@secondoftwo}}%
+    \fi%
+  \fi%
+  \@@tikztag%
 }
 \newcommand{\@@@tikztag}[5]{%
   \g@addto@macro\accumulatetikztag{\@@@@tikztag{#1}{#2}{#3}{#4}{#5}}%

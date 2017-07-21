@@ -59,7 +59,7 @@ Expressions:
        @acase{@true-e @tag*{booleans}}
        @acase{@false-e}
        @acase{@null-e @tag*{null constant}}
-       @acase{@primop @tag*{primitive operations}}
+       @acase{@primop @tag*{primitive functions}}
        @acase{@app[e @repeated{e}] @tag*{function application}}
        @acase{@ifop[e e e] @tag*{conditional}}
        @acase{@λe[(@repeated{x:τ}) e] @tag*{lambda function}}
@@ -87,31 +87,35 @@ Primitive operations:
 Values:
 
 @cases["v" #:first-sep "⩴"
-       @acase{c}
-       @acase{@num-v}
-       @acase{@true-v}
+       @acase{@primop @tag*{primitive function}}
+       @acase{@num-v @tag*{number}}
+       @acase{@true-v @tag*{booleans}}
        @acase{@false-v}
-       @acase{@primop}
-       @acase{@λv[ℰ (@repeated{x:τ}) e]}
-       @acase{@λv[ℰ (@repeated{x:τ} @${\ .\ } @${x:τ*}) e]}
-       @acase{@λv[ℰ (@repeated{x:τ} @${\ .\ } @${x:@polydot[τ α]}) e]}
-       @acase{@Λv[ℰ (@repeated{α}) e]}
-       @acase{@Λv[ℰ (@repeated{α} @polydotα[α]) e]}
-       @acase{@consv[v v]}]
+       @acase{@λv[ℰ (@repeated{x:τ}) e] @tag*{lambda function}}
+       @acase{@λv[ℰ (@repeated{x:τ} @${\ .\ } @${x:τ*}) e]
+        @tag*{variadic function}}
+       @acase{@λv[ℰ (@repeated{x:τ} @${\ .\ } @${x:@polydot[τ α]}) e]
+        @tag*{variadic polymorphic function}}
+       @acase{@Λv[ℰ (@repeated{α}) e]
+       @tag*{polymorphic abstraction}}
+       @acase{@Λv[ℰ (@repeated{α} @polydotα[α]) e]
+       @tag*{variadic polymorphic abstraction}}
+       @acase{@consv[v v] @tag*{pair}}]
 
 Execution environment:
 
 @cases["ℰ" #:first-sep "⩴"
-       @acase{@repeated{@↦v[x v]}\ @repeated{@↦v[α τ]}}]
+       @acase{@repeated{@↦v[x v]}\ @repeated{@↦v[α τ]}
+        @tag*{bound variables \& types}}]
 
 Evaluation context:
 
 @cases["E" #:first-sep "⩴"
-       @acase{[]}
-       @acase{@app[E @repeated{e}]}
+       @acase{[] @tag*{program entry point}}
+       @acase{@app[E @repeated{e}]@tag*{function application}}
        @acase{@app[v @repeated{v} E @repeated{e}]}
-       @acase{@ifop[E e e]}
-       @acase{@conse[E e]} @; TODO: shouldn't it be a primop?
+       @acase{@ifop[E e e]@tag*{conditional}}
+       @acase{@conse[E e]@tag*{pair}} @; TODO: shouldn't it be a primop?
        @acase{@conse[v E]}] @; TODO: shouldn't it be a primop?
         
 @; TODO: are other cases needed?
@@ -127,18 +131,20 @@ Typing judgement:
 Types:
 
 @cases["τ,σ" #:first-sep "⩴"
-       @acase{⊤}
-       @acase{@num-τ}
-       @acase{@true-τ}
+       @acase{⊤@tag*{top}}
+       @acase{@num-τ @tag*{number singleton}}
+       @acase{@true-τ @tag*{boolean singleton}}
        @acase{@false-τ}
-       @acase{@f→[(@repeated{τ}) R]}
-       @acase{@f→[(@repeated{τ} @${\ .\ } @${τ*}) R]}
-       @acase{@f→[(@repeated{τ} @${\ .\ } @polydot[τ α]) R]}
-       @acase{@∀r[@${(@repeated{α})} @repeated{τ}]}
-       @acase{@∀r[@${(@repeated{α} @polydotα[α])} @repeated{τ}]}
-       @acase{@un[@repeated{τ}]}
-       @acase{@consτ[τ τ]}
-       @acase{@null-τ}]
+       @acase{@f→[(@repeated{τ}) R] @tag*{function}}
+       @acase{@f→[(@repeated{τ} @${\ .\ } @${τ*}) R] @tag*{variadic function}}
+       @acase{@f→[(@repeated{τ} @${\ .\ } @polydot[τ α]) R]
+        @tag*{variadic polymorphic function}}
+       @acase{@∀r[@${(@repeated{α})} @repeated{τ}]@tag*{polymorphic type}}
+       @acase{@∀r[@${(@repeated{α} @polydotα[α])} @repeated{τ}]
+        @tag*{variadic polymorphic type}}
+       @acase{@un[@repeated{τ}]@tag*{union}}
+       @acase{@consτ[τ τ]@tag*{pair}}
+       @acase{@null-τ @tag*{null (end of lists)}}]
 
 @htodo{Add the rec types}
 
@@ -151,28 +157,30 @@ Types:
 
 Filters (conditional typing information):
 
-@cases[@${φ} #:first-sep "⩴" @acase{@repeatset{ψ}}]
+@cases[@${φ} #:first-sep "⩴" @acase{@repeatset{ψ}}@tag*{filter set}]
 
 @cases["ψ" #:first-sep "⩴"
-       @acase{τ_{@loc}}
-       @acase{@!{τ}_{@loc}}
-       @acase{⊥}]
+       @acase{τ_{@loc}
+        @tag*{@${ℰ[v] = \mathbf{?} ⇒ ℰ[@loc]@text{ is of type @${τ}}}}}
+       @acase{@!{τ}_{@loc}
+        @tag*{@${ℰ[v] = \mathbf{?} ⇒ ℰ[@loc]@text{ is not of type @${τ}}}}}
+       @acase{⊥@tag*{contradiction}}]
 
 @cases[@loc #:first-sep "⩴"
-       @acase{•\qquad\qquad@text{function's first argument}}
-       @acase{x}]
+       @acase{•@tag*{function's first argument}}
+       @acase{x@tag*{variable}}]
 
 Objects (aliasing information):
 
 @cases[@textrm{o} #:first-sep "⩴"
-       @acase{π(@loc)}
-       @acase{∅}]
+       @acase{π(@loc)@tag*{@${e} is an alias for @${π(@loc)}}}
+       @acase{∅@tag*{no aliasing information}}]
 
 Paths:
 
 @cases[@textit{π} #:first-sep "⩴"
-       @acase{pe∷π}
-       @acase{@emptypath \qquad\qquad\text{empty path}}]
+       @acase{pe∷π@tag*{path concatenation}}
+       @acase{@emptypath @tag*{empty path}}]
 
 The path concatenation operator @${∷} is associative. @htodo{Actually, we
  define it for pe∷π above, not for π∷π}. The @${@emptypath} is omitted from
@@ -182,8 +190,8 @@ paths with one or more elements, so we write @${car∷cdr} instead of @${
 Path elements (aliasing information):
 
 @cases[@textit{pe} #:first-sep "⩴"
-       @acase{car}
-       @acase{cdr}]
+       @acase{car@tag*{first element of pair}}
+       @acase{cdr@tag*{second element of pair}}]
 
 Subtyping:
 

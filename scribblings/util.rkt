@@ -652,10 +652,10 @@ EOCSS
 (define textif @mathtext{\text{ if }})
 (define otherwise @mathtext{\text{ otherwise }})
 (define quad @${\quad})
-(define (textbf . l) (mathtext "\\textbf{" l "}"))
-(define (textit . l) (mathtext "\\textit{" l "}"))
-(define (textrm . l) (mathtext "\\textrm{" l "}"))
-(define (text . l) (mathtext "\\text{" l "}"))
+(define (textbf . l) ($ (mathtext "\\textbf{" l "}")))
+(define (textit . l) ($ (mathtext "\\textit{" l "}")))
+(define (textrm . l) ($ (mathtext "\\textrm{" l "}")))
+(define (text . l) ($ (mathtext "\\text{" l "}")))
 
 ;; In some cases, LaTeX doesn't like the use of the regular & and \\ because
 ;; they were redefined (mostly when placing arrays or cases within an inferrule.
@@ -688,7 +688,7 @@ EOCSS
                                          (bytes-append #"\n\\makeatletter\n"
                                                        (file->bytes tikztag.sty)
                                                        #"\n\\makeatother\n"))))
-                (list "\\hphantom{\text{" @mathtext[txt] "}}"
+                (list "\\hphantom{\\text{" @mathtext[txt] "}}"
                       "\\tikztag" (if starred? "*" "") "{" @mathtext[txt] "}"))]
    [else (list " (" txt ")")]))
 
