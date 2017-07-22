@@ -72,16 +72,32 @@
                             (add1 a)))
                   1))
 
-@;{
-@aappendix{
- @include-asection[(lib "phc-graph/scribblings/phc-graph-implementation.scrbl")]
- @include-asection[(lib "phc-adt/scribblings/phc-adt-implementation.scrbl")]
- @include-asection[(submod (lib "remember/remember-implementation.hl.rkt") doc)]
- @include-asection[(submod (lib "multi-id/multi-id.hl.rkt") doc)]
- @include-asection[
+@(require (for-syntax racket/base
+                      mzlib/etc))
+@(define-syntax (if-appendices stx)
+   (syntax-case stx ()
+     [(_ a)
+      (if (file-exists? (build-path (this-expression-source-directory)
+                                    'up
+                                    "no-appendices"))
+          #'(displayln "Appendices turned off on this build."
+                       (current-error-port))
+          #`(begin
+              (displayln (format "Appendices enabled on this build."
+                                 #,(current-directory))
+                         (current-error-port))
+              a))]))
+@if-appendices[
+ @aappendix{
+  @include-asection[
+ (lib "phc-graph/scribblings/phc-graph-implementation.scrbl")]
+  @include-asection[(lib "phc-adt/scribblings/phc-adt-implementation.scrbl")]
+  @include-asection[
+ (submod (lib "remember/remember-implementation.hl.rkt") doc)]
+  @include-asection[(submod (lib "multi-id/multi-id.hl.rkt") doc)]
+  @include-asection[
  (lib "type-expander/scribblings/type-expander-implementation.scrbl")]
-}
-}
+ }]
 
 @;{
  Notes concerning tikz → SVG conversion:
