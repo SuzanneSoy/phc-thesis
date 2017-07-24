@@ -167,12 +167,22 @@
    (syntax-parser
      #:literals (+) #:datum-literals (⊢)
      [(_ {~and {~not +} more} ... {~optional {~seq + φ}} ⊢ x τ φ⁺ φ⁻ o)
-      #`@${@(add-between (list "Γ" (stringify more) ...) ", ")
+      #`@${@(begin (displayln (format "Warning: old gamma syntax at ~a:~a:~a"
+                                      #,(syntax-source this-syntax)
+                                      #,(syntax-line this-syntax)
+                                      #,(syntax-column this-syntax))
+                              (current-error-port))
+                   (list))
+       @(add-between (list "Γ" (stringify more) ...) ", ")
        @#,@(if (attribute φ) @list{+ @#'(stringify φ)} @list{}) ⊢
        @(stringify x)
        : @(stringify τ)
        ; @(stringify φ⁺) / @(stringify φ⁻)
-       ; @(stringify o)}]))
+       ; @(stringify o)}]
+     [(_ {~and {~not +} more} ... {~optional {~seq + φ}} ⊢ x R)
+      #`@${@(add-between (list "Γ" (stringify more) ...) ", ")
+       @#,@(if (attribute φ) @list{+ @#'(stringify φ)} @list{}) ⊢
+       @(stringify x) : @(stringify R)}]))
 @(define-syntax subst
    (syntax-parser
      [(_ {~seq from {~literal ↦} to} ...)
@@ -192,3 +202,7 @@
 (define (! . rest) @${\overline{@rest}})
 (define metatrue @${\mathrm{true}})
 (define metafalse @${\mathrm{false}})
+
+(define carπ @${\mathrm{car}})
+(define cdrπ @${\mathrm{cdr}})
+(define Numberτ @${\mathbf{Number}})

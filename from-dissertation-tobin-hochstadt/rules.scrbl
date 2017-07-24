@@ -37,6 +37,7 @@ relevant to our work@note{We informally describe a translation of our system
 their inclusion in the following semantics would needlessly complicate things.
 
 @require["../scribblings/util.rkt"
+         "../scribblings/abbreviations.rkt"
          "../scribblings/adt-utils.rkt"
          (for-label (only-meta-in 0 typed/racket)
                     typed/racket/class)
@@ -76,10 +77,10 @@ Expressions:
 Primitive operations:
 
 @cases[@primop #:first-sep "⩴"
-       @acase{@textit{add1}} ;; only here as an example
-       @acase{@textit{number?}} ;; probably used in some explanation
+       @acase{@textit{add1}@tag*{returns its argument plus @${1}}} ;; only here as an example
+       @acase{@textit{number?}@tag*{number predicate}} ;; probably used in some explanation
        @acase{@textit{cons?}@tag*{pair predicate}}
-       @acase{@textit{null?}}
+       @acase{@textit{null?}@tag*{@null-v predicate}}
        @acase{@textit{car}@tag*{first element of pair}}
        @acase{@textit{cdr}@tag*{second element of pair}}
        @acase{…}]
@@ -100,13 +101,14 @@ Values:
        @tag*{polymorphic abstraction}}
        @acase{@Λv[ℰ (@repeated{α} @polydotα[α]) e]
        @tag*{variadic polymorphic abstraction}}
-       @acase{@consv[v v] @tag*{pair}}]
+       @acase{@consv[v v] @tag*{pair}}
+       @acase{@null-v @tag*{null}}]
 
 Execution environment:
 
 @cases["ℰ" #:first-sep "⩴"
        @acase{@repeated{@↦v[x v]}\ @repeated{@↦v[α τ]}
-        @tag*{bound variables \& types}}]
+        @tag*{bound variables @${\&} types}}]
 
 Evaluation context:
 
@@ -123,16 +125,50 @@ Evaluation context:
 Typing judgement:
 
 @$${
- @Γ[⊢ e τ φ⁺ φ⁻ o]
+ @Γ[⊢ e R]
 }
 
-@todo{Explain…}
+@cases[@R #:first-sep "⩴"
+       @R[τ
+          @${φ⁺}
+          @${φ⁻}
+          @${o}]]
+
+The @Γ[⊢ e R] typing judgement indicates that the expression @${e} has type
+@${τ}.
+
+Additionally, the typing judgement indicates a set of propositions @${φ⁻}
+which are known to be true when the run-time value of @${e} is @|false-v|, and
+a set of propositions @${φ⁺} which are known to be true when the run-time
+value of @${e} is @|true-v|@note{Any other value is treated in the same way as
+ @|true-v|, as values other than @|false-v| are traditionally considered as
+ true in language of the @lisp family}. The propositions will indicate that the
+value of a separate variable belongs (or does not belong) to a given type. For
+example, the @${φ⁻} proposition @${Number_y} indicates that when @${e}
+evaluates to @|false-v|, the variable @${y} necessarily holds an integer.
+
+Finally, the typing judgement can indicate with @${o} that the expression @${
+ e} is an alias for a sub-element of another variable in the environment. For
+example, if the object @${o} is @${@carπ ∷ @cdrπ(y)}, it indicates that the
+expression @${e} produces the same value that @racket[(car (cdr y))] would,
+i.e. that it returns the second element of a (possibly improper) list stored
+in @racket[y].
+
+Readers familiar with abstract interpretation can compare the @${φ}
+propositions to the Cartesian product of the abstract domains of pairs of
+variables. A static analyser can track possible pairs of values contained in
+pairs of distinct variables, and will represent this information using an
+abstract domain which combinations of values may be possible, and which may
+not. Occurrence typing similarly exploits the fact that the type of other
+variables may depend on the value of @${τ}. @htodo{is this some weak form of
+ dependent typing?}
 
 Types:
 
 @cases["τ,σ" #:first-sep "⩴"
        @acase{⊤@tag*{top}}
        @acase{@num-τ @tag*{number singleton}}
+       @acase{@Numberτ @tag*{any number}}
        @acase{@true-τ @tag*{boolean singleton}}
        @acase{@false-τ}
        @acase{@f→[(@repeated{τ}) R] @tag*{function}}
@@ -148,16 +184,9 @@ Types:
 
 @htodo{Add the rec types}
 
-@cases[@R #:first-sep "⩴"
-       @R[τ
-          @${φ⁺}
-          @${φ⁻}
-          @${o}]]
+Filters (a.k.a. propositions):
 
-
-Filters (conditional typing information):
-
-@cases[@${φ} #:first-sep "⩴" @acase{@repeatset{ψ}}@tag*{filter set}]
+@cases[@${φ} #:first-sep "⩴" @acase{@repeatset{ψ}@tag*{filter set}}]
 
 @cases["ψ" #:first-sep "⩴"
        @acase{τ_{@loc}
@@ -190,8 +219,8 @@ paths with one or more elements, so we write @${car∷cdr} instead of @${
 Path elements (aliasing information):
 
 @cases[@textit{pe} #:first-sep "⩴"
-       @acase{car@tag*{first element of pair}}
-       @acase{cdr@tag*{second element of pair}}]
+       @acase{@carπ @tag*{first element of pair}}
+       @acase{@cdrπ @tag*{second element of pair}}]
 
 Subtyping:
 
@@ -215,6 +244,12 @@ every other type, and is not inhabited by any value.
  -
  @${⊢ ⊥ <: τ}
  @${@textsc{S-Bot}}
+ ]
+
+@$inferrule[
+ -
+ @${⊢ @num-τ <: @Numberτ}
+ @${@textsc{S-Number}}
  ]
 
 @$inferrule[
@@ -344,51 +379,51 @@ Operational semantics:
 Typing rules:
 
 @$inferrule[-
-            @${@Γ[⊢ x @${Γ(x)} @${@!{@false-τ}} @true-τ x]}
+            @${@Γ[⊢ x @R[@${Γ(x)} @${@!{@false-τ}} @true-τ x]]}
             @${@textsc{T-Var}}]
 
 @$inferrule[-
-            @${@Γ[⊢ p @${δ_τ(p)} ϵ ⊥ ∅]}
+            @${@Γ[⊢ p @R[@${δ_τ(p)} ϵ ⊥ ∅]]}
             @${@textsc{T-Primop}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @true-e @true-τ ϵ ⊥ ∅]}
+            @${@Γ[⊢ @true-e @R[@true-τ ϵ ⊥ ∅]]}
             @${@textsc{T-True}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @false-e @false-τ ⊥ ϵ ∅]}
+            @${@Γ[⊢ @false-e @R[@false-τ ⊥ ϵ ∅]]}
             @${@textsc{T-False}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @num-e @num-τ ϵ ⊥ ∅]}
+            @${@Γ[⊢ @num-e @R[@num-τ ϵ ⊥ ∅]]}
             @${@textsc{T-Num}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @null-e @null-τ ⊥ ϵ ∅]}
+            @${@Γ[⊢ @null-e @R[@null-τ ⊥ ϵ ∅]]}
             @${@textsc{T-Null}}]
 
 
-@$inferrule[@${@Γ[@${x₀:σ₀} @repeated{xᵢ:σ} ⊢ e τ φ⁺ φ⁻ o] \\
+@$inferrule[@${@Γ[@${x₀:σ₀} @repeated{xᵢ:σ} ⊢ e @R[τ φ⁺ φ⁻ o]] \\
             φ⁺' = φ⁺\vphantom{φ}@substφo[x₀ ↦ •] \\
             φ⁻' = φ⁻\vphantom{φ}@substφo[x₀ ↦ •] \\
             o' = o\vphantom{o}@substφo[x₀ ↦ •]}
             @${@Γ[⊢ @λe[(@repeated{x:σ}) e]
-                  (f→ (@repeated{σ})
-                      @R[τ
-                         @${φ⁺'}
-                         @${φ⁻'}
-                         @${o'}])
-                  ϵ ⊥ ∅]}
+                  @R[(f→ (@repeated{σ})
+                         @R[τ
+                            @${φ⁺'}
+                            @${φ⁻'}
+                            @${o'}])
+                     ϵ ⊥ ∅]]}
             @${@textsc{T-AbsPred}}]
 
-@$inferrule[@${@Γ[⊢ e τ φ⁺ φ⁻ o]}
+@$inferrule[@${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]]}
             @${@Γ[⊢ @λe[(@repeated{x:σ}) e]
-                  (f→ (@repeated{σ})
-                      @R[τ
-                         ϵ
-                         ϵ
-                         ∅])
-                  ϵ ⊥ ∅]}
+                  @R[(f→ (@repeated{σ})
+                         @R[τ
+                            ϵ
+                            ϵ
+                            ∅])
+                     ϵ ⊥ ∅]]}
             @${@textsc{T-Abs}}]
 
 The @${\vphantom{φ}@substφo[x ↦ z]} operation restricts the information
@@ -426,9 +461,9 @@ therefore should not need to be included in our @${\vphantom{
 
 @(define _op @${_{\mathit{op}}})
 
-@$inferrule[@${@Γ[⊢ @${e@_op} @${τ@_op} @${φ⁺@_op} @${φ⁻@_op} @${o@_op}] \\
-             @repeated[@Γ[⊢ @${aᵢ} @${τ_{aᵢ}}
-                          @${φ⁺_{aᵢ}} @${φ⁻_{aᵢ}} @${o_{aᵢ}}]] \\
+@$inferrule[@${@Γ[⊢ @${e@_op} @R[@${τ@_op} @${φ⁺@_op} @${φ⁻@_op} @${o@_op}]] \\
+             @repeated[@Γ[⊢ @${aᵢ}
+                          @R[@${τ_{aᵢ}} @${φ⁺_{aᵢ}} @${φ⁻_{aᵢ}} @${o_{aᵢ}}]]] \\
              @repeated[@<:[τ_a @${τ_{\mathit{in}}}]]
              @<:[@${τ@_op} @f→[(@repeated{τ_{\mathit{in}}})
                                @R[τ_r φ⁺_r φ⁻_r o_r]]]
@@ -436,17 +471,17 @@ therefore should not need to be included in our @${\vphantom{
             φ⁻_r' = φ⁻_r@substφo[• ↦ @${o_{a₀}}] \\
             o' = o@substφo[• ↦ @${o_{a₀}}]}
             @${@Γ[⊢ @app[@${e@_op} @repeated{aᵢ}]
-                  (f→ (@repeated{σ})
-                      @R[τ_r
-                         @${φ⁺'}
-                         @${φ⁻'}
-                         @${o'}])
-                  ϵ ⊥ ∅]}
+                  @R[(f→ (@repeated{σ})
+                         @R[τ_r
+                            @${φ⁺'}
+                            @${φ⁻'}
+                            @${o'}])
+                     ϵ ⊥ ∅]]}
             @${@textsc{T-App}}]
 
-@$inferrule[@${@Γ[⊢ @${e₁} @${τ₁} @${φ⁺₁} @${φ⁻₁} @${o₁}] \\
-             @Γ[+ φ⁺₁ ⊢ @${e₂} @${τ₂} @${φ⁺₂} @${φ⁻₂} @${o₂}] \\
-             @Γ[+ φ⁻₁ ⊢ @${e₃} @${τ₃} @${φ⁺₃} @${φ⁻₃} @${o₃}] \\
+@$inferrule[@${@Γ[⊢ @${e₁} @R[@${τ₁} @${φ⁺₁} @${φ⁻₁} @${o₁}]] \\
+             @Γ[+ φ⁺₁ ⊢ @${e₂} @R[@${τ₂} @${φ⁺₂} @${φ⁻₂} @${o₂}]] \\
+             @Γ[+ φ⁻₁ ⊢ @${e₃} @R[@${τ₃} @${φ⁺₃} @${φ⁻₃} @${o₃}]] \\
              @<:[τ₂ τ_r] \\
              @<:[τ₃ τ_r] \\
              φ_r = @combinefilter(φ⁺₁ / φ⁻₁, φ⁺₂ / φ⁻₂, φ⁺₃ / φ⁻₃) \\
@@ -455,9 +490,7 @@ therefore should not need to be included in our @${\vphantom{
              @nl ∅ @& @otherwise
              \end{cases}
              }
-            @${@Γ[⊢ @ifop[e₁ e₂ e₃]
-                  τ_r
-                  ϵ ⊥ ∅]}
+            @${@Γ[⊢ @ifop[e₁ e₂ e₃] @R[τ_r ϵ ⊥ ∅]]}
             @${@textsc{T-If}}]
 
 @htodo{The definition of Γ' does not specify what the other cases ≠ x are
@@ -504,27 +537,41 @@ therefore should not need to be included in our @${\vphantom{
  simply returning the intersection of τ and σ).}
 
 @aligned{
- @no-overlap(@num-τ[n], @num-τ[m]) &= @metatrue @textif n ≠ m \\
- @no-overlap(@num-τ, @true-τ) &= @metatrue \\
- @no-overlap(@num-τ, @false-τ) &= @metatrue \\
- @no-overlap(@num-τ, @null-τ) &= @metatrue \\
- @no-overlap(@true-τ, @false-τ) &= @metatrue \\
- @no-overlap(@true-τ, @null-τ) &= @metatrue \\
- @no-overlap(@false-τ, @null-τ) &= @metatrue \\
- @no-overlap(@num-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
- @no-overlap(@true-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
- @no-overlap(@false-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
- @no-overlap(@consτ[τ τ′]) &= , @f→[(@repeated{τ}) @R]) &= @metatrue \\
- @no-overlap(@null-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
- @no-overlap(@num-τ, @consτ[τ τ′]) &= @metatrue \\
- @no-overlap(@true-τ, @consτ[τ τ′]) &= @metatrue \\
- @no-overlap(@false-τ, @consτ[τ τ′]) &= @metatrue \\
- @no-overlap(@null-τ, @consτ[τ τ′]) &= @metatrue \\
- @no-overlap(@consτ[τ τ′], @consτ[σ σ′])
- &= @no-overlap(τ,σ) ∨ @no-overlap(τ′,σ′)\\
- @no-overlap((⋃ @repeatset{τ}), σ) &= ⋀@repeated{@no-overlap(τ,σ)}\\
- @no-overlap(τ, σ) &= @metatrue @textif @no-overlap(σ, τ)\\
- @no-overlap(τ, σ) &= @metafalse @otherwise \\
+ @no-overlap(τ, τ′) &= @metatrue
+ &&@textif (∃! σ . \quad @<:[σ τ]\quad ∧ \quad@<:[σ τ′]) ∧ σ = ⊥\\
+ @no-overlap(τ, σ) &= @metafalse
+ &&@otherwise
+}
+
+@;{
+ @aligned{
+  @no-overlap(@num-τ[n], @num-τ[m]) &= @metatrue @textif n ≠ m \\
+  @no-overlap(@num-τ, @true-τ) &= @metatrue \\
+  @no-overlap(@num-τ, @false-τ) &= @metatrue \\
+  @no-overlap(@num-τ, @null-τ) &= @metatrue \\
+  @no-overlap(@Numberτ, @true-τ) &= @metatrue \\
+  @no-overlap(@Numberτ, @false-τ) &= @metatrue \\
+  @no-overlap(@Numberτ, @null-τ) &= @metatrue \\
+  @no-overlap(@true-τ, @false-τ) &= @metatrue \\
+  @no-overlap(@true-τ, @null-τ) &= @metatrue \\
+  @no-overlap(@false-τ, @null-τ) &= @metatrue \\
+  @no-overlap(@num-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
+  @no-overlap(@Numberτ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
+  @no-overlap(@true-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
+  @no-overlap(@false-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
+  @no-overlap(@consτ[τ τ′], @f→[(@repeated{τ}) @R]) &= @metatrue \\
+  @no-overlap(@null-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
+  @no-overlap(@num-τ, @consτ[τ τ′]) &= @metatrue \\
+  @no-overlap(@Numberτ, @consτ[τ τ′]) &= @metatrue \\
+  @no-overlap(@true-τ, @consτ[τ τ′]) &= @metatrue \\
+  @no-overlap(@false-τ, @consτ[τ τ′]) &= @metatrue \\
+  @no-overlap(@null-τ, @consτ[τ τ′]) &= @metatrue \\
+  @no-overlap(@consτ[τ τ′], @consτ[σ σ′])
+  &= @no-overlap(τ,σ) ∨ @no-overlap(τ′,σ′)\\
+  @no-overlap((⋃ @repeatset{τ}), σ) &= ⋀@repeated{@no-overlap(τ,σ)}\\
+  @no-overlap(τ, σ) &= @metatrue @textif @no-overlap(σ, τ)\\
+  @no-overlap(τ, σ) &= @metafalse @otherwise \\
+ }
 }
 
 @htodo{Say that there are more rules in the implementation, to handle various
@@ -540,7 +587,7 @@ therefore should not need to be included in our @${\vphantom{
  ϵ / ⊥,
  ⊥/ϵ)
  &= (∪ τ σ)_@loc / @!{(∪ τ σ)_@loc} &\\
- … & … & \\
+ … & = … & \\
  @combinefilter(⊥ / ⊥, φ^±₂, φ^±₃) &= ϵ / ϵ &@otherwise \\
 }
 

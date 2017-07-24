@@ -1,7 +1,7 @@
 #lang at-exp racket
 (provide typedracket Typedracket csharp CAML CLOS NIT CPP DeBruijn HOAS PHOAS
          monocecil dotnet DLL nanopass nanopass-c-f haskell haskell98 Hackett
-         turnstile Turnstile cur Cur LaTeX C-language java)
+         turnstile Turnstile cur Cur LaTeX C-language java lisp)
 
 (require scribble/base
          scribble/core
@@ -47,3 +47,4 @@
                             [else "LaTeX"]))
 (define C-language "C")
 (define java "Java")
+(define lisp "Lisp")
