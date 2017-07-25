@@ -72,7 +72,13 @@ Expressions:
        @acase{@Λe[(@repeated{α} @polydotα[α]) e]
         @tag*{variadic polymorphic abstraction}}
        @acase{@at[e @repeated{τ}] @tag*{polymorphic instantiation}}
-       @acase{@conse[e e]@tag*{pair}}] @; TODO: shouldn't it be a primop?
+       @acase{@conse[e e]@tag*{pair}}
+       @acase{@promisee[e] @tag*{create promise}}
+       @acase{@syme[s] @tag*{symbol literal}}
+       @acase{@gensyme @tag*{fresh uninterned symbol}}
+       @acase{@eq?op @tag*{symbol equality}}] @; TODO: shouldn't it be a primop?
+
+@todo{Define s}
 
 Primitive operations:
 
@@ -102,7 +108,9 @@ Values:
        @acase{@Λv[ℰ (@repeated{α} @polydotα[α]) e]
        @tag*{variadic polymorphic abstraction}}
        @acase{@consv[v v] @tag*{pair}}
-       @acase{@null-v @tag*{null}}]
+       @acase{@null-v @tag*{null}}
+       @acase{@promisev[v] @tag*{promise}}
+       @acase{@symv[@sym*] @tag*{symbol}}]
 
 Execution environment:
 
@@ -118,8 +126,9 @@ Evaluation context:
        @acase{@app[v @repeated{v} E @repeated{e}]}
        @acase{@ifop[E e e]@tag*{conditional}}
        @acase{@conse[E e]@tag*{pair}} @; TODO: shouldn't it be a primop?
-       @acase{@conse[v E]}] @; TODO: shouldn't it be a primop?
-        
+       @acase{@conse[v E]} @; TODO: shouldn't it be a primop?
+       ]
+
 @; TODO: are other cases needed?
 
 Typing judgement:
@@ -175,12 +184,18 @@ Types:
        @acase{@f→[(@repeated{τ} @${\ .\ } @${τ*}) R] @tag*{variadic function}}
        @acase{@f→[(@repeated{τ} @${\ .\ } @polydot[τ α]) R]
         @tag*{variadic polymorphic function}}
-       @acase{@∀r[@${(@repeated{α})} @repeated{τ}]@tag*{polymorphic type}}
-       @acase{@∀r[@${(@repeated{α} @polydotα[α])} @repeated{τ}]
+       @acase{@∀r[@${(@repeated{α})} τ]@tag*{polymorphic type}}
+       @acase{@∀r[@${(@repeated{α} @polydotα[α])} τ]
         @tag*{variadic polymorphic type}}
        @acase{@un[@repeated{τ}]@tag*{union}}
        @acase{@consτ[τ τ]@tag*{pair}}
-       @acase{@null-τ @tag*{null (end of lists)}}]
+       @acase{@null-τ @tag*{null (end of lists)}}
+       @acase{@promiseτ[R] @tag*{promise}}
+       @acase{@symτ[@sym*] @tag*{symbol singleton}}
+       @acase{@symτ[@sym*] @tag*{any symbol}}
+       @acase{@∩τ[@repeatset{τ}] @tag*{any symbol}}
+       @acase{@recτ[r τ] @tag*{recursive type}}
+       ]
 
 @htodo{Add the rec types}
 
@@ -224,17 +239,19 @@ Path elements (aliasing information):
 
 Subtyping:
 
+@todo{Rule for Rec: if r is eliminated, then the resulting type is a subtype
+ of the rec. Can't use ⊥ for that, because there could be function types using
+ r where the variance is reversed (and which wouldn't collapse to ⊥ anyway.}
+
 @$inferrule[
  -
  @${⊢ τ <: τ}
- @${@textsc{S-Refl}}
- ]
+ @${@textsc{S-Refl}}]
   
 @$inferrule[
  -
  @${⊢ τ <: ⊤}
- @${@textsc{S-Top}}
- ]
+ @${@textsc{S-Top}}]
 
 @textsc{S-Bot} can be derived from @textsc{S-UnionSub}, by constructing an
 empty union. The @${⊥} type is a shorthand for @${(∪)}. It is a subtype of
@@ -243,14 +260,17 @@ every other type, and is not inhabited by any value.
 @$inferrule[
  -
  @${⊢ ⊥ <: τ}
- @${@textsc{S-Bot}}
- ]
+ @${@textsc{S-Bot}}]
 
 @$inferrule[
  -
  @${⊢ @num-τ <: @Numberτ}
- @${@textsc{S-Number}}
- ]
+ @${@textsc{S-Number}}]
+
+@$inferrule[
+ -
+ @${⊢ @symτ <: @Symbolτ}
+ @${@textsc{S-Symbol}}]
 
 @$inferrule[
  @${
@@ -258,8 +278,7 @@ every other type, and is not inhabited by any value.
   @<:R[R @${@R'}]}
  @${@<:[@f→[(@repeated{τ_a}) R]
         @f→[(@repeated{σ_a}) @${@R'}]]}
- @${@textsc{S-Fun}}
- ]
+ @${@textsc{S-Fun}}]
 
 @$inferrule[
  @${
@@ -275,8 +294,7 @@ every other type, and is not inhabited by any value.
             @${φ⁺'}
             @${φ⁻'}
             @${o'}]]}
- @${@textsc{S-R}}
- ]
+ @${@textsc{S-R}}]
 
 @$inferrule[
  @${
@@ -285,8 +303,7 @@ every other type, and is not inhabited by any value.
   @<:R[R @${@R'}]}
  @${@<:[@f→[(@repeated{τ_a} @${\ .\ } τ*) R]
         @f→[(@repeated{σ_a} @${\ .\ } σ*) @${@R'}]]}
- @${@textsc{S-Fun*}}
- ]
+ @${@textsc{S-Fun*}}]
 
 @$inferrule[
  @${
@@ -295,8 +312,7 @@ every other type, and is not inhabited by any value.
   @<:R[R @${@R'}]}
  @${@<:[@f→[(@repeated{τ_a} @${\ .\ } τ*) R]
         @f→[(@repeated{σ_a} @repeated{σᵢ}) @${@R'}]]}
- @${@textsc{S-Fun*-Fixed}}
- ]
+ @${@textsc{S-Fun*-Fixed}}]
 
 @$inferrule[
  @${
@@ -306,8 +322,7 @@ every other type, and is not inhabited by any value.
   @<:R[R @${@R'}]}
  @${@<:[@f→[(@repeated{τ_a} @${\ .\ } τ*) R]
         @f→[(@repeated{σ_a} @repeated{σᵢ} @${\ .\ } σ*) @${@R'}]]}
- @${@textsc{S-Fun*-Fixed*}}
- ]
+ @${@textsc{S-Fun*-Fixed*}}]
 
 @$inferrule[
  @${
@@ -316,15 +331,13 @@ every other type, and is not inhabited by any value.
   @<:R[R @${@R'}]}
  @${@<:[@f→[(@repeated{τ_a} @${\ .\ } @polydot[τ α]) R]
         @f→[(@repeated{σ_a} @${\ .\ } @polydot[σ α]) @${@R'}]]}
- @${@textsc{S-DFun}}
- ]
+ @${@textsc{S-DFun}}]
 
 @$inferrule[
  @${@<:[@${τ[@repeated{αᵢ ↦ βᵢ}]} σ]}
  @${@<:[@∀r[@${(@repeated{αᵢ})} τ]
         @∀r[@${(@repeated{βᵢ})} σ]]}
- @${@textsc{S-Poly-}α@textsc{-Equiv}}
- ]
+ @${@textsc{S-Poly-}α@textsc{-Equiv}}]
 
 @todo{This should use the substitution for a polydot (subst-dots?), not the
  usual subst.}
@@ -333,8 +346,7 @@ every other type, and is not inhabited by any value.
  @${@<:[@${τ[@repeated{αᵢ ↦ βᵢ} α ↦ β]} σ]}
  @${@<:[@∀r[@${(@repeated{αᵢ} @polydotα[α])} τ]
         @∀r[@${(@repeated{βᵢ} @polydotα[β])} σ]]}
- @${@textsc{S-PolyD-}α@textsc{-Equiv}}
- ]
+ @${@textsc{S-PolyD-}α@textsc{-Equiv}}]
 
 @todo{check the following rule:}
 
@@ -348,35 +360,73 @@ every other type, and is not inhabited by any value.
   @<:R[R @${@R'}]}
  @${@<:[@∀r[@${(@polydotα[α])} @f→[(@repeated{τ_a} @polydot[τ α]) R]]
         @f→[(@repeated{σ_a} σ*) @${@R'}]]}
- @${@textsc{S-DFun-Fun*}}
- ]
+ @${@textsc{S-DFun-Fun*}}]
 
 @todo{What if some tvars are unbound in the types above, how do they compare?}
 
 @$inferrule[
  @${∃ i . @<:[τ @${σᵢ}]}
- @${@<:[τ @${\bigcup @repeated{σᵢ}}]}
- @${@textsc{S-UnionSuper}}
- ]
+ @${@<:[τ @${⋃ @repeated{σᵢ}}]}
+ @${@textsc{S-UnionSuper}}]
 
 @$inferrule[
  @${@repeated[@<:[τᵢ @${σ}]]}
- @${@<:[@${\bigcup @repeated{τᵢ}} σ]}
- @${@textsc{S-UnionSub}}
- ]
+ @${@<:[@${⋃ @repeated{τᵢ}} σ]}
+ @${@textsc{S-UnionSub}}]
 
 @$inferrule[
  @${@<:[τ₁ σ₁] \\
   @<:[τ₂ σ₂]}
  @${@<:[@consτ[τ₁ τ₂] @consτ[σ₁ σ₂]]}
- @${@textsc{S-Pair}}
- ]
+ @${@textsc{S-Pair}}]
+
+@$inferrule[
+ @${∃ i . @<:[@${σᵢ} τ]}
+ @${@<:[@${⋂ @repeated{σᵢ}} τ]}
+ @${@textsc{S-IntersectionSub}}]
+
+@$inferrule[
+ @${@repeated[@<:[@${σ} τᵢ]]}
+ @${@<:[σ @${⋂ @repeated{τᵢ}}]}
+ @${@textsc{S-IntersectionSuper}}]
+
+@$inferrule[
+ @${@<:[τ σ]}
+ @${@<:[@promiseτ[τ] @promiseτ[σ]]}
+ @${@textsc{S-Promise}}]
 
 Operational semantics:
 
 
 
+Type validity rules:
+
+@todo{From Tobin-Hochstadt + rule for Rec}
+
 Typing rules:
+
+@todo{Add rule for the (optional?) simplification of intersections}
+
+@$inferrule[@${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]]}
+            @${@Γ[⊢ @promisee[e] @R[@R[τ φ⁺ φ⁻ o] ϵ ⊥ ∅]]}
+            @${@textsc{T-Promise}}]
+
+@$inferrule[-
+            @${@Γ[⊢ @syme[s] @R[@symτ[s] ϵ ⊥ ∅]]}
+            @${@textsc{T-Symbol}}]
+
+@$inferrule[-
+            @${@Γ[⊢ @gensyme @R[@Symbolτ ϵ ⊥ ∅]]}
+            @${@textsc{T-Symbol}}]
+
+@htodo{Are the hypotheses for T-Eq? necessary? After all, in Racket eq? works
+ on Any.}
+@$inferrule[@${@Γ[⊢ e₁ @R[τ₁ φ⁺₁ φ⁻₁ o₂]] \\
+             @Γ[⊢ e₂ @R[τ₂ φ⁺₂ φ⁻₂ o₂]] \\
+             @<:[τ₁ Symbol] \\
+             @<:[τ₂ Symbol]}
+            @${@Γ[⊢ @eq?op[e₁ e₂] @R[@Booleanτ ϵ ⊥ ∅]]}
+            @${@textsc{T-Eq?}}]
 
 @$inferrule[-
             @${@Γ[⊢ x @R[@${Γ(x)} @${@!{@false-τ}} @true-τ x]]}
@@ -586,7 +636,7 @@ therefore should not need to be included in our @${\vphantom{
  \{ τ_@loc \} ∪ φ⁺₁ / \{ @!{τ}_@loc \} φ⁻₁,
  ϵ / ⊥,
  ⊥/ϵ)
- &= (∪ τ σ)_@loc / @!{(∪ τ σ)_@loc} &\\
+ &= (∪\ τ\ σ)_@loc / @!{(∪\ τ\ σ)_@loc} &\\
  … & = … & \\
  @combinefilter(⊥ / ⊥, φ^±₂, φ^±₃) &= ϵ / ϵ &@otherwise \\
 }

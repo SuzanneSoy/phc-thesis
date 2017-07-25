@@ -2,7 +2,8 @@
 @(provide (except-out (all-defined-out)
                       num-e*
                       num-v*
-                      num-τ*))
+                      num-τ*
+                      recτ*))
 @require["util.rkt"
          scriblib/render-cond
          (for-label (only-meta-in 0 typed/racket))]
@@ -127,6 +128,7 @@
 (define-syntax false-τ (defop "false"))
 
 (define-syntax un (defop "∪"))
+(define-syntax ∩τ (defop "∩"))
 
 (define-syntax-rule (f→ (from ...) R)
   @${(@(add-between (list @(stringify from) ...) "\\ ") → @(stringify R))})
@@ -206,3 +208,16 @@
 (define carπ @${\mathrm{car}})
 (define cdrπ @${\mathrm{cdr}})
 (define Numberτ @${\mathbf{Number}})
+(define-syntax promisee (defop "delay"))
+(define-syntax promiseτ (defop "promise"))
+(define-syntax promisev (defop "promise"))
+(define-syntax syme (defop "symbol"))
+(define-syntax symτ (defop "symbol"))
+(define-syntax symv (defop "symbol"))
+(define Symbolτ @${\mathbf{Symbol}})
+(define-syntax gensyme (defop "gensym"))
+(define-syntax eq?op (defop "eq?"))
+(define sym* @${s′})
+(define-syntax recτ* (defop "Rec"))
+(define-syntax-rule (recτ r τ) (recτ* r τ))
+(define Booleanτ @${(∪ @true-τ @false-τ)})
