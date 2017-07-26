@@ -56,6 +56,7 @@
 (define-syntax record (defop "record"))
 (define-syntax variant (defop "V"))
 (define-syntax ifop (defop "if"))
+(define-syntax mapop (defop "map"))
 (define-syntax-rule (λv env (arg ...) expr)
   @${[@(stringify env), λ(@(list (stringify arg) ...)).@(stringify expr)]})
 (define-syntax-rule (λe (arg ...) expr)
@@ -64,14 +65,18 @@
   @${Λ(@(spaces (stringify arg) ...)).@(stringify expr)})
 (define-syntax-rule (Λv env (arg ...) expr)
   @${[@(stringify env), Λ(@(spaces (stringify arg) ...)).@(stringify expr)]}) ;; TODO: is the env necessary here? It's a type env, right?
-(define (repeated . l) @${\overrightarrow{@l}})
-(define (repeatset . l)
+(define (repeated #:n [n #f] . l)
+  (if n
+      @${\overrightarrow{@l}\{\}^\{\scriptscriptstyle{}@|n|\}}
+      @${\overrightarrow{@l}}))
+(define (repeatset #:w [wide? #f] . l)
+  (define w (if wide? "\\!" ""))
   (cond-element
    [html
-    @${\def\overrightbracedarrow#1{\overset{\scriptscriptstyle{\raise1mu{\{}}}{\vphantom{#1}}\overrightarrow{#1}\overset{\scriptscriptstyle{\raise1mu{\}}}}{\vphantom{#1}}}\overrightbracedarrow{@l}}]
+    @${\def\overrightbracedarrow#1{\overset{\scriptscriptstyle{\raise1mu{\{}}}{\vphantom{#1}}\overrightarrow{@|w|#1@|w|}\overset{\scriptscriptstyle{\raise1mu{\}}}}{\vphantom{#1}}}\overrightbracedarrow{@l}}]
    [else
     ;; Defined in util.rkt
-    @${\overrightbracedarrow{@l}}]))
+    @${\overrightbracedarrow{@|w|@|l|@|w|}}]))
 (define |P| @${\ |\ })
 (define ρc @${\rho_{c}})
 (define ρf @${\rho_{f}})
@@ -80,7 +85,9 @@
 (define-syntax atf (defop (list "@" @${{}_{@textbf{f}}})))
 (define-syntax Λc (defop (list "Λ" @${{}_{@textbf{c}}})))
 (define-syntax Λf (defop (list "Λ" @${{}_{@textbf{f}}})))
-(define-syntax ∀r (defop @${\mathbf{∀}}))
+(define-syntax ∀r* (defop @${\mathbf{∀}}))
+(define-syntax-rule (∀r (α ...) τ)
+  (∀r* @${(@(add-between (list (stringify α) ...) "\\ "))} τ))
 (define-syntax ∀c (defop @${\mathbf{∀}_{@textbf{c}}}))
 (define-syntax ∀f (defop @${\mathbf{∀}_{@textbf{f}}}))
 (define-syntax-rule (ctor-pred c)
@@ -136,8 +143,8 @@
   (syntax-case stx ()
     [(_ to φ⁺ φ⁻ o)
      #'@${❲@(stringify to)
-      ; @(stringify φ⁺) / @(stringify φ⁻)
-      ; @(stringify o)❳}]
+      \;;\; @(stringify φ⁺) {/} @(stringify φ⁻)
+      \;;\; @(stringify o)❳}]
     [self (identifier? #'self)
      #'@${\mathrm{R}}]))
 #;(define-syntax-rule (f→ (from ...) to φ O)
@@ -187,8 +194,11 @@
        @(stringify x) : @(stringify R)}]))
 @(define-syntax subst
    (syntax-parser
-     [(_ {~seq from {~literal ↦} to} ...)
-      #'@$["[" (list (stringify from) "↦" (stringify to)) ... "]"]]))
+     [(_ {~seq from {~literal ↦} to} ...
+         (~and {~seq repeated ...}
+               {~seq {~optional ({~literal repeated} . _)}}))
+      #'@$["[" (list (stringify from) "↦" (stringify to)) ...
+           repeated ... "]"]]))
 @(define-syntax substφo
    (syntax-parser
      [(_ from {~literal ↦} to)
@@ -220,4 +230,6 @@
 (define sym* @${s′})
 (define-syntax recτ* (defop "Rec"))
 (define-syntax-rule (recτ r τ) (recτ* r τ))
-(define Booleanτ @${(∪ @true-τ @false-τ)})
+(define Booleanτ @${\mathbf{Boolean}})
+(define (transdots a b c) @${\mathit{td_τ}(@a,\ @b,\ @c)})
+(define (substdots a b c d) @${\mathit{sd}(@a,\ @b,\ @c,\ @d)})

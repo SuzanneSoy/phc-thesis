@@ -75,8 +75,9 @@ Expressions:
        @acase{@conse[e e]@tag*{pair}}
        @acase{@promisee[e] @tag*{create promise}}
        @acase{@syme[s] @tag*{symbol literal}}
-       @acase{@gensyme @tag*{fresh uninterned symbol}}
-       @acase{@eq?op @tag*{symbol equality}}] @; TODO: shouldn't it be a primop?
+       @acase{@gensyme[] @tag*{fresh uninterned symbol}}
+       @acase{@eq?op[e e] @tag*{symbol equality}}
+       @acase{@mapop[e e]}] @; TODO: shouldn't it be a primop?
 
 @todo{Define s}
 
@@ -109,7 +110,7 @@ Values:
        @tag*{variadic polymorphic abstraction}}
        @acase{@consv[v v] @tag*{pair}}
        @acase{@null-v @tag*{null}}
-       @acase{@promisev[v] @tag*{promise}}
+       @acase{@promisev[ℰ e] @tag*{promise}}
        @acase{@symv[@sym*] @tag*{symbol}}]
 
 Execution environment:
@@ -151,9 +152,9 @@ which are known to be true when the run-time value of @${e} is @|false-v|, and
 a set of propositions @${φ⁺} which are known to be true when the run-time
 value of @${e} is @|true-v|@note{Any other value is treated in the same way as
  @|true-v|, as values other than @|false-v| are traditionally considered as
- true in language of the @lisp family}. The propositions will indicate that the
+ true in language of the @lisp family.}. The propositions will indicate that the
 value of a separate variable belongs (or does not belong) to a given type. For
-example, the @${φ⁻} proposition @${Number_y} indicates that when @${e}
+example, the @${φ⁻} proposition @${@|Numberτ|_y} indicates that when @${e}
 evaluates to @|false-v|, the variable @${y} necessarily holds an integer.
 
 Finally, the typing judgement can indicate with @${o} that the expression @${
@@ -184,18 +185,24 @@ Types:
        @acase{@f→[(@repeated{τ} @${\ .\ } @${τ*}) R] @tag*{variadic function}}
        @acase{@f→[(@repeated{τ} @${\ .\ } @polydot[τ α]) R]
         @tag*{variadic polymorphic function}}
-       @acase{@∀r[@${(@repeated{α})} τ]@tag*{polymorphic type}}
-       @acase{@∀r[@${(@repeated{α} @polydotα[α])} τ]
+       @acase{@∀r[(@repeated{α}) τ]@tag*{polymorphic type}}
+       @acase{@∀r[(@repeated{α} @polydotα[α]) τ]
         @tag*{variadic polymorphic type}}
-       @acase{@un[@repeated{τ}]@tag*{union}}
+       @acase{@un[@repeatset{τ}]@tag*{union}}
        @acase{@consτ[τ τ]@tag*{pair}}
        @acase{@null-τ @tag*{null (end of lists)}}
        @acase{@promiseτ[R] @tag*{promise}}
        @acase{@symτ[@sym*] @tag*{symbol singleton}}
        @acase{@symτ[@sym*] @tag*{any symbol}}
        @acase{@∩τ[@repeatset{τ}] @tag*{any symbol}}
-       @acase{@recτ[r τ] @tag*{recursive type}}
-       ]
+       @acase{@recτ[r τ] @tag*{recursive type}}]
+
+Additionally, the @Booleanτ type is defined as the union of the @true-τ and
+@false-τ singleton types.
+
+@$${
+ @Booleanτ = @un[@true-τ @false-τ]
+}
 
 @htodo{Add the rec types}
 
@@ -205,9 +212,9 @@ Filters (a.k.a. propositions):
 
 @cases["ψ" #:first-sep "⩴"
        @acase{τ_{@loc}
-        @tag*{@${ℰ[v] = \mathbf{?} ⇒ ℰ[@loc]@text{ is of type @${τ}}}}}
+        @tag*{@${(ℰ[v] = \mathbf{?}) ⇒ ℰ[@loc]@text{ is of type @${τ}}}}}
        @acase{@!{τ}_{@loc}
-        @tag*{@${ℰ[v] = \mathbf{?} ⇒ ℰ[@loc]@text{ is not of type @${τ}}}}}
+        @tag*{@${(ℰ[v] = \mathbf{?}) ⇒ ℰ[@loc]@text{ is not of type @${τ}}}}}
        @acase{⊥@tag*{contradiction}}]
 
 @cases[@loc #:first-sep "⩴"
@@ -239,37 +246,40 @@ Path elements (aliasing information):
 
 Subtyping:
 
+The subtyping judgement is @${@<:[τ₁ τ₂]}. It indicates that @${τ₁} is a
+subtype of @${τ₂} (or that @${τ₁} and @${τ₂} are the same type).
+
 @todo{Rule for Rec: if r is eliminated, then the resulting type is a subtype
  of the rec. Can't use ⊥ for that, because there could be function types using
  r where the variance is reversed (and which wouldn't collapse to ⊥ anyway.}
 
 @$inferrule[
  -
- @${⊢ τ <: τ}
+ @${@<:[τ τ]}
  @${@textsc{S-Refl}}]
   
 @$inferrule[
  -
- @${⊢ τ <: ⊤}
+ @${@<:[τ ⊤]}
  @${@textsc{S-Top}}]
 
 @textsc{S-Bot} can be derived from @textsc{S-UnionSub}, by constructing an
-empty union. The @${⊥} type is a shorthand for @${(∪)}. It is a subtype of
-every other type, and is not inhabited by any value.
+empty union. The @${⊥} type is a shorthand for the empty union @${(∪)}. It is
+a subtype of every other type, and is not inhabited by any value.
 
 @$inferrule[
  -
- @${⊢ ⊥ <: τ}
+ @${@<:[⊥ τ]}
  @${@textsc{S-Bot}}]
 
 @$inferrule[
  -
- @${⊢ @num-τ <: @Numberτ}
+ @${@<:[@num-τ @Numberτ]}
  @${@textsc{S-Number}}]
 
 @$inferrule[
  -
- @${⊢ @symτ <: @Symbolτ}
+ @${@<:[@symτ @Symbolτ]}
  @${@textsc{S-Symbol}}]
 
 @$inferrule[
@@ -335,8 +345,8 @@ every other type, and is not inhabited by any value.
 
 @$inferrule[
  @${@<:[@${τ[@repeated{αᵢ ↦ βᵢ}]} σ]}
- @${@<:[@∀r[@${(@repeated{αᵢ})} τ]
-        @∀r[@${(@repeated{βᵢ})} σ]]}
+ @${@<:[@∀r[(@repeated{αᵢ}) τ]
+        @∀r[(@repeated{βᵢ}) σ]]}
  @${@textsc{S-Poly-}α@textsc{-Equiv}}]
 
 @todo{This should use the substitution for a polydot (subst-dots?), not the
@@ -344,8 +354,8 @@ every other type, and is not inhabited by any value.
 
 @$inferrule[
  @${@<:[@${τ[@repeated{αᵢ ↦ βᵢ} α ↦ β]} σ]}
- @${@<:[@∀r[@${(@repeated{αᵢ} @polydotα[α])} τ]
-        @∀r[@${(@repeated{βᵢ} @polydotα[β])} σ]]}
+ @${@<:[@∀r[(@repeated{αᵢ} @polydotα[α]) τ]
+        @∀r[(@repeated{βᵢ} @polydotα[β]) σ]]}
  @${@textsc{S-PolyD-}α@textsc{-Equiv}}]
 
 @todo{check the following rule:}
@@ -358,7 +368,7 @@ every other type, and is not inhabited by any value.
   @repeated{@<:[σ_a τ_a]} \\
   @<:[σ @${τ[α ↦ ⊤]}] \\
   @<:R[R @${@R'}]}
- @${@<:[@∀r[@${(@polydotα[α])} @f→[(@repeated{τ_a} @polydot[τ α]) R]]
+ @${@<:[@∀r[(@polydotα[α]) @f→[(@repeated{τ_a} @polydot[τ α]) R]]
         @f→[(@repeated{σ_a} σ*) @${@R'}]]}
  @${@textsc{S-DFun-Fun*}}]
 
@@ -403,6 +413,24 @@ Type validity rules:
 
 @todo{From Tobin-Hochstadt + rule for Rec}
 
+@$inferrule[@${@polydotα[α] ∈ Δ}
+            @${Δ ⊢ @polydotα[α]}
+            @${@textsc{TE-DVar}}]
+
+@htodo{isn't there any well-scopedness constraint for the φ?}
+
+@$inferrule[@${Δ ▷ @polydot[τ_r α] \\ @repeated{Δ ⊢ τᵢ} \\ Δ ⊢ τ}
+            @${Δ ⊢ @f→[(@repeated{τᵢ} @polydot[τ_r α]) @R[τ φ⁺ φ⁻ o]]}
+            @${@textsc{TE-DFun}}]
+
+@$inferrule[@${Δ ∪ \{@repeated{αᵢ} @polydotα[β]\} ⊢ τ}
+            @${Δ ⊢ @∀r[(@repeated{αᵢ} @polydotα[β]) τ]}
+            @${@textsc{TE-DAll}}]
+
+@$inferrule[@${Δ ⊢ @polydotα[α] \\ Δ ∪ \{α\} ⊢ τ}
+            @${Δ ▷ @polydot[τ α]}
+            @${@textsc{TE-DPretype}}]
+
 Typing rules:
 
 @todo{Add rule for the (optional?) simplification of intersections}
@@ -416,7 +444,7 @@ Typing rules:
             @${@textsc{T-Symbol}}]
 
 @$inferrule[-
-            @${@Γ[⊢ @gensyme @R[@Symbolτ ϵ ⊥ ∅]]}
+            @${@Γ[⊢ @gensyme[] @R[@Symbolτ ϵ ⊥ ∅]]}
             @${@textsc{T-Symbol}}]
 
 @htodo{Are the hypotheses for T-Eq? necessary? After all, in Racket eq? works
@@ -452,6 +480,23 @@ Typing rules:
             @${@Γ[⊢ @null-e @R[@null-τ ⊥ ϵ ∅]]}
             @${@textsc{T-Null}}]
 
+@htodo{The original TD-Map rule (p.95) seems wrong, as it allows un-dotted
+ references to α in the function's type. But it is impossible to construct such
+ a function, and the meaning of α in that case is unclear. I think the rule
+ should instead expect a polymorphic function, with occurrences of α in τ_r
+ replaced with the new β variable, as shown below.}
+
+@$inferrule[@${@Γ[Δ ⊢ e_r @R[@polydot[τ_r α] φ⁺_r φ⁻_r o_r]] \\
+             @Γ[@${Δ} ⊢
+                e_f @R[@∀r[(β) @f→[(@${τ_r@subst[α ↦ β]}) @R[τ φ⁺ φ⁻ o]]]
+                       φ⁺_f
+                       φ⁻_f
+                       o_f]]}
+            @${@Γ[Δ ⊢ @mapop[e_f e_r] @R[@polydot[@${τ@subst[β ↦ α]} α]
+                                           ϵ
+                                           ⊥
+                                           ∅]]}
+            @${@textsc{TD-Map}}]
 
 @$inferrule[@${@Γ[@${x₀:σ₀} @repeated{xᵢ:σ} ⊢ e @R[τ φ⁺ φ⁻ o]] \\
             φ⁺' = φ⁺\vphantom{φ}@substφo[x₀ ↦ •] \\
@@ -466,6 +511,10 @@ Typing rules:
                      ϵ ⊥ ∅]]}
             @${@textsc{T-AbsPred}}]
 
+@htodo{Technically, in the rules T-Abs and T-DAbs, we should keep any φ and o information concerning outer
+ variables (those not declared within the lambda, and therefore still available
+ after it finishes executing).}
+
 @$inferrule[@${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]]}
             @${@Γ[⊢ @λe[(@repeated{x:σ}) e]
                   @R[(f→ (@repeated{σ})
@@ -475,6 +524,18 @@ Typing rules:
                             ∅])
                      ϵ ⊥ ∅]]}
             @${@textsc{T-Abs}}]
+
+@$inferrule[@${@repeated{Δ ⊢ τₖ} \\
+             Δ ▷ @polydot[τ_r α] \\
+             @Γ[@repeated{xₖ : τₖ} @${x_r : @polydot[τ_r α]} ⊢ e @R[τ φ⁺ φ⁻ o]]}
+            @${@Γ[⊢ @λe[(@repeated{xₖ:τₖ} @${x_r:@polydot[τ_r α]}) e]
+                  @R[(f→ (@repeated{τₖ} @polydot[τ_r α])
+                         @R[τ
+                            ϵ
+                            ϵ
+                            ∅])
+                     ϵ ⊥ ∅]]}
+            @${@textsc{T-DAbs}}]
 
 The @${\vphantom{φ}@substφo[x ↦ z]} operation restricts the information
 contained within a @${φ} or @${o} so that the result only contains information
@@ -529,6 +590,39 @@ therefore should not need to be included in our @${\vphantom{
                      ϵ ⊥ ∅]]}
             @${@textsc{T-App}}]
 
+@todo{For the inst rules, are the φ⁺ φ⁻ o preserved?}
+@$inferrule[@${@repeated[#:n "n"]{Δ ⊢ τⱼ} \\
+             @Γ[Δ ⊢ @${e@_op} @R[@∀r[(@repeated[#:n "n"]{αⱼ}) τ]
+                                 φ⁺ φ⁻ o]]}
+            @Γ[⊢ @at[@${e@_op} @repeated[#:n "n"]{τⱼ} @repeated[#:n "m"]{τₖ}]
+               @R[@${τ@subst[@repeated[#:n "n"]{aⱼ ↦ τⱼ}]}
+                  ϵ ϵ ∅]]
+            @${@textsc{T-Inst}}]
+
+@$inferrule[@${@repeated[#:n "n"]{Δ ⊢ τⱼ} \\
+             @repeated[#:n "m"]{Δ ⊢ τₖ} \\
+             @Γ[Δ ⊢ @${e@_op} @R[@∀r[(@repeated[#:n "n"]{αⱼ} @polydotα[β]) τ]
+                         φ⁺ φ⁻ o]]}
+            @Γ[⊢ @at[@${e@_op} @repeated[#:n "n"]{τⱼ} @repeated[#:n "m"]{τₖ}]
+               @R[@transdots[@${τ@subst[@repeated[#:n "n"]{aⱼ ↦ τⱼ}]}
+                             @${β}
+                             @repeated[#:n "m"]{τₖ}]
+                  ϵ ϵ ∅]]
+            @${@textsc{T-DInst}}]
+
+@$inferrule[@${@repeated{Δ ⊢ τₖ} \\
+             Δ ▷ @polydot[τ_r β] \\
+             @Γ[Δ ⊢ @${e@_op} @R[@∀r[(@repeated{αₖ} @polydotα[α_r]) τ]
+                                 φ⁺ φ⁻ o]]}
+            @Γ[⊢ @at[@${e@_op} @repeated{τₖ} @polydot[τ_r β]]
+               @R[@substdots[@${τ@subst[@repeated{aₖ ↦ τₖ}]}
+                             @${α_r}
+                             @${τ_r}
+                             @${β}]
+                  ϵ ϵ ∅]]
+            @${@textsc{T-DInstD}}]
+
+
 @$inferrule[@${@Γ[⊢ @${e₁} @R[@${τ₁} @${φ⁺₁} @${φ⁻₁} @${o₁}]] \\
              @Γ[+ φ⁺₁ ⊢ @${e₂} @R[@${τ₂} @${φ⁺₂} @${φ⁻₂} @${o₂}]] \\
              @Γ[+ φ⁻₁ ⊢ @${e₃} @R[@${τ₃} @${φ⁺₃} @${φ⁻₃} @${o₃}]] \\
@@ -538,8 +632,7 @@ therefore should not need to be included in our @${\vphantom{
              o_r = \begin{cases}
              o₂ @& @textif o₂ = o₃
              @nl ∅ @& @otherwise
-             \end{cases}
-             }
+             \end{cases}}
             @${@Γ[⊢ @ifop[e₁ e₂ e₃] @R[τ_r ϵ ⊥ ∅]]}
             @${@textsc{T-If}}]
 
