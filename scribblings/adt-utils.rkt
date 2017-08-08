@@ -3,8 +3,9 @@
                       num-e*
                       num-v*
                       num-τ*
-                      recτ*))
+                      List…τ*))
 @require["util.rkt"
+         (only-in scribble/base emph)
          scriblib/render-cond
          (for-label (only-meta-in 0 typed/racket))]
 
@@ -67,7 +68,7 @@
   @${[@(stringify env), Λ(@(spaces (stringify arg) ...)).@(stringify expr)]}) ;; TODO: is the env necessary here? It's a type env, right?
 (define (repeated #:n [n #f] . l)
   (if n
-      @${\overrightarrow{@l}\{\}^\{\scriptscriptstyle{}@|n|\}}
+      @${\overrightarrow{@l}\overset{\scriptscriptstyle\,\ifmathjax{\raise1mu{@|n|}}\iflatex{@|n|}}{\vphantom{@l}}}
       @${\overrightarrow{@l}}))
 (define (repeatset #:w [wide? #f] . l)
   (define w (if wide? "\\!" ""))
@@ -139,6 +140,10 @@
 
 (define-syntax-rule (f→ (from ...) R)
   @${(@(add-between (list @(stringify from) ...) "\\ ") → @(stringify R))})
+(define-syntax-rule (f* (from ... rest*) R)
+  (f→ (from ... @${\ .\ } rest*) R))
+(define-syntax-rule (f… (from ... polydot) R)
+  (f→ (from ... @${\ .\ } polydot) R))
 (define-syntax (R stx)
   (syntax-case stx ()
     [(_ to φ⁺ φ⁻ o)
@@ -156,40 +161,50 @@
 
 (define primop "p")
 
-(define-syntax conse (defop "cons"))
+(define-syntax consp (defop "cons"))
 (define-syntax-rule (consv a b) @${⟨@(stringify a), @(stringify b)⟩})
 (define-syntax-rule (consτ a b) @${⟨@(stringify a), @(stringify b)⟩})
 (define-syntax-rule (polydot τ α)
   @${@(stringify τ) \mathbf{…}_{@(stringify α)}})
 (define-syntax-rule (polydotα α)
   @${@(stringify α) \mathbf{…}})
+(define-syntax List…τ* (defop "List"))
+(define-syntax-rule (List…τ τ α)
+  @List…τ*[@polydot[τ α]])
 @;(define-syntax →Values (defop "Values"))
 (define-syntax-rule (→Values v ...) (spaces (stringify v) ...))
 (define @emptypath @${ϵ})
 (define-syntax-rule (<: a b)
-  @${⊢ @(stringify a) \mathrel{<:} @(stringify b)})
+  @${⊢ @(stringify a) \mathrel{≤:} @(stringify b)})
+@define[<:*]{{\mathrel{≤:}}}
+(define-syntax-rule (=: a b)
+  @${⊢ @(stringify a) \mathrel{=:} @(stringify b)})
+(define-syntax-rule (≠: a b)
+  @${⊢ @(stringify a) \mathrel{≠:} @(stringify b)})
+(define-syntax-rule (=:def a b)
+  @${⊢ @(stringify a) \mathrel{≝} @(stringify b)})
 
 (define-syntax-rule (<:R a b)
-  @${⊢ @(stringify a) \mathrel{{<:}_R} @(stringify b)})
+  @${⊢ @(stringify a) \mathrel{{≤:}_R} @(stringify b)})
 
 @(define-syntax Γ
    (syntax-parser
-     #:literals (+) #:datum-literals (⊢)
-     [(_ {~and {~not +} more} ... {~optional {~seq + φ}} ⊢ x τ φ⁺ φ⁻ o)
-      #`@${@(begin (displayln (format "Warning: old gamma syntax at ~a:~a:~a"
-                                      #,(syntax-source this-syntax)
-                                      #,(syntax-line this-syntax)
-                                      #,(syntax-column this-syntax))
-                              (current-error-port))
-                   (list))
-       @(add-between (list "Γ" (stringify more) ...) ", ")
-       @#,@(if (attribute φ) @list{+ @#'(stringify φ)} @list{}) ⊢
-       @(stringify x)
-       : @(stringify τ)
-       ; @(stringify φ⁺) / @(stringify φ⁻)
-       ; @(stringify o)}]
-     [(_ {~and {~not +} more} ... {~optional {~seq + φ}} ⊢ x R)
+     #:literals (+) #:datum-literals (⊢ Δ)
+     [(_ {~and {~not +} more} ...
+         {~optional {~seq + φ}}
+         {~optional {~seq Δ Δ∪ ...}}
+         ⊢ x τ φ⁺ φ⁻ o)
+      (raise-syntax-error 'Γ "Use of the old gamma syntax" this-syntax)]
+     [(_ {~and {~not +} {~not Δ} more} ...
+         {~optional {~seq + φ}}
+         {~optional {~seq Δ Δ∪ ...}}
+         ⊢ x R)
       #`@${@(add-between (list "Γ" (stringify more) ...) ", ")
+       ;
+       @(add-between (list "Δ" @#,@(if (attribute Δ∪)
+                                       #'{(stringify Δ∪) ...}
+                                       #'{}))
+                     "∪")
        @#,@(if (attribute φ) @list{+ @#'(stringify φ)} @list{}) ⊢
        @(stringify x) : @(stringify R)}]))
 @(define-syntax subst
@@ -197,8 +212,11 @@
      [(_ {~seq from {~literal ↦} to} ...
          (~and {~seq repeated ...}
                {~seq {~optional ({~literal repeated} . _)}}))
-      #'@$["[" (list (stringify from) "↦" (stringify to)) ...
-           repeated ... "]"]]))
+      #'@$["[" (add-between (list (list (stringify from) "↦" (stringify to))
+                                  ...
+                                  repeated
+                                  ...)
+                            "\\ ") "]"]]))
 @(define-syntax substφo
    (syntax-parser
      [(_ from {~literal ↦} to)
@@ -217,8 +235,10 @@
 
 (define carπ @${\mathrm{car}})
 (define cdrπ @${\mathrm{cdr}})
+(define forceπ @${\mathrm{force}})
 (define Numberτ @${\mathbf{Number}})
 (define-syntax promisee (defop "delay"))
+(define-syntax forcee (defop "force"))
 (define-syntax promiseτ (defop "promise"))
 (define-syntax promisev (defop "promise"))
 (define-syntax syme (defop "symbol"))
@@ -228,8 +248,27 @@
 (define-syntax gensyme (defop "gensym"))
 (define-syntax eq?op (defop "eq?"))
 (define sym* @${s′})
+(define 𝒮* @${𝒮′})
 (define-syntax recτ* (defop "Rec"))
 (define-syntax-rule (recτ r τ) (recτ* r τ))
 (define Booleanτ @${\mathbf{Boolean}})
 (define (transdots a b c) @${\mathit{td_τ}(@a,\ @b,\ @c)})
 (define (substdots a b c d) @${\mathit{sd}(@a,\ @b,\ @c,\ @d)})
+(define object @emph{object})
+(define Objects @emph{Objects})
+(define (elim a b) @${\mathit{elim}(@a,\ @b)})
+(define-syntax-rule (<:elim r a b)
+  @${⊢ @(stringify a)
+ \mathrel{{≤:}_{\mathrm{elim}\ @(stringify r)}}
+ @(stringify b)})
+
+(define-syntax include-equation
+  (syntax-rules ()
+    [(_ filename)
+     (let ()
+       (local-require (only-in (submod filename equations) [equations tmp]))
+       tmp)]
+    [(_ filename eq)
+     (let ()
+       (local-require (only-in filename [eq tmp]))
+       tmp)]))

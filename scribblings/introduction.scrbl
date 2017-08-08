@@ -344,7 +344,8 @@
   transformations. Programmers using functional languages often write list
   transformations using @htodo{higher-order} functions like @racket[map],
   @racket[foldl], @racket[filter], @racket[zip] and so on, instead of explicitly
-  writing recursive functions.
+  writing recursive functions.@htodo{mention FxCop and/or StyleCop, which have
+   some hand-coded (?) functions to traverse all nodes of a certain type.}
 
   The graph can be manipulated by updating some or all nodes of a given type,
   using an old-node to new-node transformation function. This transformation

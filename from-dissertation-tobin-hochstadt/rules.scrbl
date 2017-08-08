@@ -5,42 +5,12 @@
 @; permission to copy these rules, but did not ask for a relicensing under the
 @; CC0 license.
 
-The following definitions and rules are copied and adjusted
-from@~cite["tobin-hochstadt_typed_2010"], with the author's permission. Some
-of the notations were changed to use those of@~cite["kent2016occurrence"]. We
-include below the grammar, semantics and typing rules related to the minimal
-core of the Typed Racket language@note{The core language is defined
- in@~cite[#:precision "pp. 61–70" "tobin-hochstadt_typed_2010"].}, dubbed @${
- λ_{\mathit{TS}}}, including extensions which add pairs@note{The extensions
- needed to handle pairs are described
- in@~cite[#:precision "pp. 71–75" "tobin-hochstadt_typed_2010"].}, functions of
-multiple arguments, variadic functions and variadic polymorphic
-functions@note{The extensions needed to handle functions of multiple
- arguments, variadic functions, and variadic functions where the type of the
- “rest” arguments are not uniform are described
- in@~cite[#:precision "pp. 91–77" "tobin-hochstadt_typed_2010"].}, @todo{
- intersection types}, @todo{recursive types}, @todo{symbols} and @todo{
- promises}. We purposefully omit extensions which allow advanced logic
-reasoning when propagating information gained by complex combinations of
-conditionals@note{The extensions which allow advanced logic reasoning are
- described in@~cite[#:precision "pp. 75–78" "tobin-hochstadt_typed_2010"].},
-refinement types@note{The extensions which introduce refinement types are
- described in@~cite[#:precision "pp. 85–89" "tobin-hochstadt_typed_2010"].},
-dependent refinement types@note{Dependent refinement types are presented in
- @~cite["kent2016occurrence"].} (which allow using theories from external
-solvers to reason about values and their type, e.g. using bitvector theory to
-ensure that a sequence of operations does not produce a result exceeding a
-certain machine integer size), structs and classes. These extensions are not
-relevant to our work@note{We informally describe a translation of our system
- of records into structs in section @todo{[??]}, but settle for an alternative
- implementation in section @todo{[??]} which does not rely on structs.}, and
-their inclusion in the following semantics would needlessly complicate things.
-
 @require["../scribblings/util.rkt"
          "../scribblings/abbreviations.rkt"
          "../scribblings/adt-utils.rkt"
          (for-label (only-meta-in 0 typed/racket)
                     typed/racket/class)
+         (only-in scribble/base emph)
          scribble/example
          racket/string]
 @(use-mathjax)
@@ -52,100 +22,130 @@ their inclusion in the following semantics would needlessly complicate things.
        #:tag "from-dissertation-tobin-hochstadt"]{Formal semantics for part of
  @|typedracket|'s type system}
 
-Expressions:
+The following definitions and rules are copied and adjusted
+from@~cite["tobin-hochstadt_typed_2010"], with the author's permission. Some
+of the notations were changed to use those of@~cite["kent2016occurrence"].
 
-@cases["e" #:first-sep "⩴"
-       @acase{x @P y @P z@tag*{variable}}
-       @acase{@num-e @tag*{number}}
-       @acase{@true-e @tag*{booleans}}
-       @acase{@false-e}
-       @acase{@null-e @tag*{null constant}}
-       @acase{@primop @tag*{primitive functions}}
-       @acase{@app[e @repeated{e}] @tag*{function application}}
-       @acase{@ifop[e e e] @tag*{conditional}}
-       @acase{@λe[(@repeated{x:τ}) e] @tag*{lambda function}}
-       @acase{@λe[(@repeated{x:τ} @${\ .\ } @${x:τ*}) e]
-        @tag*{variadic function}}
-       @acase{@λe[(@repeated{x:τ} @${\ .\ } @${x:@polydot[τ α]}) e]
-        @tag*{variadic polymorpic function}}
-       @acase{@Λe[(@repeated{α}) e]@tag*{polymorphic abstraction}}
-       @acase{@Λe[(@repeated{α} @polydotα[α]) e]
-        @tag*{variadic polymorphic abstraction}}
-       @acase{@at[e @repeated{τ}] @tag*{polymorphic instantiation}}
-       @acase{@conse[e e]@tag*{pair}}
-       @acase{@promisee[e] @tag*{create promise}}
-       @acase{@syme[s] @tag*{symbol literal}}
-       @acase{@gensyme[] @tag*{fresh uninterned symbol}}
-       @acase{@eq?op[e e] @tag*{symbol equality}}
-       @acase{@mapop[e e]}] @; TODO: shouldn't it be a primop?
+We include below the grammar, semantics and typing rules related to the
+minimal core of the Typed Racket language@note{The core language is defined
+ in@~cite[#:precision "pp. 61–70" "tobin-hochstadt_typed_2010"].}, dubbed @${
+ λ_{\mathit{TS}}}, including extensions which add pairs@note{The extensions
+ needed to handle pairs are described
+ in@~cite[#:precision "pp. 71–75" "tobin-hochstadt_typed_2010"].}, functions of
+multiple arguments, variadic functions and variadic polymorphic
+functions@note{The extensions needed to handle functions of multiple
+ arguments, variadic functions, and variadic functions where the type of the
+ “rest” arguments are not uniform are described
+ in@~cite[#:precision "pp. 91–77" "tobin-hochstadt_typed_2010"].}, intersection
+types, recursive types, symbols and promises. These features have been
+informally described in @secref["tr-overview"].
 
-@todo{Define s}
+We purposefully omit extensions which allow advanced logic reasoning when
+propagating information gained by complex combinations of conditionals@note{
+ The extensions which allow advanced logic reasoning are described
+ in@~cite[#:precision "pp. 75–78" "tobin-hochstadt_typed_2010"].}, refinement
+types@note{The extensions which introduce refinement types are described
+ in@~cite[#:precision "pp. 85–89" "tobin-hochstadt_typed_2010"].}, dependent
+refinement types@note{Dependent refinement types are presented in
+ @~cite["kent2016occurrence"].} (which allow using theories from external
+solvers to reason about values and their type, e.g. using bitvector theory to
+ensure that a sequence of operations does not produce a result exceeding a
+certain machine integer size), structs and classes. These extensions are not
+relevant to our work@note{We informally describe a translation of our system
+ of records into structs in section @todo{[??]}, but settle for an alternative
+ implementation in section @todo{[??]} which does not rely on structs.}, and
+their inclusion in the following semantics would needlessly complicate things.
 
-Primitive operations:
+@subsubsub*section{Expressions}
 
-@cases[@primop #:first-sep "⩴"
-       @acase{@textit{add1}@tag*{returns its argument plus @${1}}} ;; only here as an example
-       @acase{@textit{number?}@tag*{number predicate}} ;; probably used in some explanation
-       @acase{@textit{cons?}@tag*{pair predicate}}
-       @acase{@textit{null?}@tag*{@null-v predicate}}
-       @acase{@textit{car}@tag*{first element of pair}}
-       @acase{@textit{cdr}@tag*{second element of pair}}
-       @acase{…}]
+The following expressions are available in the subset of @typedracket which we
+consider. These expressions include references to variables, creation of basic
+values (numbers, booleans, lists of pairs ending with @null-v, symbols,
+promises), a variety of lambda functions with different handling of @emph{
+ rest} arguments (fixed number of arguments, polymorphic functions with a
+uniform list of @emph{rest} arguments and variadic polymorphic functions, as
+well as polymorphic abstractions), a small sample of primitive functions which
+are part of Racket's library and a few operations manipulating these values
+(function application and polymorphic instantiation, forcing promises, symbol
+comparison and so on).
 
-Values:
+@include-equation["e.rkt"]
 
-@cases["v" #:first-sep "⩴"
-       @acase{@primop @tag*{primitive function}}
-       @acase{@num-v @tag*{number}}
-       @acase{@true-v @tag*{booleans}}
-       @acase{@false-v}
-       @acase{@λv[ℰ (@repeated{x:τ}) e] @tag*{lambda function}}
-       @acase{@λv[ℰ (@repeated{x:τ} @${\ .\ } @${x:τ*}) e]
-        @tag*{variadic function}}
-       @acase{@λv[ℰ (@repeated{x:τ} @${\ .\ } @${x:@polydot[τ α]}) e]
-        @tag*{variadic polymorphic function}}
-       @acase{@Λv[ℰ (@repeated{α}) e]
-       @tag*{polymorphic abstraction}}
-       @acase{@Λv[ℰ (@repeated{α} @polydotα[α]) e]
-       @tag*{variadic polymorphic abstraction}}
-       @acase{@consv[v v] @tag*{pair}}
-       @acase{@null-v @tag*{null}}
-       @acase{@promisev[ℰ e] @tag*{promise}}
-       @acase{@symv[@sym*] @tag*{symbol}}]
+Symbol literals are noted as @${s ∈ 𝒮} and the universe of symbols (which
+includes symbol literals and fresh symbols created via @gensyme[]) is noted as
+@${@sym* ∈ @𝒮*}.
 
-Execution environment:
+@include-equation["e.rkt" sym]
 
-@cases["ℰ" #:first-sep "⩴"
-       @acase{@repeated{@↦v[x v]}\ @repeated{@↦v[α τ]}
-        @tag*{bound variables @${\&} types}}]
+@subsubsub*section{Primitive operations (library functions)}
 
-Evaluation context:
+Racket offers a large selection of library functions, which we consider as
+primitive operations. A few of these are listed below, and their type is given
+later after, once the type system has been introduced. @textit{number?},
+@textit{pair?} and @textit{null?} are predicates for the corresponding type.
+@textit{car} and @textit{cdr} are accessors for the first and second elements
+of a pair, which can be created using @|consp|. The @textit{identity} function
+returns its argument unmodified, and @textit{add1} returns its numeric
+argument plus 1. These last two functions are simply listed as examples.
 
-@cases["E" #:first-sep "⩴"
-       @acase{[] @tag*{program entry point}}
-       @acase{@app[E @repeated{e}]@tag*{function application}}
-       @acase{@app[v @repeated{v} E @repeated{e}]}
-       @acase{@ifop[E e e]@tag*{conditional}}
-       @acase{@conse[E e]@tag*{pair}} @; TODO: shouldn't it be a primop?
-       @acase{@conse[v E]} @; TODO: shouldn't it be a primop?
-       ]
+@include-equation["p.rkt"]
+
+@subsubsub*section{Values}
+
+These expressions and primitive functions may produce or manipulate the
+following values:
+
+@include-equation["v.rkt"]
+
+@subsubsub*section{Run-time environment}
+
+Lambda functions are closures over their execution environment. The execution
+environment maps to their value those variables which were within the scope of
+the closure. In principle, it also maps type variables and dotted type
+variables to the type or types used to instantiate the polymorphic functions
+which are part of the scope of the closure. Typed Racket uses @emph{type
+ erasure} however, that is to say that the compile-time type of values does not
+persist at run-time. Primitive types are still implicitly tagged with their
+type (which allows for untagged unions and predicates such as
+@racket[number?]), but the type of a function cannot be determined at run-time
+for example. This means that the type-variable-to-type mapping of @${ℰ} is not
+effectively present at run-time with the current implementation of Typed
+Racket.
+
+@include-equation["envrt.rkt"]
+
+@subsubsub*section{Evaluation contexts}
+
+The operational semantics given below rely on the following evaluation
+contexts:
+
+@include-equation["Ectx.rkt"]
 
 @; TODO: are other cases needed?
 
-Typing judgement:
+@subsubsub*section{Typing judgement}
 
-@$${
- @Γ[⊢ e R]
+@;{
+ The type system of @typedracket relies on the following typing judgement. It
+ indicates that the expression @${e} has type @${τ}. Additionally, if the
+ run-time value of @${e} is @false-v then the propositions contained in @${φ⁻}
+ are valid. If the run-time value of @${e} is not @false-v, then the
+ propositions contained in @${φ⁺} are valid. Finally, @${e} is an alias for the
+ @object @${o}. We use here the same terminology as
+ @~cite["tobin-hochstadt_typed_2010"], which denotes by @object a sub-element
+ of a variable (or a sub-element of the first argument of the function, when
+ @R[τ @${φ⁺} @${φ⁻} @${o}] is the return type of a function).
 }
 
-@cases[@R #:first-sep "⩴"
-       @R[τ
-          @${φ⁺}
-          @${φ⁻}
-          @${o}]]
+@include-equation["GammaR.rkt" Γ]
+
+@include-equation["GammaR.rkt" R]
 
 The @Γ[⊢ e R] typing judgement indicates that the expression @${e} has type
-@${τ}.
+@${τ}. The @${Γ} typing environment maps variables to their type (and to extra
+information), while the @${Δ} environment stores the polymorphic type
+variables, variadic polymorphic type variables and recursive type variables
+which are in scope.
 
 Additionally, the typing judgement indicates a set of propositions @${φ⁻}
 which are known to be true when the run-time value of @${e} is @|false-v|, and
@@ -173,312 +173,244 @@ not. Occurrence typing similarly exploits the fact that the type of other
 variables may depend on the value of @${τ}. @htodo{is this some weak form of
  dependent typing?}
 
-Types:
+@subsubsub*section{Types}
 
-@cases["τ,σ" #:first-sep "⩴"
-       @acase{⊤@tag*{top}}
-       @acase{@num-τ @tag*{number singleton}}
-       @acase{@Numberτ @tag*{any number}}
-       @acase{@true-τ @tag*{boolean singleton}}
-       @acase{@false-τ}
-       @acase{@f→[(@repeated{τ}) R] @tag*{function}}
-       @acase{@f→[(@repeated{τ} @${\ .\ } @${τ*}) R] @tag*{variadic function}}
-       @acase{@f→[(@repeated{τ} @${\ .\ } @polydot[τ α]) R]
-        @tag*{variadic polymorphic function}}
-       @acase{@∀r[(@repeated{α}) τ]@tag*{polymorphic type}}
-       @acase{@∀r[(@repeated{α} @polydotα[α]) τ]
-        @tag*{variadic polymorphic type}}
-       @acase{@un[@repeatset{τ}]@tag*{union}}
-       @acase{@consτ[τ τ]@tag*{pair}}
-       @acase{@null-τ @tag*{null (end of lists)}}
-       @acase{@promiseτ[R] @tag*{promise}}
-       @acase{@symτ[@sym*] @tag*{symbol singleton}}
-       @acase{@symτ[@sym*] @tag*{any symbol}}
-       @acase{@∩τ[@repeatset{τ}] @tag*{any symbol}}
-       @acase{@recτ[r τ] @tag*{recursive type}}]
+@Typedracket handles the types listed below. Aside from the top type (@${⊤})
+which is the supertype of all other types, this list includes singleton types
+for numbers, booleans, symbols and the @null-v value. The types @Numberτ and
+@Symbolτ are the infinite unions of all number and symbol singletons,
+respectively. Also present are function types (with fixed arguments,
+homogeneous @emph{rest} arguments and the variadic polymorphic functions which
+accept heterogeneous @emph{rest} arguments, as well as polymorphic
+abstractions), unions of other types, intersections of other types, the type
+of pairs and promises. The value assigned to a variadic polymorphic function's
+rest argument will have a type of the form @List…τ[τ α]. Finally, @typedracket
+allows recursive types to be described with the @recτ* combinator.
+
+@include-equation["tausigma.rkt"]
 
 Additionally, the @Booleanτ type is defined as the union of the @true-τ and
 @false-τ singleton types.
 
-@$${
- @Booleanτ = @un[@true-τ @false-τ]
-}
+@include-equation["tausigma.rkt" Boolean]
 
-@htodo{Add the rec types}
+@subsubsub*section{Filters (value-dependent propositions)}
 
-Filters (a.k.a. propositions):
+The filters associated with an expression are a set of positive (resp.
+negative) propositions which are valid when the expression is true (resp.
+false).
 
-@cases[@${φ} #:first-sep "⩴" @acase{@repeatset{ψ}@tag*{filter set}}]
+@include-equation["phi-psi-o-path.rkt" φ]
 
-@cases["ψ" #:first-sep "⩴"
-       @acase{τ_{@loc}
-        @tag*{@${(ℰ[v] = \mathbf{?}) ⇒ ℰ[@loc]@text{ is of type @${τ}}}}}
-       @acase{@!{τ}_{@loc}
-        @tag*{@${(ℰ[v] = \mathbf{?}) ⇒ ℰ[@loc]@text{ is not of type @${τ}}}}}
-       @acase{⊥@tag*{contradiction}}]
+These propositions indicate that a specific subelement of a location has a
+given type.
 
-@cases[@loc #:first-sep "⩴"
-       @acase{•@tag*{function's first argument}}
-       @acase{x@tag*{variable}}]
+@include-equation["phi-psi-o-path.rkt" ψ]
 
-Objects (aliasing information):
+The location can be a variable, or the special @${•} token, which denotes a
+function's first parameter, when the propositions are associated with that
+function's result. This allows us to express relations between the output of a
+function and its input, without referring to the actual name of the parameter,
+which is irrelevant. In other words, @${•} occurs in an α-normal form of a
+function's type.
 
-@cases[@textrm{o} #:first-sep "⩴"
-       @acase{π(@loc)@tag*{@${e} is an alias for @${π(@loc)}}}
-       @acase{∅@tag*{no aliasing information}}]
+@include-equation["phi-psi-o-path.rkt" loc]
 
-Paths:
+@Objects, which represent aliasing information, can either indicate that the
+expression being considered is an alias for a sub-element of a variable, or
+that no aliasing information is known.
 
-@cases[@textit{π} #:first-sep "⩴"
-       @acase{pe∷π@tag*{path concatenation}}
-       @acase{@emptypath @tag*{empty path}}]
+@subsubsub*section{Objects (aliasing information)}
+
+@include-equation["phi-psi-o-path.rkt" o]
+
+Sub-elements are described via a chain of path elements which are used to
+access the sub-element starting from the variable.
+
+@subsubsub*section{Paths}
+
+@include-equation["phi-psi-o-path.rkt" π]
 
 The path concatenation operator @${∷} is associative. @htodo{Actually, we
  define it for pe∷π above, not for π∷π}. The @${@emptypath} is omitted from
 paths with one or more elements, so we write @${car∷cdr} instead of @${
  car∷cdr∷@emptypath}.
 
-Path elements (aliasing information):
+@subsubsub*section{Path elements}
 
-@cases[@textit{pe} #:first-sep "⩴"
-       @acase{@carπ @tag*{first element of pair}}
-       @acase{@cdrπ @tag*{second element of pair}}]
+Path elements can be @carπ and @cdrπ, to indicate access to a pair's first or
+second element, and @forceπ, to indicate that the proposition or object
+targets the result obtained after forcing a promise. We will note here that
+this obviously is only sound if forcing a promise always returns the same
+result (otherwise the properties and object which held on a former value may
+hold on the new result). Racket features promises which do not cache their
+result. These could return a different result each time they are forced by
+relying on external state. However, forcing a promise is generally assumed to
+be an idempotent operation, and not respecting this implicit contract in
+production code would be bad practice. Typed Racket disallows non-cached
+promises altogether. We introduced a small module @racketmodname[delay-pure]
+which allows the safe creation of non-cached promises.
+@racketmodname[delay-pure] restricts the language to a small subset of
+functions and operators which are known to not perform any mutation, and
+prevents access to mutable variables. This ensures that the promises created
+that way always produce the same value, without the need to actually cache
+their result.
 
-Subtyping:
+@include-equation["phi-psi-o-path.rkt" pe]
 
-The subtyping judgement is @${@<:[τ₁ τ₂]}. It indicates that @${τ₁} is a
-subtype of @${τ₂} (or that @${τ₁} and @${τ₂} are the same type).
+@subsubsub*section{Subtyping}
+The subtyping judgement is @${@<:[τ δ]}. It indicates that @${τ} is a
+subtype of @${σ} (or that @${τ} and @${σ} are the same type).
 
-@todo{Rule for Rec: if r is eliminated, then the resulting type is a subtype
- of the rec. Can't use ⊥ for that, because there could be function types using
- r where the variance is reversed (and which wouldn't collapse to ⊥ anyway.}
+The @<:* relation is reflexive and transitive. When two or more types are all
+subtypes of each other, they form an equivalence class. They are considered
+different notations for the same type, and we note @=:[τ σ], whereas @≠:[τ σ]
+indicates that @${τ} and @${σ} are not mutually subtypes of each other (but
+one can be a strict subtype of the other).
 
-@$inferrule[
- -
- @${@<:[τ τ]}
- @${@textsc{S-Refl}}]
-  
-@$inferrule[
- -
- @${@<:[τ ⊤]}
- @${@textsc{S-Top}}]
+@include-equation["subtyping.rkt" S-Reflexive]
+@include-equation["subtyping.rkt" S-Transitive]
 
-@textsc{S-Bot} can be derived from @textsc{S-UnionSub}, by constructing an
-empty union. The @${⊥} type is a shorthand for the empty union @${(∪)}. It is
-a subtype of every other type, and is not inhabited by any value.
+The @${⊥} type is a shorthand for the empty union @${(∪)}. It is a subtype of
+every other type, and is not inhabited by any value. @textsc{S-Bot} can be
+derived from @textsc{S-UnionSub}, by constructing an empty union.
 
-@$inferrule[
- -
- @${@<:[⊥ τ]}
- @${@textsc{S-Bot}}]
+@$p[@include-equation["subtyping.rkt" S-Top]
+    @include-equation["subtyping.rkt" S-Bot]]
 
-@$inferrule[
- -
- @${@<:[@num-τ @Numberτ]}
- @${@textsc{S-Number}}]
+The singleton types @num-τ and @symτ[s] which are only inhabited by their
+literal counterpart are subtypes of the more general @Numberτ or @Symbolτ
+types, respectively.
 
-@$inferrule[
- -
- @${@<:[@symτ @Symbolτ]}
- @${@textsc{S-Symbol}}]
+@$p[@include-equation["subtyping.rkt" S-Number]
+    @include-equation["subtyping.rkt" S-Symbol]]
 
-@$inferrule[
- @${
-  @repeated{@<:[σ_a τ_a]} \\
-  @<:R[R @${@R'}]}
- @${@<:[@f→[(@repeated{τ_a}) R]
-        @f→[(@repeated{σ_a}) @${@R'}]]}
- @${@textsc{S-Fun}}]
+The following subtyping rules are concerned with function types and
+polymorphic types:
 
-@$inferrule[
- @${
-  @<:[τ_r σ_r] \\
-  @${φ⁺' ⊆ φ⁺ } \\
-  @${φ⁻' ⊆ φ⁻ } \\
-  o = o' ∨ o' = ∅}
- @${@<:R[@R[τ_r
-            @${φ⁺}
-            @${φ⁻}
-            @${o}]
-         @R[σ_r
-            @${φ⁺'}
-            @${φ⁻'}
-            @${o'}]]}
- @${@textsc{S-R}}]
+@$p[@include-equation["subtyping.rkt" S-Fun]
+    @include-equation["subtyping.rkt" S-R]
+    @include-equation["subtyping.rkt" S-Fun*]
+    @include-equation["subtyping.rkt" S-Fun*-Fixed]
+    @include-equation["subtyping.rkt" S-Fun*-Fixed*]
+    @include-equation["subtyping.rkt" S-DFun]
+    @include-equation["subtyping.rkt" S-Poly-α-Equiv]
+    @include-equation["subtyping.rkt" S-PolyD-α-Equiv]
+    @include-equation["subtyping.rkt" S-DFun-Fun*]]
 
-@$inferrule[
- @${
-  @repeated{@<:[σ_a τ_a]} \\
-  @<:[σ τ] \\
-  @<:R[R @${@R'}]}
- @${@<:[@f→[(@repeated{τ_a} @${\ .\ } τ*) R]
-        @f→[(@repeated{σ_a} @${\ .\ } σ*) @${@R'}]]}
- @${@textsc{S-Fun*}}]
+@todo{@textsc{S-PolyD-α-Equiv} should use the substitution for a polydot
+ (subst-dots?), not the usual subst.}
 
-@$inferrule[
- @${
-  @repeated{@<:[σ_a τ_a]} \\
-  @repeated{@<:[σᵢ τ]} \\
-  @<:R[R @${@R'}]}
- @${@<:[@f→[(@repeated{τ_a} @${\ .\ } τ*) R]
-        @f→[(@repeated{σ_a} @repeated{σᵢ}) @${@R'}]]}
- @${@textsc{S-Fun*-Fixed}}]
-
-@$inferrule[
- @${
-  @repeated{@<:[σ_a τ_a]} \\
-  @repeated{@<:[σᵢ τ]} \\
-  @<:[σ τ] \\
-  @<:R[R @${@R'}]}
- @${@<:[@f→[(@repeated{τ_a} @${\ .\ } τ*) R]
-        @f→[(@repeated{σ_a} @repeated{σᵢ} @${\ .\ } σ*) @${@R'}]]}
- @${@textsc{S-Fun*-Fixed*}}]
-
-@$inferrule[
- @${
-  @repeated{@<:[σ_a τ_a]} \\
-  @<:[σ τ] \\
-  @<:R[R @${@R'}]}
- @${@<:[@f→[(@repeated{τ_a} @${\ .\ } @polydot[τ α]) R]
-        @f→[(@repeated{σ_a} @${\ .\ } @polydot[σ α]) @${@R'}]]}
- @${@textsc{S-DFun}}]
-
-@$inferrule[
- @${@<:[@${τ[@repeated{αᵢ ↦ βᵢ}]} σ]}
- @${@<:[@∀r[(@repeated{αᵢ}) τ]
-        @∀r[(@repeated{βᵢ}) σ]]}
- @${@textsc{S-Poly-}α@textsc{-Equiv}}]
-
-@todo{This should use the substitution for a polydot (subst-dots?), not the
- usual subst.}
-
-@$inferrule[
- @${@<:[@${τ[@repeated{αᵢ ↦ βᵢ} α ↦ β]} σ]}
- @${@<:[@∀r[(@repeated{αᵢ} @polydotα[α]) τ]
-        @∀r[(@repeated{βᵢ} @polydotα[β]) σ]]}
- @${@textsc{S-PolyD-}α@textsc{-Equiv}}]
-
-@todo{check the following rule:}
+@todo{check the @textsc{S-DFun-Fun*} rule.}
 
 @htodo{Try to detach the ∀ from the →, in case the → is nested further deep.
  If it works.}
 
-@$inferrule[
- @${
-  @repeated{@<:[σ_a τ_a]} \\
-  @<:[σ @${τ[α ↦ ⊤]}] \\
-  @<:R[R @${@R'}]}
- @${@<:[@∀r[(@polydotα[α]) @f→[(@repeated{τ_a} @polydot[τ α]) R]]
-        @f→[(@repeated{σ_a} σ*) @${@R'}]]}
- @${@textsc{S-DFun-Fun*}}]
+The following rules are concerned with recursive types built with the
+@racket[Rec] combinator. The @textsc{S-RecWrap} rule allows considering
+@Numberτ a subtype of @recτ[r Numberτ] for example (i.e. applying the
+recursive type combinator to a type which does not refer to @${r} is a no-op),
+but it also allows deriving
+@<:[@recτ[r @un[@consτ[τ r] @null-τ]] @un[@consτ[τ ⊤] @null-τ]]. The @textsc{
+ S-RecElim} rule has the opposite effect, and is mainly useful to “upcast”
+members of an union containing @${r}. It allows the deriving
+@<:[@null-τ @recτ[r @un[@consτ[τ r] @null-τ]]]. The rules @textsc{S-RecStep}
+and @textsc{S-RecUnStep} allow unraveling a single step of the recursion, or
+assimilating an such an unraveled step as part of the recursive type.
 
-@todo{What if some tvars are unbound in the types above, how do they compare?}
+@todo{TODO: renamings}
 
-@$inferrule[
- @${∃ i . @<:[τ @${σᵢ}]}
- @${@<:[τ @${⋃ @repeated{σᵢ}}]}
- @${@textsc{S-UnionSuper}}]
+@$p[
+ @include-equation["subtyping.rkt" S-RecWrap]
+ @include-equation["subtyping.rkt" S-RecElim]
+ @include-equation["subtyping.rkt" S-RecStep]
+ @include-equation["subtyping.rkt" S-RecUnStep]]
 
-@$inferrule[
- @${@repeated[@<:[τᵢ @${σ}]]}
- @${@<:[@${⋃ @repeated{τᵢ}} σ]}
- @${@textsc{S-UnionSub}}]
+The rules below describe how union and intersection types compare.
 
-@$inferrule[
- @${@<:[τ₁ σ₁] \\
-  @<:[τ₂ σ₂]}
- @${@<:[@consτ[τ₁ τ₂] @consτ[σ₁ σ₂]]}
- @${@textsc{S-Pair}}]
+@$p[@include-equation["subtyping.rkt" S-UnionSuper]
+    @include-equation["subtyping.rkt" S-UnionSub]
+    @include-equation["subtyping.rkt" S-IntersectionSub]
+    @include-equation["subtyping.rkt" S-IntersectionSuper]]
 
-@$inferrule[
- @${∃ i . @<:[@${σᵢ} τ]}
- @${@<:[@${⋂ @repeated{σᵢ}} τ]}
- @${@textsc{S-IntersectionSub}}]
+Finally, promises are handled by comparing the type that they produce when
+forced, and pairs are compared pointwise. Dotted lists types, which usually
+represent the type of the value assigned to a variadic polymorphic function's
+“rest” argument
 
-@$inferrule[
- @${@repeated[@<:[@${σ} τᵢ]]}
- @${@<:[σ @${⋂ @repeated{τᵢ}}]}
- @${@textsc{S-IntersectionSuper}}]
+@$p[@include-equation["subtyping.rkt" S-Promise]
+    @include-equation["subtyping.rkt" S-Pair]
+    @include-equation["subtyping.rkt" S-DList]]
 
-@$inferrule[
- @${@<:[τ σ]}
- @${@<:[@promiseτ[τ] @promiseτ[σ]]}
- @${@textsc{S-Promise}}]
+@subsubsub*section{Operational semantics}
 
-Operational semantics:
+@todo{TODO}
 
+@subsubsub*section{Type validity rules}
 
+Polymorphic type variables valid types if they are bound, that is if they are
+present in the @${Δ} environment. Additionally variadic (i.e. dotted)
+polymorphic type variables may be present in the environment. When this is the
+case, they can be used as part of a @List…τ[τ α] type
 
-Type validity rules:
+@$p[@include-equation["te.rkt" TE-Var]
+    @include-equation["te.rkt" TE-DList]]
 
-@todo{From Tobin-Hochstadt + rule for Rec}
-
-@$inferrule[@${@polydotα[α] ∈ Δ}
-            @${Δ ⊢ @polydotα[α]}
-            @${@textsc{TE-DVar}}]
+@htodo{There are more rules needed (one for building every type, most are
+ trivial).}
 
 @htodo{isn't there any well-scopedness constraint for the φ?}
 
-@$inferrule[@${Δ ▷ @polydot[τ_r α] \\ @repeated{Δ ⊢ τᵢ} \\ Δ ⊢ τ}
-            @${Δ ⊢ @f→[(@repeated{τᵢ} @polydot[τ_r α]) @R[τ φ⁺ φ⁻ o]]}
-            @${@textsc{TE-DFun}}]
+The following rules indicate that function types are valid if their use of
+polymorphic type variables is well-scoped.
 
-@$inferrule[@${Δ ∪ \{@repeated{αᵢ} @polydotα[β]\} ⊢ τ}
-            @${Δ ⊢ @∀r[(@repeated{αᵢ} @polydotα[β]) τ]}
-            @${@textsc{TE-DAll}}]
+@$p[@include-equation["te.rkt" TE-DFun]
+    @include-equation["te.rkt" TE-All]
+    @include-equation["te.rkt" TE-DAll]
+    @include-equation["te.rkt" TE-DPretype]]
 
-@$inferrule[@${Δ ⊢ @polydotα[α] \\ Δ ∪ \{α\} ⊢ τ}
-            @${Δ ▷ @polydot[τ α]}
-            @${@textsc{TE-DPretype}}]
+The following rule indicates that types built using the recursive type
+combinator @recτ* are valid if their use of the recursive type variable @${r}
+is well-scoped.
 
-Typing rules:
+@include-equation["te.rkt" TE-Rec]
+
+The next rules are trivial, and state that the base types are valid, or simply
+examine validity pointwise for unions, intersections, pairs, promises and
+filters. @htodo{and objects}
+
+@$p[
+ @include-equation["te.rkt" TE-Trivial]
+ @include-equation["te.rkt" TE-R]
+ @include-equation["te.rkt" TE-Phi]
+ @include-equation["te.rkt" TE-Psi]
+ @include-equation["te.rkt" TE-Psi-Not]
+ @include-equation["te.rkt" TE-Psi-Bot]
+ ]
+
+@subsubsub*section{Typing rules}
 
 @todo{Add rule for the (optional?) simplification of intersections}
 
-@$inferrule[@${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]]}
-            @${@Γ[⊢ @promisee[e] @R[@R[τ φ⁺ φ⁻ o] ϵ ⊥ ∅]]}
-            @${@textsc{T-Promise}}]
+@$${
+ \begin{aligned}
+ \end{aligned}
+}
 
-@$inferrule[-
-            @${@Γ[⊢ @syme[s] @R[@symτ[s] ϵ ⊥ ∅]]}
-            @${@textsc{T-Symbol}}]
-
-@$inferrule[-
-            @${@Γ[⊢ @gensyme[] @R[@Symbolτ ϵ ⊥ ∅]]}
-            @${@textsc{T-Symbol}}]
+@include-equation["trules.rkt" T-Promise]
+@include-equation["trules.rkt" T-Symbol]
+@include-equation["trules.rkt" T-Gensym]
 
 @htodo{Are the hypotheses for T-Eq? necessary? After all, in Racket eq? works
  on Any.}
-@$inferrule[@${@Γ[⊢ e₁ @R[τ₁ φ⁺₁ φ⁻₁ o₂]] \\
-             @Γ[⊢ e₂ @R[τ₂ φ⁺₂ φ⁻₂ o₂]] \\
-             @<:[τ₁ Symbol] \\
-             @<:[τ₂ Symbol]}
-            @${@Γ[⊢ @eq?op[e₁ e₂] @R[@Booleanτ ϵ ⊥ ∅]]}
-            @${@textsc{T-Eq?}}]
 
-@$inferrule[-
-            @${@Γ[⊢ x @R[@${Γ(x)} @${@!{@false-τ}} @true-τ x]]}
-            @${@textsc{T-Var}}]
-
-@$inferrule[-
-            @${@Γ[⊢ p @R[@${δ_τ(p)} ϵ ⊥ ∅]]}
-            @${@textsc{T-Primop}}]
-
-@$inferrule[-
-            @${@Γ[⊢ @true-e @R[@true-τ ϵ ⊥ ∅]]}
-            @${@textsc{T-True}}]
-
-@$inferrule[-
-            @${@Γ[⊢ @false-e @R[@false-τ ⊥ ϵ ∅]]}
-            @${@textsc{T-False}}]
-
-@$inferrule[-
-            @${@Γ[⊢ @num-e @R[@num-τ ϵ ⊥ ∅]]}
-            @${@textsc{T-Num}}]
-
-@$inferrule[-
-            @${@Γ[⊢ @null-e @R[@null-τ ⊥ ϵ ∅]]}
-            @${@textsc{T-Null}}]
+@include-equation["trules.rkt" T-Eq?]
+@include-equation["trules.rkt" T-Var]
+@include-equation["trules.rkt" T-Primop]
+@include-equation["trules.rkt" T-True]
+@include-equation["trules.rkt" T-False]
+@include-equation["trules.rkt" T-Num]
+@include-equation["trules.rkt" T-Null]
 
 @htodo{The original TD-Map rule (p.95) seems wrong, as it allows un-dotted
  references to α in the function's type. But it is impossible to construct such
@@ -486,56 +418,24 @@ Typing rules:
  should instead expect a polymorphic function, with occurrences of α in τ_r
  replaced with the new β variable, as shown below.}
 
-@$inferrule[@${@Γ[Δ ⊢ e_r @R[@polydot[τ_r α] φ⁺_r φ⁻_r o_r]] \\
-             @Γ[@${Δ} ⊢
-                e_f @R[@∀r[(β) @f→[(@${τ_r@subst[α ↦ β]}) @R[τ φ⁺ φ⁻ o]]]
-                       φ⁺_f
-                       φ⁻_f
-                       o_f]]}
-            @${@Γ[Δ ⊢ @mapop[e_f e_r] @R[@polydot[@${τ@subst[β ↦ α]} α]
-                                           ϵ
-                                           ⊥
-                                           ∅]]}
-            @${@textsc{TD-Map}}]
+@include-equation["trules.rkt" T-DMap]
 
-@$inferrule[@${@Γ[@${x₀:σ₀} @repeated{xᵢ:σ} ⊢ e @R[τ φ⁺ φ⁻ o]] \\
-            φ⁺' = φ⁺\vphantom{φ}@substφo[x₀ ↦ •] \\
-            φ⁻' = φ⁻\vphantom{φ}@substφo[x₀ ↦ •] \\
-            o' = o\vphantom{o}@substφo[x₀ ↦ •]}
-            @${@Γ[⊢ @λe[(@repeated{x:σ}) e]
-                  @R[(f→ (@repeated{σ})
-                         @R[τ
-                            @${φ⁺'}
-                            @${φ⁻'}
-                            @${o'}])
-                     ϵ ⊥ ∅]]}
-            @${@textsc{T-AbsPred}}]
+Below are the rules for the various flavours of lambda functions and
+polymorphic abstractions.
+
+@include-equation["trules.rkt" T-AbsPred]
 
 @htodo{Technically, in the rules T-Abs and T-DAbs, we should keep any φ and o information concerning outer
  variables (those not declared within the lambda, and therefore still available
  after it finishes executing).}
 
-@$inferrule[@${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]]}
-            @${@Γ[⊢ @λe[(@repeated{x:σ}) e]
-                  @R[(f→ (@repeated{σ})
-                         @R[τ
-                            ϵ
-                            ϵ
-                            ∅])
-                     ϵ ⊥ ∅]]}
-            @${@textsc{T-Abs}}]
+@include-equation["trules.rkt" T-Abs]
+@include-equation["trules.rkt" T-DAbs]
 
-@$inferrule[@${@repeated{Δ ⊢ τₖ} \\
-             Δ ▷ @polydot[τ_r α] \\
-             @Γ[@repeated{xₖ : τₖ} @${x_r : @polydot[τ_r α]} ⊢ e @R[τ φ⁺ φ⁻ o]]}
-            @${@Γ[⊢ @λe[(@repeated{xₖ:τₖ} @${x_r:@polydot[τ_r α]}) e]
-                  @R[(f→ (@repeated{τₖ} @polydot[τ_r α])
-                         @R[τ
-                            ϵ
-                            ϵ
-                            ∅])
-                     ϵ ⊥ ∅]]}
-            @${@textsc{T-DAbs}}]
+@todo{Should the φ⁺ φ⁻ o be preserved in T-TAbs and T-DTAbs?}
+
+@include-equation["trules.rkt" T-TAbs]
+@include-equation["trules.rkt" T-DTAbs]
 
 The @${\vphantom{φ}@substφo[x ↦ z]} operation restricts the information
 contained within a @${φ} or @${o} so that the result only contains information
@@ -547,193 +447,51 @@ about the variable @${x}, and renames it to @${z}. When applied to a filter
 The @${⊥} cases of the @${\operatorname{apo}} operator
 from@~cite[#:precision "pp. 65,75" "tobin-hochstadt_typed_2010"] are covered
 by the corresponding cases in the @${@restrict} and @${@remove} operators, and
-therefore should not need to be included in our @${\vphantom{
-  φ}@substφo[x ↦ z]} operator.
+therefore should not need to be included in our @${\vphantom{φ}@substφo[x ↦ z]}
+operator.
 
-@$${
- \begin{aligned}
- φ@substφo[x ↦ z] &= \bigcup @repeated{ψ@substφo[x ↦ z]}&\\
- ⊥@substφo[x ↦ z] &= \{⊥\}&\\
- τ_{π(y)}\vphantom{τ}@substφo[x ↦ z] &= ∅ &@textif y ≠ x \\
- @!{τ}_{π(y)}\vphantom{τ}@substφo[x ↦ z] &= ∅ &@textif y ≠ x \\
- τ_{π(x)}\vphantom{τ}@substφo[x ↦ z] &= \{τ_{π(z)}\} &\\
- @!{τ}_{π(x)}\vphantom{τ}@substφo[x ↦ z] &= \{@!{τ}_{π(z)}\} &
- \end{aligned}
-}
+@include-equation["trules.rkt" substφ]
+@include-equation["trules.rkt" substo]
 
-@$${
- \begin{aligned}
- π(x)@substφo[x ↦ ∅] &= ∅ &\\
- π(x)@substφo[x ↦ z] &= π(z) &@textif z ≠ ∅ \\
- π(y)@substφo[x ↦ z] &= ∅ &@textif y ≠ x \\
- ∅@substφo[x ↦ z] &= ∅ &
- \end{aligned}
-}
+Below are the typing rules for the various flavours of function application and
+instantiation of polymorphic abstractions.
 
-@(define _op @${_{\mathit{op}}})
-
-@$inferrule[@${@Γ[⊢ @${e@_op} @R[@${τ@_op} @${φ⁺@_op} @${φ⁻@_op} @${o@_op}]] \\
-             @repeated[@Γ[⊢ @${aᵢ}
-                          @R[@${τ_{aᵢ}} @${φ⁺_{aᵢ}} @${φ⁻_{aᵢ}} @${o_{aᵢ}}]]] \\
-             @repeated[@<:[τ_a @${τ_{\mathit{in}}}]]
-             @<:[@${τ@_op} @f→[(@repeated{τ_{\mathit{in}}})
-                               @R[τ_r φ⁺_r φ⁻_r o_r]]]
-            φ⁺_r' = φ⁺_r@substφo[• ↦ @${o_{a₀}}] \\
-            φ⁻_r' = φ⁻_r@substφo[• ↦ @${o_{a₀}}] \\
-            o' = o@substφo[• ↦ @${o_{a₀}}]}
-            @${@Γ[⊢ @app[@${e@_op} @repeated{aᵢ}]
-                  @R[(f→ (@repeated{σ})
-                         @R[τ_r
-                            @${φ⁺'}
-                            @${φ⁻'}
-                            @${o'}])
-                     ϵ ⊥ ∅]]}
-            @${@textsc{T-App}}]
+@include-equation["trules.rkt" T-App]
 
 @todo{For the inst rules, are the φ⁺ φ⁻ o preserved?}
-@$inferrule[@${@repeated[#:n "n"]{Δ ⊢ τⱼ} \\
-             @Γ[Δ ⊢ @${e@_op} @R[@∀r[(@repeated[#:n "n"]{αⱼ}) τ]
-                                 φ⁺ φ⁻ o]]}
-            @Γ[⊢ @at[@${e@_op} @repeated[#:n "n"]{τⱼ} @repeated[#:n "m"]{τₖ}]
-               @R[@${τ@subst[@repeated[#:n "n"]{aⱼ ↦ τⱼ}]}
-                  ϵ ϵ ∅]]
-            @${@textsc{T-Inst}}]
 
-@$inferrule[@${@repeated[#:n "n"]{Δ ⊢ τⱼ} \\
-             @repeated[#:n "m"]{Δ ⊢ τₖ} \\
-             @Γ[Δ ⊢ @${e@_op} @R[@∀r[(@repeated[#:n "n"]{αⱼ} @polydotα[β]) τ]
-                         φ⁺ φ⁻ o]]}
-            @Γ[⊢ @at[@${e@_op} @repeated[#:n "n"]{τⱼ} @repeated[#:n "m"]{τₖ}]
-               @R[@transdots[@${τ@subst[@repeated[#:n "n"]{aⱼ ↦ τⱼ}]}
-                             @${β}
-                             @repeated[#:n "m"]{τₖ}]
-                  ϵ ϵ ∅]]
-            @${@textsc{T-DInst}}]
-
-@$inferrule[@${@repeated{Δ ⊢ τₖ} \\
-             Δ ▷ @polydot[τ_r β] \\
-             @Γ[Δ ⊢ @${e@_op} @R[@∀r[(@repeated{αₖ} @polydotα[α_r]) τ]
-                                 φ⁺ φ⁻ o]]}
-            @Γ[⊢ @at[@${e@_op} @repeated{τₖ} @polydot[τ_r β]]
-               @R[@substdots[@${τ@subst[@repeated{aₖ ↦ τₖ}]}
-                             @${α_r}
-                             @${τ_r}
-                             @${β}]
-                  ϵ ϵ ∅]]
-            @${@textsc{T-DInstD}}]
-
-
-@$inferrule[@${@Γ[⊢ @${e₁} @R[@${τ₁} @${φ⁺₁} @${φ⁻₁} @${o₁}]] \\
-             @Γ[+ φ⁺₁ ⊢ @${e₂} @R[@${τ₂} @${φ⁺₂} @${φ⁻₂} @${o₂}]] \\
-             @Γ[+ φ⁻₁ ⊢ @${e₃} @R[@${τ₃} @${φ⁺₃} @${φ⁻₃} @${o₃}]] \\
-             @<:[τ₂ τ_r] \\
-             @<:[τ₃ τ_r] \\
-             φ_r = @combinefilter(φ⁺₁ / φ⁻₁, φ⁺₂ / φ⁻₂, φ⁺₃ / φ⁻₃) \\
-             o_r = \begin{cases}
-             o₂ @& @textif o₂ = o₃
-             @nl ∅ @& @otherwise
-             \end{cases}}
-            @${@Γ[⊢ @ifop[e₁ e₂ e₃] @R[τ_r ϵ ⊥ ∅]]}
-            @${@textsc{T-If}}]
+@include-equation["trules.rkt" T-Inst]
+@include-equation["trules.rkt" T-DInst]
+@include-equation["trules.rkt" T-DInstD]
+@include-equation["trules.rkt" T-If]
 
 @htodo{The definition of Γ' does not specify what the other cases ≠ x are
  (they are the same as the original Γ, but this is only implicit).}
 
-@aligned{
- Γ + \{τ_{π(x)}\} ∪ @repeatset{ψ}
- &= (Γ, x : @update(Γ(x), τ_π)) + @repeatset{ψ}\\
- Γ + \{@!{τ}_{π(x)}\} ∪ @repeatset{ψ}
- &= (Γ, x : @update(Γ(x), @!{τ}_π)) + @repeatset{ψ}\\
- Γ + \{⊥\} ∪ @repeatset{ψ} &= Γ' @where ∀x∈ \operatorname{dom}(Γ).Γ'(x) = ⊥\\
- Γ + ϵ &= Γ \\
-}
+@include-equation["trules.rkt" Γ+]
+@include-equation["trules.rkt" update]
+@include-equation["trules.rkt" restrict]
+@include-equation["trules.rkt" remove]
 
-@aligned{
- @update(@consτ[τ τ′], σ_{π∷car} )
- &= @consτ[@${@update(τ, σ_π)} τ′]\\
- @update(@consτ[τ τ′], @!{σ}_{π∷car})
- &= @consτ[@${@update(τ, @!{σ}_π)} τ′]\\
- @update(@consτ[τ τ′], σ_{π∷cdr} )
- &= @consτ[τ @${@update(τ′, σ_π)}]\\
- @update(@consτ[τ τ′], @!{σ}_{π∷cdr} )
- &= @consτ[τ @${@update(τ′, @!{σ}_π)}]\\
- @update(τ, σ_ϵ) &= @restrict(τ, σ) \\
- @update(τ, @!{σ}_ϵ) &= @remove(τ, σ)
-}
-
-@aligned{
- @restrict(τ, σ) &= ⊥ &@textif @no-overlap(τ,σ)\\
- @restrict((⋃ @repeatset{τ}), σ) &= (⋃ @repeatset{@restrict(τ,σ)} &\\
- @restrict(τ, σ) &= τ &@textif @<:[τ σ]\\
- @restrict(τ, σ) &= σ &@otherwise
-}
-
-@aligned{
- @remove(τ, σ) &= ⊥ &@textif @<:[τ σ] \\
- @remove((⋃ @repeatset{τ}), σ) &= (⋃ @repeatset{@remove(τ,σ)} &\\
- @remove(τ, σ) &= τ &@otherwise
-}
-
-@todo{Shouldn't no-overlap be simplified to @${@no-overlap(τ, τ') = (@<:[σ τ]
+@;{Shouldn't no-overlap be simplified to @${@no-overlap(τ, τ') = (@<:[σ τ]
   ∧ @<:[σ τ′] ⇒ σ = ⊥)}? Then @${@restrict(τ,σ)} can be simplified to returning
  the most general type which is a subtype of τ and σ if one exists (or maybe
  simply returning the intersection of τ and σ).}
 
-@aligned{
- @no-overlap(τ, τ′) &= @metatrue
- &&@textif (∃! σ . \quad @<:[σ τ]\quad ∧ \quad@<:[σ τ′]) ∧ σ = ⊥\\
- @no-overlap(τ, σ) &= @metafalse
- &&@otherwise
-}
+@todo{Δ is not available here.}
+@todo{The non-nested use of σ is not quite correct syntactically speaking}
 
-@;{
- @aligned{
-  @no-overlap(@num-τ[n], @num-τ[m]) &= @metatrue @textif n ≠ m \\
-  @no-overlap(@num-τ, @true-τ) &= @metatrue \\
-  @no-overlap(@num-τ, @false-τ) &= @metatrue \\
-  @no-overlap(@num-τ, @null-τ) &= @metatrue \\
-  @no-overlap(@Numberτ, @true-τ) &= @metatrue \\
-  @no-overlap(@Numberτ, @false-τ) &= @metatrue \\
-  @no-overlap(@Numberτ, @null-τ) &= @metatrue \\
-  @no-overlap(@true-τ, @false-τ) &= @metatrue \\
-  @no-overlap(@true-τ, @null-τ) &= @metatrue \\
-  @no-overlap(@false-τ, @null-τ) &= @metatrue \\
-  @no-overlap(@num-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
-  @no-overlap(@Numberτ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
-  @no-overlap(@true-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
-  @no-overlap(@false-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
-  @no-overlap(@consτ[τ τ′], @f→[(@repeated{τ}) @R]) &= @metatrue \\
-  @no-overlap(@null-τ, @f→[(@repeated{τ}) @R]) &= @metatrue \\
-  @no-overlap(@num-τ, @consτ[τ τ′]) &= @metatrue \\
-  @no-overlap(@Numberτ, @consτ[τ τ′]) &= @metatrue \\
-  @no-overlap(@true-τ, @consτ[τ τ′]) &= @metatrue \\
-  @no-overlap(@false-τ, @consτ[τ τ′]) &= @metatrue \\
-  @no-overlap(@null-τ, @consτ[τ τ′]) &= @metatrue \\
-  @no-overlap(@consτ[τ τ′], @consτ[σ σ′])
-  &= @no-overlap(τ,σ) ∨ @no-overlap(τ′,σ′)\\
-  @no-overlap((⋃ @repeatset{τ}), σ) &= ⋀@repeated{@no-overlap(τ,σ)}\\
-  @no-overlap(τ, σ) &= @metatrue @textif @no-overlap(σ, τ)\\
-  @no-overlap(τ, σ) &= @metafalse @otherwise \\
- }
-}
+@include-equation["trules.rkt" no-overlap]
 
 @htodo{Say that there are more rules in the implementation, to handle various
  boolean operations.}
 
-@aligned{
- @combinefilter(ϵ / ⊥, φ^±₂, φ^±₃) &= φ₂ &\\
- @combinefilter(⊥ / ϵ, φ^±₂, φ^±₃) &= φ₃ &\\
- @combinefilter(⊥ / ⊥, φ^±₂, φ^±₃) &= ⊥ &\\
- @combinefilter(φ⁺₁ / φ⁻₁, φ⁺₂ / φ⁻₂, ⊥/ϵ) &= φ⁺₁ ∪ φ⁺₂ &\\
- @combinefilter(
- \{ τ_@loc \} ∪ φ⁺₁ / \{ @!{τ}_@loc \} φ⁻₁,
- ϵ / ⊥,
- ⊥/ϵ)
- &= (∪\ τ\ σ)_@loc / @!{(∪\ τ\ σ)_@loc} &\\
- … & = … & \\
- @combinefilter(⊥ / ⊥, φ^±₂, φ^±₃) &= ϵ / ϵ &@otherwise \\
-}
+@include-equation["trules.rkt" combinefilter]
 
 @htodo{The Γ ⊢ x : τ … does not generate a Γ(x) = τ, I suspect. There should
  be indicated somewhere an equivalence between these two notations (and we
  should fix the @${Γ,x:update(…)}, as it is a third notation).}
+
+@subsubsub*section{δ-rules}
+
+@include-equation["deltarules.rkt"]

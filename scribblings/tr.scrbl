@@ -84,7 +84,7 @@ documentation for programmers who desire to use @|typedracket|; we will
 therefore keep our overview succinct and gloss over most details.
 
 @asection{
- @atitle{Overview of Typed Racket's type system}
+ @atitle[#:tag "tr-overview"]{Overview of Typed Racket's type system}
 
  @asection{
   @atitle{Simple primitive types}

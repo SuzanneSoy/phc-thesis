@@ -17,6 +17,7 @@
          (all-from-out scribble-math)
          $
          $$
+         $p
          version-text
          aappendix
          tex-header

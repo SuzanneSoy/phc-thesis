@@ -5,9 +5,11 @@
          scribble/latex-properties
          scribble/html-properties
          scribble-math
-         scribble-math/mathjax-convert-unicode)
+         scribble-math/mathjax-convert-unicode
+         scriblib/render-cond)
 
 (provide mathtext
+         $p
          (rename-out [$* $]
                      [$$* $$]))
 
@@ -27,7 +29,10 @@
                              (clean-$ ((traverse-element-traverse e) a b)
                                       mathmode?)))]
         [(match e
-           [(element (style (or "math" "texMathInline" "texMathDisplay") _)
+           [(element (style (or "math"
+                                (regexp #px"^texMathInline")
+                                (regexp #px"^texMathDisplay"))
+                            _)
                      content)
             #t]
            [_ #f])
@@ -62,3 +67,49 @@
 
 (define ($$* . elts)
   (apply $$ (clean-$ elts #t)))
+
+(define tex-mathpar
+  (string->bytes/utf-8 #<<EOTEX
+\def\texMathDisplayMathpar#1{\ifmmode #1\else\begin{mathpar}#1\end{mathpar}\fi}
+EOTEX
+                       ))
+
+(define math-mathpar-style-latex
+  (style "texMathDisplayMathpar" ;; MUST start with texMathDisplay.
+         (list (tex-addition tex-mathpar)
+               'exact-chars)))
+
+(define $p-css
+  (string->bytes/utf-8 #<<EOF
+.mathpar {
+    text-align: center;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    margin-left: -1.5em;
+    margin-right: -1.5em;
+}
+
+.mathpar .MathJax_Display {
+    width: auto;
+    display: inline-block!important;
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+}
+
+.mathpar::after {
+    clear: both;
+    content: "";
+    display: block;
+}
+EOF
+                 ))
+(define $p-html-style
+  (style "mathpar" (list (alt-tag "div") (css-addition $p-css))))
+
+(define ($p . elts)
+  (cond-element
+   [latex (apply $$ #:latex-style math-mathpar-style-latex
+                 (clean-$ (add-between elts "\\and") #t))]
+   [else (apply elem #:style $p-html-style elts)]))
