@@ -1,6 +1,6 @@
 #lang at-exp s-exp phc-thesis/from-dissertation-tobin-hochstadt/lang-util
 
-@; This file is not under the CC0 license, as it contains rules and definitions
+@; This file is NOT under the CC0 license, as it contains rules and definitions
 @; copied with permission from Sam Tobin-Hochstadt's Ph.D thesis. I obtained the
 @; permission to copy these rules, but did not ask for a relicensing under the
 @; CC0 license.
@@ -22,7 +22,7 @@
         @tag*{variadic polymorphic type}}
        @acase{α @P β@tag*{polymorphic type variable}}
        @acase{@un[@repeatset{τ}]@tag*{union}}
-       @acase{@∩τ[@repeatset{τ}] @tag*{any symbol}}
+       @acase{@∩τ[@repeatset{τ}] @tag*{intersection}}
        @acase{@consτ[τ τ]@tag*{pair}}
        @acase{@null-τ @tag*{null (end of lists)}}
        @acase{@List…τ[τ α] @tag*{variadic polymorphic list}}
@@ -33,4 +33,11 @@
 
 @$${
  @=:def[@Booleanτ @un[@true-τ @false-τ]]
+}
+
+#:Listτ
+
+@$${
+ @=:def[@Listτ[τ @repeated{σ}] @consτ[τ @Listτ[@repeated{σ}]]]
+ @=:def[@Listτ[] @null-τ]
 }

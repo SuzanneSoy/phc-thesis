@@ -78,6 +78,8 @@
    [else
     ;; Defined in util.rkt
     @${\overrightbracedarrow{@|w|@|l|@|w|}}]))
+(define (repeatSet . l)
+  @${\{@(apply repeatset l)\}})
 (define |P| @${\ |\ })
 (define ρc @${\rho_{c}})
 (define ρf @${\rho_{f}})
@@ -171,6 +173,7 @@
 (define-syntax List…τ* (defop "List"))
 (define-syntax-rule (List…τ τ α)
   @List…τ*[@polydot[τ α]])
+(define-syntax Listτ (defop "List"))
 @;(define-syntax →Values (defop "Values"))
 (define-syntax-rule (→Values v ...) (spaces (stringify v) ...))
 (define @emptypath @${ϵ})
@@ -228,6 +231,9 @@
 (define no-overlap @${\operatorname{no-overlap}})
 (define restrict @${\operatorname{restrict}})
 (define remove @${\operatorname{remove}})
+(define simplify* @${\operatorname{simplify}})
+(define-syntax-rule (simplify τ) @${@simplify*(@(stringify τ))})
+(define propagate⊥ @${\operatorname{propagate_⊥}})
 (define loc @${\mathit{loc}})
 (define (! . rest) @${\overline{@rest}})
 (define metatrue @${\mathrm{true}})

@@ -190,9 +190,12 @@ allows recursive types to be described with the @recτ* combinator.
 @include-equation["tausigma.rkt"]
 
 Additionally, the @Booleanτ type is defined as the union of the @true-τ and
-@false-τ singleton types.
+@false-τ singleton types, and the @Listτ type operator is a shorthand for
+describing the type of heterogeneous linked lists of pairs, with a fixed
+length.
 
 @include-equation["tausigma.rkt" Boolean]
+@include-equation["tausigma.rkt" Listτ]
 
 @subsubsub*section{Filters (value-dependent propositions)}
 
@@ -385,17 +388,11 @@ filters. @htodo{and objects}
  @include-equation["te.rkt" TE-Phi]
  @include-equation["te.rkt" TE-Psi]
  @include-equation["te.rkt" TE-Psi-Not]
- @include-equation["te.rkt" TE-Psi-Bot]
- ]
+ @include-equation["te.rkt" TE-Psi-Bot]]
 
 @subsubsub*section{Typing rules}
 
-@todo{Add rule for the (optional?) simplification of intersections}
 
-@$${
- \begin{aligned}
- \end{aligned}
-}
 
 @include-equation["trules.rkt" T-Promise]
 @include-equation["trules.rkt" T-Symbol]
@@ -491,6 +488,27 @@ instantiation of polymorphic abstractions.
 @htodo{The Γ ⊢ x : τ … does not generate a Γ(x) = τ, I suspect. There should
  be indicated somewhere an equivalence between these two notations (and we
  should fix the @${Γ,x:update(…)}, as it is a third notation).}
+
+@subsubsub*section{Simplification of intersections}
+
+In some cases, intersections are simplified, and the eventual resulting @${⊥}
+types propagate outwards through pairs (and structs, which we do not model
+here). The @simplify* and @propagate⊥ operators show how these simplification
+and propagation steps are performed. The simplification step mostly consists
+in distributing intersections over unions and pairs, and collapsing pairs and
+unions which contain @${⊥}, for the traversed parts of the type.
+
+@include-equation["simplify.rkt" Simplify1]
+
+@${@simplify[τ]} is applied pointwise in other cases:
+
+@include-equation["simplify.rkt" Simplify2]
+
+@include-equation["simplify.rkt" Propagate⊥]
+
+@todo{Apply the intersections on substituted poly types after an inst (or rely
+ on the sutyping rule for intersections to recognise that ⊥ is a subtype of the
+ resulting type?)}.
 
 @subsubsub*section{δ-rules}
 
