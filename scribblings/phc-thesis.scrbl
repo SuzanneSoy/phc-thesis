@@ -83,8 +83,7 @@
           #'(displayln "Appendices turned off on this build."
                        (current-error-port))
           #`(begin
-              (displayln (format "Appendices enabled on this build."
-                                 #,(current-directory))
+              (displayln "Appendices enabled on this build."
                          (current-error-port))
               a))]))
 @if-appendices[
