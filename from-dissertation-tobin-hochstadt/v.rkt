@@ -10,16 +10,25 @@
        @acase{@num-v @tag*{number}}
        @acase{@true-v @tag*{booleans}}
        @acase{@false-v}
-       @acase{@λv[ℰ (@repeated{x:τ}) e] @tag*{lambda function}}
-       @acase{@λv[ℰ (@repeated{x:τ} @${\ .\ } @${x:τ*}) e]
+       @acase{@λv[(@repeated{x:τ}) e] @tag*{lambda function}}
+       @acase{@λv[(@repeated{x:τ} @${\ .\ } @${x:τ*}) e]
         @tag*{variadic function}}
-       @acase{@λv[ℰ (@repeated{x:τ} @${\ .\ } @${x:@polydot[τ α]}) e]
+       @acase{@λv[(@repeated{x:τ} @${\ .\ } @${x:@polydot[τ α]}) e]
         @tag*{variadic polymorphic function}}
-       @acase{@Λv[ℰ (@repeated{α}) e]
+       @acase{@Λv[(@repeated{α}) e]
         @tag*{polymorphic abstraction}}
-       @acase{@Λv[ℰ (@repeated{α} @polydotα[α]) e]
+       @acase{@Λv[(@repeated{α} @polydotα[α]) e]
         @tag*{variadic polymorphic abstraction}}
        @acase{@consv[v v] @tag*{pair}}
        @acase{@null-v @tag*{null}}
-       @acase{@promisev[ℰ e] @tag*{promise}}
+       @acase{@promisev[e] @tag*{promise}}
        @acase{@symv[@sym*] @tag*{symbol}}]
+
+#:listv
+
+@$${
+ \begin{aligned}
+ @listv[v₀ @repeated{vᵢ}] &≝ @consv[v₀ @listv[@repeated{vᵢ}]] \\
+ @listv[] &≝ @null-v \\
+ \end{aligned}
+}

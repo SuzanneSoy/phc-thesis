@@ -58,14 +58,14 @@
 (define-syntax variant (defop "V"))
 (define-syntax ifop (defop "if"))
 (define-syntax mapop (defop "map"))
-(define-syntax-rule (λv env (arg ...) expr)
-  @${[@(stringify env), λ(@(list (stringify arg) ...)).@(stringify expr)]})
+(define-syntax-rule (λv (arg ...) expr)
+  @${λ(@(list (stringify arg) ...)).@(stringify expr)})
 (define-syntax-rule (λe (arg ...) expr)
   @${λ(@(spaces (stringify arg) ...)).@(stringify expr)})
 (define-syntax-rule (Λe (arg ...) expr)
   @${Λ(@(spaces (stringify arg) ...)).@(stringify expr)})
-(define-syntax-rule (Λv env (arg ...) expr)
-  @${[@(stringify env), Λ(@(spaces (stringify arg) ...)).@(stringify expr)]}) ;; TODO: is the env necessary here? It's a type env, right?
+(define-syntax-rule (Λv (arg ...) expr)
+  @${Λ(@(spaces (stringify arg) ...)).@(stringify expr)}) ;; TODO: is the env necessary here? It's a type env, right?
 (define (repeated #:n [n #f] . l)
   (if n
       @${\overrightarrow{@l}\overset{\scriptscriptstyle\,\ifmathjax{\raise1mu{@|n|}}\iflatex{@|n|}}{\vphantom{@l}}}
@@ -165,6 +165,7 @@
 
 (define-syntax consp (defop "cons"))
 (define-syntax-rule (consv a b) @${⟨@(stringify a), @(stringify b)⟩})
+(define-syntax listv (defop "list"))
 (define-syntax-rule (consτ a b) @${⟨@(stringify a), @(stringify b)⟩})
 (define-syntax-rule (polydot τ α)
   @${@(stringify τ) \mathbf{…}_{@(stringify α)}})
@@ -174,6 +175,7 @@
 (define-syntax-rule (List…τ τ α)
   @List…τ*[@polydot[τ α]])
 (define-syntax Listτ (defop "List"))
+(define-syntax Listofτ (defop "Listof"))
 @;(define-syntax →Values (defop "Values"))
 (define-syntax-rule (→Values v ...) (spaces (stringify v) ...))
 (define @emptypath @${ϵ})

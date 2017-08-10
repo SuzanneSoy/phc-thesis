@@ -87,11 +87,11 @@
 
 #:T-AbsPred
 
-@$inferrule[@${@Γ[@${x₀:σ₀} @repeated{xᵢ:σ} ⊢ e @R[τ φ⁺ φ⁻ o]] \\
+@$inferrule[@${@Γ[@${x₀:σ₀} @repeated{xᵢ:σᵢ} ⊢ e @R[τ φ⁺ φ⁻ o]] \\
              φ⁺' = φ⁺\vphantom{φ}@substφo[x₀ ↦ •] \\
              φ⁻' = φ⁻\vphantom{φ}@substφo[x₀ ↦ •] \\
              o' = o\vphantom{o}@substφo[x₀ ↦ •]}
-            @${@Γ[⊢ @λe[(@repeated{x:σ}) e]
+            @${@Γ[⊢ @λe[(x₀:σ₀ @repeated{xᵢ:σᵢ}) e]
                   @R[(f→ (@repeated{σ})
                          @R[τ
                             @${φ⁺'}
@@ -102,7 +102,7 @@
 
 #:T-Abs
 
-@$inferrule[@${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]]}
+@$inferrule[@${@Γ[@repeated{x:σ} ⊢ e @R[τ φ⁺ φ⁻ o]]}
             @${@Γ[⊢ @λe[(@repeated{x:σ}) e]
                   @R[(f→ (@repeated{σ})
                          @R[τ
@@ -111,6 +111,18 @@
                             ∅])
                      ϵ ⊥ ∅]]}
             @${@textsc{T-Abs}}]
+
+#:T-Abs*
+
+@$inferrule[@${@Γ[@repeated{x:σ} @${x_r:@Listofτ[σ_r]} ⊢ e @R[τ φ⁺ φ⁻ o]]}
+            @${@Γ[⊢ @λe[(@repeated{x:σ} @${\ .\ } @${x_r:σ_r*}) e]
+                  @R[(f→ (@repeated{σ})
+                         @R[τ
+                            ϵ
+                            ϵ
+                            ∅])
+                     ϵ ⊥ ∅]]}
+            @${@textsc{T-Abs*}}]
 
 #:T-DAbs
 
@@ -286,7 +298,7 @@
 
 @aligned{
  @remove(τ, σ) &= ⊥ &@textif @<:[τ σ] \\
- @remove((⋃ @repeatset{τ}), σ) &= (⋃ @repeatset{@remove(τ,σ)} &\\
+ @remove((⋃ @repeatset{τ}), σ) &= (⋃ @repeatset{@remove(τ,σ)}) &\\
  @remove(τ, σ) &= τ &@otherwise
 }
 

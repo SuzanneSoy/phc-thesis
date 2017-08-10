@@ -46,12 +46,12 @@
  &= @promiseτ[@simplify[R]]\\
  @simplify[@recτ[r τ]]
  &= @recτ[r @simplify[τ]] \\
- @simplify[τ] &= τ \qquad @otherwise
+ @simplify[τ] &= τ \qquad @otherwise \\
  @simplify[@R[τ φ⁺ φ⁻ o]] &= @R[@simplify[τ] @simplify[φ⁺] @simplify[φ⁻] o]\\
  @simplify[@repeatset{ψ}] &= @repeatset{@simplify[ψ]}\\
  @simplify[@${τ_{π(loc)}}] &= @simplify[τ]_{π(loc)}\\
  @simplify[@${@!{τ}_{π(loc)}}] &= @!{@simplify[τ]}_{π(loc)}\\
- @simplify[⊥] = ⊥ \\
+ @simplify[⊥] = ⊥
  \end{aligned}
 }
 

@@ -28,19 +28,15 @@ shorthand for the above lambda functions.
 As per the typing rules given in @secref{adt-row-trules}, these functions have
 the following types:
 
-@$${
- @$inferrule[
- @${@textsc{T-Abs}}
- @${Γ ⊢ @ctor[κ] : (∀ (α) (α → @ctor[κ α])) ; ϵ|⊥ ; ∅}
- ]
-}
+@htodo{The rules below are the same??? Probably an unfinished copy-paste}
 
-@$${
- @$inferrule[
- @${…}
- @${Γ ⊢ @ctor[κ] : (∀ (α) (α → @ctor[κ α])) ; ϵ|⊥ ; ∅}
- ]
-}
+@$inferrule[-
+            @${Γ ⊢ @ctor[κ] : (∀ (α) (α → @ctor[κ α])) ; ϵ|⊥ ; ∅}
+            @${@textsc{T-Abs}}]
+
+@$inferrule[-
+            @${Γ ⊢ @ctor[κ] : (∀ (α) (α → @ctor[κ α])) ; ϵ|⊥ ; ∅}
+            @${…}]
 
 @todo{Write their types here too.}
 

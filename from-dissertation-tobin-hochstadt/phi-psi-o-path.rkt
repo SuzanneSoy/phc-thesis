@@ -13,9 +13,9 @@
 
 @cases["ψ" #:first-sep "⩴"
        @acase{τ_{π(@loc)}
-        @tag*{@${(ℰ[v] = \mathbf{?}) ⇒ ℰ[π(@loc)]@text{ is of type @${τ}}}}}
+        @tag*{@${(v = \mathbf{?}) ⇒ π(@loc)@text{ is of type @${τ}}}}}
        @acase{@!{τ}_{π(@loc)}
-        @tag*{@${(ℰ[v] = \mathbf{?}) ⇒ ℰ[π(@loc)]@text{ is not of type @${τ}}}}}
+        @tag*{@${(v = \mathbf{?}) ⇒ π(@loc)@text{ is not of type @${τ}}}}}
        @acase{⊥@tag*{contradiction}}]
 
 #:loc

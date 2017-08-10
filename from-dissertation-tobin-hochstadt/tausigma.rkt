@@ -38,6 +38,14 @@
 #:Listτ
 
 @$${
- @=:def[@Listτ[τ @repeated{σ}] @consτ[τ @Listτ[@repeated{σ}]]]
+ \begin{aligned}
+ @=:def[@Listτ[τ @repeated{σ}] @consτ[τ @Listτ[@repeated{σ}]]] \\
  @=:def[@Listτ[] @null-τ]
+ \end{aligned}
+}
+
+#:Listofτ
+
+@$${
+ @=:def[@Listofτ[τ] @recτ[r @un[@null-τ @consτ[τ r]]]]
 }

@@ -97,22 +97,29 @@ following values:
 
 @include-equation["v.rkt"]
 
-@subsubsub*section{Run-time environment}
+The @listv value notation is defined as a shorthand for a @|null-v|-terminated
+linked list of pairs.
 
-Lambda functions are closures over their execution environment. The execution
-environment maps to their value those variables which were within the scope of
-the closure. In principle, it also maps type variables and dotted type
-variables to the type or types used to instantiate the polymorphic functions
-which are part of the scope of the closure. Typed Racket uses @emph{type
- erasure} however, that is to say that the compile-time type of values does not
-persist at run-time. Primitive types are still implicitly tagged with their
-type (which allows for untagged unions and predicates such as
-@racket[number?]), but the type of a function cannot be determined at run-time
-for example. This means that the type-variable-to-type mapping of @${ℰ} is not
-effectively present at run-time with the current implementation of Typed
-Racket.
+@include-equation["v.rkt" listv]
 
-@include-equation["envrt.rkt"]
+@;{
+ @subsubsub*section{Run-time environment}
+
+ Lambda functions are closures over their execution environment. The execution
+ environment maps to their value those variables which were within the scope of
+ the closure. In principle, it also maps type variables and dotted type
+ variables to the type or types used to instantiate the polymorphic functions
+ which are part of the scope of the closure. Typed Racket uses @emph{type
+  erasure} however, that is to say that the compile-time type of values does not
+ persist at run-time. Primitive types are still implicitly tagged with their
+ type (which allows for untagged unions and predicates such as
+ @racket[number?]), but the type of a function cannot be determined at run-time
+ for example. This means that the type-variable-to-type mapping of @${ℰ} is not
+ effectively present at run-time with the current implementation of Typed
+ Racket.
+
+ @include-equation["envrt.rkt"]
+}
 
 @subsubsub*section{Evaluation contexts}
 
@@ -191,11 +198,14 @@ allows recursive types to be described with the @recτ* combinator.
 
 Additionally, the @Booleanτ type is defined as the union of the @true-τ and
 @false-τ singleton types, and the @Listτ type operator is a shorthand for
-describing the type of heterogeneous linked lists of pairs, with a fixed
-length.
+describing the type of @|null-v|-terminated heterogeneous linked lists of
+pairs, with a fixed length. The @Listofτ type operator is a shorthand for
+describing the type of @|null-v|-terminated homogeneous linked lists of pairs,
+with an unspecified length.
 
 @include-equation["tausigma.rkt" Boolean]
 @include-equation["tausigma.rkt" Listτ]
+@include-equation["tausigma.rkt" Listofτ]
 
 @subsubsub*section{Filters (value-dependent propositions)}
 
@@ -347,7 +357,25 @@ represent the type of the value assigned to a variadic polymorphic function's
 
 @subsubsub*section{Operational semantics}
 
-@todo{TODO}
+For simplicity, we assume that promises only contain pure expressions, and
+therefore that the expression always produces the same value (modulo object
+identity, i.e. pointer equality issues). In practice, @typedracket allows
+expressions relying on external state, and caches the value obtained after
+forcing the promise for the first time. The subset of the language which we
+present here does not contain any mutable value, and does not allow mutation
+of variables either, so the expression wrapped by promises is, by definition,
+pure. We note here that we implemented a small library for @typedracket which
+allows the creation of promises encapsulating a pure expression, and whose
+result is not cached.
+
+@$p[@include-equation["operational-semantics.rkt" E-Delta]
+    @include-equation["operational-semantics.rkt" E-Beta]
+    @include-equation["operational-semantics.rkt" E-Beta*]
+    @include-equation["operational-semantics.rkt" E-TBeta]
+    @include-equation["operational-semantics.rkt" E-TDBeta]
+    @include-equation["operational-semantics.rkt" E-IfFalse]
+    @include-equation["operational-semantics.rkt" E-IfTrue]
+    @include-equation["operational-semantics.rkt" E-Context]]
 
 @subsubsub*section{Type validity rules}
 
@@ -392,47 +420,37 @@ filters. @htodo{and objects}
 
 @subsubsub*section{Typing rules}
 
-
-
-@include-equation["trules.rkt" T-Promise]
-@include-equation["trules.rkt" T-Symbol]
-@include-equation["trules.rkt" T-Gensym]
+The rules below relate the simple expressions to their type.
 
 @htodo{Are the hypotheses for T-Eq? necessary? After all, in Racket eq? works
  on Any.}
 
-@include-equation["trules.rkt" T-Eq?]
-@include-equation["trules.rkt" T-Var]
-@include-equation["trules.rkt" T-Primop]
-@include-equation["trules.rkt" T-True]
-@include-equation["trules.rkt" T-False]
-@include-equation["trules.rkt" T-Num]
-@include-equation["trules.rkt" T-Null]
-
-@htodo{The original TD-Map rule (p.95) seems wrong, as it allows un-dotted
- references to α in the function's type. But it is impossible to construct such
- a function, and the meaning of α in that case is unclear. I think the rule
- should instead expect a polymorphic function, with occurrences of α in τ_r
- replaced with the new β variable, as shown below.}
-
-@include-equation["trules.rkt" T-DMap]
+@$p[@include-equation["trules.rkt" T-Symbol]
+    @include-equation["trules.rkt" T-Gensym]
+    @include-equation["trules.rkt" T-Promise]
+    @include-equation["trules.rkt" T-Var]
+    @include-equation["trules.rkt" T-Primop]
+    @include-equation["trules.rkt" T-True]
+    @include-equation["trules.rkt" T-False]
+    @include-equation["trules.rkt" T-Num]
+    @include-equation["trules.rkt" T-Null]
+    @include-equation["trules.rkt" T-Eq?]]
 
 Below are the rules for the various flavours of lambda functions and
 polymorphic abstractions.
-
-@include-equation["trules.rkt" T-AbsPred]
 
 @htodo{Technically, in the rules T-Abs and T-DAbs, we should keep any φ and o information concerning outer
  variables (those not declared within the lambda, and therefore still available
  after it finishes executing).}
 
-@include-equation["trules.rkt" T-Abs]
-@include-equation["trules.rkt" T-DAbs]
-
 @todo{Should the φ⁺ φ⁻ o be preserved in T-TAbs and T-DTAbs?}
 
-@include-equation["trules.rkt" T-TAbs]
-@include-equation["trules.rkt" T-DTAbs]
+@$p[@include-equation["trules.rkt" T-AbsPred]
+    @include-equation["trules.rkt" T-Abs]
+    @include-equation["trules.rkt" T-Abs*]
+    @include-equation["trules.rkt" T-DAbs]
+    @include-equation["trules.rkt" T-TAbs]
+    @include-equation["trules.rkt" T-DTAbs]]
 
 The @${\vphantom{φ}@substφo[x ↦ z]} operation restricts the information
 contained within a @${φ} or @${o} so that the result only contains information
@@ -443,31 +461,69 @@ about the variable @${x}, and renames it to @${z}. When applied to a filter
 
 The @${⊥} cases of the @${\operatorname{apo}} operator
 from@~cite[#:precision "pp. 65,75" "tobin-hochstadt_typed_2010"] are covered
-by the corresponding cases in the @${@restrict} and @${@remove} operators, and
-therefore should not need to be included in our @${\vphantom{φ}@substφo[x ↦ z]}
-operator.
+by the corresponding cases in the @${@restrict} and @${@remove} operators
+defined below, and therefore should not need to be included in our @${
+ \vphantom{φ}@substφo[x ↦ z]} operator. The subst
 
 @include-equation["trules.rkt" substφ]
 @include-equation["trules.rkt" substo]
 
-Below are the typing rules for the various flavours of function application and
-instantiation of polymorphic abstractions.
-
-@include-equation["trules.rkt" T-App]
-
-@todo{For the inst rules, are the φ⁺ φ⁻ o preserved?}
-
-@include-equation["trules.rkt" T-Inst]
-@include-equation["trules.rkt" T-DInst]
-@include-equation["trules.rkt" T-DInstD]
-@include-equation["trules.rkt" T-If]
-
 @htodo{The definition of Γ' does not specify what the other cases ≠ x are
  (they are the same as the original Γ, but this is only implicit).}
 
+The @racket[map] function can be called like any other function, but also has
+a specific rule allowing a more precise result type when mapping a polymorphic
+function over a @List…τ[τ α]. @racket[ormap], @racket[andmap] and
+@racket[apply] similarly have special rules for variadic polymorphic lists. We
+include the rule for @racket[map] below as an example. The other rules are
+present in @~cite[#:precision "pp. 96" "tobin-hochstadt_typed_2010"].
+
+@htodo{The original TD-Map rule (p.95) seems wrong, as it allows un-dotted
+ references to α in the function's type. But it is impossible to construct such
+ a function, and the meaning of α in that case is unclear. I think the rule
+ should instead expect a polymorphic function, with occurrences of α in τ_r
+ replaced with the new β variable, as shown below.}
+
+@include-equation["trules.rkt" T-DMap]
+
+Below are the typing rules for the various flavours of function application and
+instantiation of polymorphic abstractions.
+
+@todo{For the inst rules, are the φ⁺ φ⁻ o preserved?}
+
+@$p[@include-equation["trules.rkt" T-App]
+    @include-equation["trules.rkt" T-Inst]
+    @include-equation["trules.rkt" T-DInst]
+    @include-equation["trules.rkt" T-DInstD]]
+
+@;=====================TODO:write something vvvvvvvvvvvv
+
+The rule for @ifop uses the information gained in the condition to narrow the
+type of variables in the @emph{then} and @emph{else} branches. This is the
+core rule of the occurrence typing aspect of @|typedracket|.
+
+@include-equation["trules.rkt" T-If]
+
+The @${Γ + φ} operator narrows the type of variables in the environment using
+the information contained within @${φ}.
+
 @include-equation["trules.rkt" Γ+]
+
+The @update operator propagates the information contained within a @${ψ} down
+to the affected part of the type.
+
 @include-equation["trules.rkt" update]
+
+The @update operator can then apply @restrict to perform the intersection of
+the type indicated by the @|ifop|'s condition and the currently-known type for
+the subpart of the considered variable.
+
 @include-equation["trules.rkt" restrict]
+
+The @update operator can also apply
+the @remove operator when the condition determined that the subpart of the
+considered variable is @emph{not} of a given type.
+
 @include-equation["trules.rkt" remove]
 
 @;{Shouldn't no-overlap be simplified to @${@no-overlap(τ, τ') = (@<:[σ τ]
@@ -478,16 +534,33 @@ instantiation of polymorphic abstractions.
 @todo{Δ is not available here.}
 @todo{The non-nested use of σ is not quite correct syntactically speaking}
 
+The @restrict operator and the @simplify* operator described later both rely
+on @no-overlap to determine whether two types have no intersection, aside from
+the @${⊥} type.
+
 @include-equation["trules.rkt" no-overlap]
 
 @htodo{Say that there are more rules in the implementation, to handle various
  boolean operations.}
+
+The @combinefilter operator is used to combine the @${φ} information from the
+two branches of the @ifop expression, based on the @${φ} information of the
+condition. This allows @typedracket to correctly interpret @racket[and],
+@racket[or] as well as other boolean operations, which are implemented as
+macros translating down to nested @racket[if] conditionals. @Typedracket will
+therefore be able to determine that in the @emph{then} branch of
+@racket[(if (and (string? x) (number? y)) 'then 'else)], the type of
+@racketid[x] is @racket[String], and the type of @racketid[y] is
+@racket[Number]. We only detail a few cases of combinefilter here, a more
+complete description of the operator can be found
+in@~cite[#:precision "pp. 69,75–84" "tobin-hochstadt_typed_2010"].
 
 @include-equation["trules.rkt" combinefilter]
 
 @htodo{The Γ ⊢ x : τ … does not generate a Γ(x) = τ, I suspect. There should
  be indicated somewhere an equivalence between these two notations (and we
  should fix the @${Γ,x:update(…)}, as it is a third notation).}
+
 
 @subsubsub*section{Simplification of intersections}
 
@@ -511,5 +584,8 @@ unions which contain @${⊥}, for the traversed parts of the type.
  resulting type?)}.
 
 @subsubsub*section{δ-rules}
+
+Finally, the type and semantics of primitive functions are expressed using the
+δ-rules given below.
 
 @include-equation["deltarules.rkt"]
