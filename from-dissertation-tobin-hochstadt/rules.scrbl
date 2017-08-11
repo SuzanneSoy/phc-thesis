@@ -618,7 +618,6 @@ in@~cite[#:precision "pp. 69,75–84" "tobin-hochstadt_typed_2010"].
  be indicated somewhere an equivalence between these two notations (and we
  should fix the @${Γ,x:update(…)}, as it is a third notation).}
 
-
 @subsubsub*section{Simplification of intersections}
 
 In some cases, intersections are simplified, and the eventual resulting @${⊥}
@@ -646,3 +645,17 @@ Finally, the type and semantics of primitive functions are expressed using the
 δ-rules given below.
 
 @include-equation["deltarules.rkt"]
+
+@subsubsub*section{Soundness proof}
+
+Since @typedracket is an existing language which we use for our
+implementation, and not a new language, we do not provide here a full proof of
+correctness.
+
+We invite instead the interested reader to refer to the proof sketches given
+in@~cite[#:precision "pp. 68–84" "tobin-hochstadt_typed_2010"]. These proof
+sketches only cover a subset of the language presented here, namely a language
+with variables, function applictation, functions of a single argument, pairs,
+booleans, numbers and @ifop conditionals with support for occurrence typing.
+Since occurrence typing is the main focus of the proof, the other extensions
+aggregated here should not significantly threaten its validity.
