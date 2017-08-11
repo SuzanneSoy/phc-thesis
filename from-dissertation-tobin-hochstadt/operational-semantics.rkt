@@ -25,6 +25,8 @@
  δ(@textit{number?}, @num-v) &= @true-v & \\
  δ(@textit{number?}, v) &= @false-v & @text{otherwise} \\
  δ(@consp, v₁, v₂) &= @consv[v₁ v₂] & \\
+ δ(@textit{car}, @consv[v₁ v₂]) &= v₁ & \\
+ δ(@textit{cdr}, @consv[v₁ v₂]) &= v₂ & \\
  δ(@textit{pair?}, @consv[v v]) &= @true-v & \\
  δ(@textit{pair?}, v) &= @false-v & @text{otherwise} \\
  δ(@textit{null?}, @null-v) &= @true-v & \\
