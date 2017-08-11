@@ -1,7 +1,6 @@
 #lang at-exp racket
 @(provide (except-out (all-defined-out)
                       num-e*
-                      num-v*
                       num-τ*
                       List…τ*))
 @require["util.rkt"
@@ -280,3 +279,5 @@
      (let ()
        (local-require (only-in filename [eq tmp]))
        tmp)]))
+
+(define δe @${δ_{\mathrm{e}}})

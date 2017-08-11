@@ -272,7 +272,7 @@ their result.
 @include-equation["phi-psi-o-path.rkt" pe]
 
 @subsubsub*section{Subtyping}
-The subtyping judgement is @${@<:[τ δ]}. It indicates that @${τ} is a
+The subtyping judgement is @${@<:[τ σ]}. It indicates that @${τ} is a
 subtype of @${σ} (or that @${τ} and @${σ} are the same type).
 
 The @<:* relation is reflexive and transitive. When two or more types are all
@@ -357,6 +357,40 @@ represent the type of the value assigned to a variadic polymorphic function's
 
 @subsubsub*section{Operational semantics}
 
+The semantics for the simplest expressions and for primitive functions are
+expressed using δ-rules.
+
+@$p[@include-equation["operational-semantics.rkt" E-Delta]
+    @include-equation["operational-semantics.rkt" E-DeltaE]]
+
+@include-equation["operational-semantics.rkt" δ-rules]
+
+@include-equation["operational-semantics.rkt" δe-rules]
+
+The @textsc{E-Context} rule indicates that when the expression has the shape
+@${E[L]}, the subpart @${L} can be evaluated and replaced by its result. The
+syntax @${E[L]} indicates the replacement of the only occurrence of @${[⋅]}
+within an evaluation context @${E}. The evaluation context can then match an
+expression with the same shape, thereby separating the @${L} part from its
+context.
+
+@include-equation["operational-semantics.rkt" E-Context]
+
+The next rules handle β-reduction for the various flavours of functions.
+
+@$p[@include-equation["operational-semantics.rkt" E-Beta]
+    @include-equation["operational-semantics.rkt" E-Beta*]
+    @include-equation["operational-semantics.rkt" E-BetaD]]
+
+Instantiation of polymorphic abstractions is a no-op at run-time, because
+@typedracket performs type erasure (no typing information subsists at
+run-time, aside from the implicit tags used to distinguish the various
+primitive data types: pairs, numbers, symbols, @null-v, @true-v, @false-v,
+functions and promises).
+
+@$p[@include-equation["operational-semantics.rkt" E-TBeta]
+    @include-equation["operational-semantics.rkt" E-TDBeta]]
+
 For simplicity, we assume that promises only contain pure expressions, and
 therefore that the expression always produces the same value (modulo object
 identity, i.e. pointer equality issues). In practice, @typedracket allows
@@ -368,21 +402,44 @@ pure. We note here that we implemented a small library for @typedracket which
 allows the creation of promises encapsulating a pure expression, and whose
 result is not cached.
 
-@$p[@include-equation["operational-semantics.rkt" E-Delta]
-    @include-equation["operational-semantics.rkt" E-Beta]
-    @include-equation["operational-semantics.rkt" E-Beta*]
-    @include-equation["operational-semantics.rkt" E-TBeta]
-    @include-equation["operational-semantics.rkt" E-TDBeta]
-    @include-equation["operational-semantics.rkt" E-IfFalse]
-    @include-equation["operational-semantics.rkt" E-IfTrue]
-    @include-equation["operational-semantics.rkt" E-Context]]
+@include-equation["operational-semantics.rkt" E-Force]
+
+Once the evaluation context rule has been applied to evaluate the condition of
+an @ifop expression, the evaluation continues with the @emph{then} branch or
+with the @emph{else} branch, depending on the condition's value. Following
+@lisp tradition, all values other than @false-v are interpreted as a true
+condition.
+
+@$p[@include-equation["operational-semantics.rkt" E-If-False]
+    @include-equation["operational-semantics.rkt" E-If-True]]
+
+The @gensyme expression produces a fresh symbol @${@sym* ∈ 𝒮*}, which is
+guaranteed to be different from all symbol literals @${s ∈ 𝒮}, and different
+from all previous and future symbols returned by @|gensyme|. The @eq?op
+operator can then be used to compare symbol literals and symbols produced by
+@|gensyme|.
+
+@$p[@include-equation["operational-semantics.rkt" E-Gensym]
+    @include-equation["operational-semantics.rkt" E-Eq?-True]
+    @include-equation["operational-semantics.rkt" E-Eq?-False]]
+
+The semantics of @mapop are standard. We note here that @mapop can also be
+used as a first-class function in @typedracket, and the same can be achieved
+with the simplified semantics using the η-expansion
+@;
+@Λe[(α β) @λv[(@${x_f:@f→[(α) @R[β ϵ ϵ ∅]]}
+                @${x_l:@Listofτ[α]}) @mapop[x_f x_l]]]
+of the @mapop operator.
+
+@$p[@include-equation["operational-semantics.rkt" E-Map-Pair]
+    @include-equation["operational-semantics.rkt" E-Map-Null]]
 
 @subsubsub*section{Type validity rules}
 
 Polymorphic type variables valid types if they are bound, that is if they are
 present in the @${Δ} environment. Additionally variadic (i.e. dotted)
 polymorphic type variables may be present in the environment. When this is the
-case, they can be used as part of a @List…τ[τ α] type
+case, they can be used as part of a @List…τ[τ α] type.
 
 @$p[@include-equation["te.rkt" TE-Var]
     @include-equation["te.rkt" TE-DList]]
@@ -439,9 +496,9 @@ The rules below relate the simple expressions to their type.
 Below are the rules for the various flavours of lambda functions and
 polymorphic abstractions.
 
-@htodo{Technically, in the rules T-Abs and T-DAbs, we should keep any φ and o information concerning outer
- variables (those not declared within the lambda, and therefore still available
- after it finishes executing).}
+@htodo{Technically, in the rules T-Abs and T-DAbs, we should keep any φ and o
+ information concerning outer variables (those not declared within the lambda,
+ and therefore still available after it finishes executing).}
 
 @todo{Should the φ⁺ φ⁻ o be preserved in T-TAbs and T-DTAbs?}
 

@@ -6,9 +6,11 @@
 @; CC0 license.
 
 @cases["E" #:first-sep "⩴"
-       @acase{[] @tag*{program entry point}}
+       @acase{[⋅] @tag*{program entry point}}
        ;@acase{@app[E @repeated{e}]}; I think this case is not needed.
        @acase{@app[@repeated{v} E @repeated{e}]@tag*{function application}}
        @acase{@ifop[E e e]@tag*{conditional}}
        @acase{@eq?op[E e]@tag*{symbol equality}}
-       @acase{@eq?op[v E]}]
+       @acase{@eq?op[v E]}
+       @acase{@mapop[E e]}
+       @acase{@mapop[v E]}]

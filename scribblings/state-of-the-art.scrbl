@@ -71,8 +71,13 @@
  spirit of implementing languages as
  libraries@~cite["tobin-hochstadt_languages_as_libraries_2011"]}
 
-@asection{
- @atitle[#:tag "related-adt"]{Algebraic datatypes for compilers}
+@asection{ @atitle[#:tag "related-adt"]{Algebraic datatypes for compilers}
+ @epigraph["Personal communication from a friend"]{I used polymorphic variants
+  @htodo{this winter} to solve the @tt{assert false} problems in my @htodo{put
+   the language name here if I'm allowed to quote} lexical analyser, along with
+  some subtyping. You have to write the typecasts explicitly, but that aside it
+  is very powerful (a constructor can “belong” to several types etc.).}
+  
  The @tt{phc-adt} library implements algebraic datatypes (variants and
  structures) which are adapted to compiler-writing.
 
