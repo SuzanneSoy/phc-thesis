@@ -20,8 +20,8 @@ the value stored in an instance of a constructor.
  "e" #:first-sep "⩴"
  @acase{…}
  @acase{@ctor[@κ e]}
- @acase{(@ctor-pred[@κ] e)}
- @acase{(@ctor-val[@κ] e)}
+ @acase{(@ctor-pred[@κ]\ e)}
+ @acase{(@ctor-val[@κ]\ e)}
  @intertext{@list[]
             
   We also introduce expressions related to records. The first builds an instance

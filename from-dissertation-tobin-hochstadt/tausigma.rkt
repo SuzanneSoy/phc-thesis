@@ -1,4 +1,4 @@
-#lang at-exp s-exp phc-thesis/from-dissertation-tobin-hochstadt/lang-util
+#lang at-exp s-exp phc-thesis/scribblings/equations-lang
 
 @; This file is NOT under the CC0 license, as it contains rules and definitions
 @; copied with permission from Sam Tobin-Hochstadt's Ph.D thesis. I obtained the

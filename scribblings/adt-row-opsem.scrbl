@@ -8,6 +8,22 @@
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Operational Semantics (with ρ)}
 
+@list{
+
+ Instantiation of the new sorts of polymorphic abstractions is a no-op at
+ run-time, similarly to those of @|typedracket|.
+ 
+ @;; New:
+ @$p[@$inferrule[-
+                 @${@atc[e @repeated{@ρc}] ↪ e}
+                 @${@textsc{E-Inst-C}}]
+
+     @$inferrule[-
+                 @${@atf[e @repeated{@ρf}] ↪ e}
+                 @${@textsc{E-Inst-F}}]]
+}
+
+
 @todo{Does this need any change when adding row typing (they don't add any
  rules in @~cite["tobin-hochstadt_typed_2010"])?}
 
@@ -77,7 +93,7 @@ indexed by a constructor label or a field label, like @${@ctor-pred[@κ]},
   @textif v = @record[@repeated{@|ɐ|ⱼ = vⱼ}] ∧ @repeatset{@|ɐ|ⱼ} = @repeatset{@|ɐ|ᵢ}
   \\
   δ(@record-pred[@repeated{@|ɐ|ᵢ}], v) &= \#f @text[" otherwise"]
-  }
+ }
 }
 
 @$${
@@ -98,7 +114,7 @@ indexed by a constructor label or a field label, like @${@ctor-pred[@κ]},
  @${@opwith[@record[@repeated{@|ɐ|ᵢ = vᵢ}] @${@|ɐ|ⱼ} @${v'}]
    ↪ @record[@${@repeatset{@|ɐ|ᵢ = vᵢ} ∖ \{@|ɐ|ⱼ = vⱼ\}}
              @${\quad @|ɐ|ⱼ = v'}] \\
-  (@|ɐ|ⱼ = vⱼ) ∈ @repeatset{@|ɐ|ᵢ = vᵢ}}
+   (@|ɐ|ⱼ = vⱼ) ∈ @repeatset{@|ɐ|ᵢ = vᵢ}}
  @${@textsc{E-Record-With}_1}
  ]
 }
@@ -121,7 +137,7 @@ indexed by a constructor label or a field label, like @${@ctor-pred[@κ]},
  @${@|ɐ|ⱼ ∈ @repeatset{@|ɐ|ᵢ}}
  @${@opwithout[@record[@repeated{@|ɐ|ᵢ = vᵢ}] @${@|ɐ|ⱼ}]
    ↪ @record[@${@repeatset{@|ɐ|ᵢ = vᵢ} ∖ \{@|ɐ|ⱼ = vⱼ\}}] \\
-  (@|ɐ|ⱼ = vⱼ) ∈ @repeatset{@|ɐ|ᵢ = vᵢ}}
+   (@|ɐ|ⱼ = vⱼ) ∈ @repeatset{@|ɐ|ᵢ = vᵢ}}
  @${@textsc{E-Record-Without}}
  ]
 }

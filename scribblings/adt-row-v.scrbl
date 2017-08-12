@@ -8,8 +8,6 @@
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Values (with ρ)}
 
-@todo{Does this need any change when adding row typing?}
-
 @$${v ⩴ …
  @P @ctor[@κ v]
  @P @record[@repeated{@|ɐ|ᵢ = vᵢ}]}

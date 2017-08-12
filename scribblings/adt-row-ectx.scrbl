@@ -14,12 +14,13 @@
  @cases["E" #:first-sep "⩴"
         @acase{…}
         @acase{@ctor[@κ E]}
-        @acase{(@ctor-pred[@κ] E)}
-        @acase{(@ctor-val[@κ] E)}
+        @acase{(@ctor-pred[@κ]\ E)}
+        @acase{(@ctor-val[@κ]\ E)}
         @acase{@record[@repeated{@|ɐ|ᵢ = vᵢ}
                        @${@|ɐ|ⱼ = E}
                        @repeated{@|ɐ|ₖ = eₖ}]}
-        @acase{(@record-pred[@repeated{@|ɐ|ᵢ}] E)}
+        @acase{(@record-pred[@repeated{@|ɐ|ᵢ}]\ E)}
+        @acase{(@record-pred*[@repeated{@|ɐ|ᵢ} @repeated{-@|ɐ|ⱼ}]\ E)}
         @acase{E.@|ɐ|}
         @acase{@opwith[E @|ɐ| e]}
         @acase{@opwith[v @|ɐ| E]}
