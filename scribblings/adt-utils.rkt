@@ -2,7 +2,9 @@
 @(provide (except-out (all-defined-out)
                       num-e*
                       num-τ*
-                      List…τ*))
+                      List…τ*
+                      Λc*
+                      Λf*))
 @require["util.rkt"
          (only-in scribble/base emph)
          scriblib/render-cond
@@ -71,12 +73,12 @@
       @${\overrightarrow{@l}}))
 (define (repeatset #:w [wide? #f] . l)
   (define w (if wide? "\\!" ""))
-  (cond-element
-   [html
-    @${\def\overrightbracedarrow#1{\overset{\scriptscriptstyle{\raise1mu{\{}}}{\vphantom{#1}}\overrightarrow{@|w|#1@|w|}\overset{\scriptscriptstyle{\raise1mu{\}}}}{\vphantom{#1}}}\overrightbracedarrow{@l}}]
-   [else
-    ;; Defined in util.rkt
-    @${\overrightbracedarrow{@|w|@|l|@|w|}}]))
+  ($ (cond-element
+      [html
+       @${\def\overrightbracedarrow#1{\overset{\scriptscriptstyle{\raise1mu{\{}}}{\vphantom{#1}}\overrightarrow{@|w|#1@|w|}\overset{\scriptscriptstyle{\raise1mu{\}}}}{\vphantom{#1}}}\overrightbracedarrow{@l}}]
+      [else
+       ;; Defined in util.rkt
+       @${\overrightbracedarrow{@|w|@|l|@|w|}}])))
 (define (repeatSet . l)
   @${\{@(apply repeatset l)\}})
 (define |P| @${\ |\ })
@@ -85,8 +87,16 @@
 (define-syntax at (defop "@"))
 (define-syntax atc (defop (list "@" @${{}_{@textbf{c}}})))
 (define-syntax atf (defop (list "@" @${{}_{@textbf{f}}})))
-(define-syntax Λc (defop (list "Λ" @${{}_{@textbf{c}}})))
-(define-syntax Λf (defop (list "Λ" @${{}_{@textbf{f}}})))
+(define-syntax Λc* (defop (list "Λ" @${{}_{@textbf{c}}})))
+(define-syntax Λf* (defop (list "Λ" @${{}_{@textbf{f}}})))
+(define-syntax-rule (Λce (ρ ...) e)
+  (Λc* @${(@(add-between (list ρ ...) "\\ "))} e))
+(define-syntax-rule (Λcv (ρ ...) e)
+  (Λc* @${(@(add-between (list ρ ...) "\\ "))} e))
+(define-syntax-rule (Λfe (ρ ...) e)
+  (Λf* @${(@(add-between (list ρ ...) "\\ "))} e))
+(define-syntax-rule (Λfv (ρ ...) e)
+  (Λf* @${(@(add-between (list ρ ...) "\\ "))} e))
 (define-syntax ∀r* (defop @${\mathbf{∀}}))
 (define-syntax-rule (∀r (α ...) τ)
   (∀r* @${(@(add-between (list (stringify α) ...) "\\ "))} τ))

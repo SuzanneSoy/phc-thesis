@@ -39,6 +39,7 @@
          acase
          cases
          intertext
+         interpar
          cases*
          frac
          where
@@ -600,7 +601,13 @@ EOCSS
                      racket/contract/base
                      syntax/parse
                      syntax/parse/experimental/template))
-(define (intertext . l) (list (mathtext "\\text{" l "}")))
+(define-syntax (intertext stx)
+  (syntax-case stx ()
+    [(_ . l) (eq? (syntax-local-context) 'module)
+     #'(begin . l)]
+    [(_ . l)
+     #'(list (mathtext "\\text{" l "}"))]))
+(define-syntax-rule (interpar l ...) (intertext "\n" "\n" l ... "\n" "\n"))
 (define (array<l>-no-extra-h-space lst)
   (list "\\!\\begin{array}{l}"
         (add-between lst "\\\\")
@@ -610,14 +617,14 @@ EOCSS
         @$${\hphantom{@array<l>-no-extra-h-space[phantoms]}}))
 (define-syntax cases*
   (syntax-parser
-    #:literals (acase intertext)
+    #:literals (acase intertext interpar)
     [(_ term
         {~optional {~seq #:first-sep first-sep}}
         {~optional {~seq #:then-sep then-sep}}
-        {~optional (intertext . intertext₀)}
+        {~optional {~and inter₀ ({~or intertext interpar} . _)}}
         (~seq {~and acaseᵢ₀ [acase . _]}
               {~and acaseᵢⱼ [acase . _]} ...
-              [intertext . intertextᵢ])
+              {~and interᵢ [{~or intertext interpar} . _]})
         ...
         {~and acaseₙ₀ [acase . _]}
         {~and acaseₙⱼ [acase . _]} ...)
@@ -641,8 +648,8 @@ EOCSS
                                (minwidth phantoms acaseₙ₀)
                                acaseₙⱼ
                                ...]))
-       (?? (?@ . intertext₀))
-       (?@ tmpᵢ . intertextᵢ)
+       (?? inter₀)
+       (?@ tmpᵢ interᵢ)
        ...
        tmpₙ
        ))]))

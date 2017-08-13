@@ -49,7 +49,7 @@
  @δe(@λe[(@repeated{x:τ} @${\ .\ } @${x_r:@polydot[σ α]}) e])
  = @λv[(@repeated{x:τ} @${\ .\ } @${x_r:@polydot[σ α]}) e] \\
  @δe(@Λe[(@repeated{α}) e]) = @Λv[(@repeated{α}) e] \\
- @δe(@Λe[(@repeated{α} @polydotα[β]) e]) = @Λe[(@repeated{α} @polydotα[β]) e] \\
+ @δe(@Λe[(@repeated{α} @polydotα[β]) e]) = @Λv[(@repeated{α} @polydotα[β]) e] \\
  @δe(@promisee[e]) = @promisev[e] \\
  @δe(@syme[s]) = @symv[s]
  \end{aligned}

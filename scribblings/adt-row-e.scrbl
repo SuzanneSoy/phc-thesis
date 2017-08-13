@@ -22,8 +22,7 @@ the value stored in an instance of a constructor.
  @acase{@ctor[@κ e]}
  @acase{(@ctor-pred[@κ]\ e)}
  @acase{(@ctor-val[@κ]\ e)}
- @intertext{@list[]
-            
+ @interpar{
   We also introduce expressions related to records. The first builds an instance
   of a record with the given fields. We note that the order in which the fields
   appear affects the order in which the sub-expressions will be evaluated.
@@ -35,32 +34,25 @@ the value stored in an instance of a constructor.
   field stored in the given instance. The fifth expression updates an existing
   record instance by adding (or replacing) the field @ɐ, while the sixth removes
   the @ɐ field.
-
- @list[]}
-
+ }
  @acase{…}
  @acase{@record[@repeated{@↦e[@${@|ɐ|ᵢ} eᵢ]}]}
- @acase{(@record-pred[@repeated{@|ɐ|ᵢ}]\ e)}
- @acase{(@record-pred*[@repeated{@|ɐ|ᵢ} @repeated{-@|ɐ|ⱼ}]\ e)}@;added
+ @acase{(@record-pred[@repeatset{@|ɐ|ᵢ}]\ e)}
+ @acase{(@record-pred*[@repeatset{@|ɐ|ᵢ} @repeatset{-@|ɐ|ⱼ}]\ e)}@;added
  @acase{e.@|ɐ|}
  @acase{@opwith[e @|ɐ| e]}
  @acase{@opwithout[e @|ɐ|]}
-
- @intertext{@list[]
-           
+ @interpar{
   Finally, we define the row-polymorphic abstractions
-  @Λc[@${(@repeated{@ρc})} e] and @Λf[@${(@repeated{@ρf})} e] which bind row
+  @Λce[(@repeated{@ρc}) e] and @Λfe[(@repeated{@ρf}) e] which bind row
   type variables hiding constructors and fields respectively. The corresponding
   instantiation operators are @atc[e @repeated{@ρc}] and @atf[e @repeated{@ρf}].
-   
- @list[]}
-
+ }
  @acase{…}
- @acase{@Λc[@${(@repeated{@ρc})} e]}@; new
- @acase{@Λf[@${(@repeated{@ρf})} e]}@; new
+ @acase{@Λce[(@repeated{@ρc}) e]}@; new
+ @acase{@Λfe[(@repeated{@ρf}) e]}@; new
  @acase{@atc[e @repeated{@ρc}]}@; new
- @acase{@atf[e @repeated{@ρf}]}@; new
- ]
+ @acase{@atf[e @repeated{@ρf}]}]@; new
 
 
 @;{

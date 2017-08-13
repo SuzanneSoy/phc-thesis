@@ -61,15 +61,15 @@ their inclusion in the following semantics would needlessly complicate things.
 We note a sequence of elements with @repeated{y}. When there is more than one
 sequence involved in a rule or equation, we may use the notation
 @repeated[#:n "n"]{y} to indicate that there are @${n} elements in the
-sequence. Two sequences can that way be forced to have the same number of
-elements. We represent a set of elements (an “unordered” sequence) with the
-notation @repeatset{y}. The use of ellipses in @polydotα{α} does not indicate
-the repetition of @${α}. Instead, it indicates that @${α} is a @emph{variadic}
-polymorphic type variable: a placeholder for zero or more types which will be
-substituted for occurrences of @${α} when the polymorphic type is
-instantiated. These ellipses appear as such in the @typedracket source code,
-and are the reason we use the notation @repeated{y} to indicate repetition,
-instead of the ellipses commonly used for that purpose.
+sequence. Two sequences can be forced to have the same number of elements in
+that way. We represent a set of elements (an “unordered” sequence) with the
+notation @repeatset{y}. The use of ellipses in @polydotα{α} does not
+indicate the repetition of @${α}. Instead, it indicates that @${α} is a @emph{
+ variadic} polymorphic type variable: a placeholder for zero or more types
+which will be substituted for occurrences of @${α} when the polymorphic type
+is instantiated. These ellipses appear as such in the @typedracket source
+code, and are the reason we use the notation @repeated{y} to indicate
+repetition, instead of the ellipses commonly used for that purpose.
 
 We indicate the syntactical substitution of @${y} with @${z} in @${w} using
 the notation @${w@subst[y ↦ z]}. When given several elements to replace, the

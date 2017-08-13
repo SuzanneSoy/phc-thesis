@@ -15,11 +15,11 @@
  
  @;; New:
  @$p[@$inferrule[-
-                 @${@atc[e @repeated{@ρc}] ↪ e}
+                 @${@atc[@Λcv[(@repeated{@ρc}) e] @repeated{@ρc}] ↪ e}
                  @${@textsc{E-Inst-C}}]
 
      @$inferrule[-
-                 @${@atf[e @repeated{@ρf}] ↪ e}
+                 @${@atf[@Λfv[(@repeated{@ρc}) e] @repeated{@ρf}] ↪ e}
                  @${@textsc{E-Inst-F}}]]
 }
 
