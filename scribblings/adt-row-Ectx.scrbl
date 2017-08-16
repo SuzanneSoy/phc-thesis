@@ -18,7 +18,8 @@
                        @${@|ɐ|ⱼ = E}
                        @repeated{@|ɐ|ₖ = eₖ}]@tag*{record instance}}
         @acase{(@record-pred[@repeatset{@|ɐ|ᵢ}]\ E)@tag*{record predicate}}
-        @acase{(@record-pred*[@repeatset{@|ɐ|ᵢ} @repeatset{-@|ɐ|ⱼ}]\ E)@tag*{row-polymorphic record predicate}}
+        @acase{(@record-pred*[@repeatset{@|ɐ|ᵢ} @repeatset{-@|ɐ|ⱼ}]\ E)
+          @tag*{row-polymorphic record predicate}}
         @acase{E.@|ɐ|@tag*{record field access}}
         @acase{@opwith[E @|ɐ| e]@tag*{record update (new/change)}}
         @acase{@opwith[v @|ɐ| E]}

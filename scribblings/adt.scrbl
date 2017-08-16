@@ -24,10 +24,10 @@ constants, i.e. they are written literally in the program source.
 @$${@κ ⩴ name ∈ 𝒞}
 @$${@ɐ ⩴ name ∈ ℱ}
 
+@include-asection["adt-row-tausigma.scrbl"]
 @include-asection["adt-row-e.scrbl"]
 @include-asection["adt-row-v.scrbl"]
 @include-asection["adt-row-Ectx.scrbl"]
-@include-asection["adt-row-tausigma.scrbl"]
 @include-asection["adt-row-te.scrbl"]
 @include-asection["adt-row-sub.scrbl"]
 @include-asection["adt-row-pe.scrbl"]

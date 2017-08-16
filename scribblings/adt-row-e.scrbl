@@ -53,10 +53,14 @@ the value stored in an instance of a constructor.
   instantiation operators are @atc[e @repeated{@ςc}] and @atf[e @repeated{@ςf}].
  }
  @acase{…}
- @acase{@Λce[(@repeated{@ρc}) e]@tag*{row-polymorphic abstraction (constructors)}}@; new
- @acase{@Λfe[(@repeated{@ρf}) e]@tag*{row-polymorphic abstraction (fields)}}@; new
- @acase{@atc[e @repeated{@ςc}]@tag*{row-polymorphic instantiation (constructors)}}@; new
- @acase{@atf[e @repeated{@ςf}]@tag*{row-polymorphic instantiation (fields)}}]@; new
+ @acase{@Λce[(@repeated{@ρc}) e]
+  @tag*{row-polymorphic abstraction (constructors)}}@; new
+ @acase{@Λfe[(@repeated{@ρf}) e]
+  @tag*{row-polymorphic abstraction (fields)}}@; new
+ @acase{@atc[e @repeated{@ςc}]
+  @tag*{row-polymorphic instantiation (constructors)}}@; new
+ @acase{@atf[e @repeated{@ςf}]
+  @tag*{row-polymorphic instantiation (fields)}}]@; new
 
 @;{
  Note: In the @${@record[@repeated{@|ɐ|ᵢ = eᵢ}]} expression, which builds a
