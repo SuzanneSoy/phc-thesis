@@ -627,26 +627,37 @@ EOCSS
 (define (minwidth phantoms realcontent)
   (list "\\rlap{" realcontent "}"
         @$${\hphantom{@array<l>-no-extra-h-space[phantoms]}}))
+(begin-for-syntax
+  (define-syntax-class acase-cls
+    (pattern ({~and self {~literal acase}}
+              {~and arg {~not ({~or {~literal tag} {~literal tag*}} . _)}} ...
+              {~optional ({~and tag-id {~or {~literal tag} {~literal tag*}}}
+                          . tag-args)})
+             #:with phantom-tag
+             #`(self arg ...
+                     . #,(if (attribute tag-id)
+                             #'{(tag-id #:phantom? #t . tag-args)}
+                             #'())))))
 (define-syntax cases*
   (syntax-parser
-    #:literals (acase intertext interpar)
+    #:literals (intertext interpar)
     [(_ term
         {~optional {~seq #:first-sep first-sep}}
         {~optional {~seq #:then-sep then-sep}}
         {~optional {~and inter₀ ({~or intertext interpar} . _)}}
-        (~seq {~and acaseᵢ₀ [acase . _]}
-              {~and acaseᵢⱼ [acase . _]} ...
+        (~seq acaseᵢ₀:acase-cls
+              acaseᵢⱼ:acase-cls ...
               {~and interᵢ [{~or intertext interpar} . _]})
         ...
-        {~and acaseₙ₀ [acase . _]}
-        {~and acaseₙⱼ [acase . _]} ...)
+        acaseₙ₀:acase-cls
+        acaseₙⱼ:acase-cls ...)
      #:with (tmpᵢ ...) (generate-temporaries #'((acaseᵢⱼ ...) ...))
      (quasitemplate
       (#,(if ((or/c 'expression list?) (syntax-local-context)) #'list #'begin)
        (define phantoms
-         (list (?@ acaseᵢ₀ acaseᵢⱼ ...)
+         (list (?@ acaseᵢ₀.phantom-tag acaseᵢⱼ.phantom-tag ...)
                ...
-               (?? (?@ acaseₙ₀ acaseₙⱼ ...))))
+               (?? (?@ acaseₙ₀.phantom-tag acaseₙⱼ.phantom-tag ...))))
        (define tmpᵢ @cases[term
                            (?? (?@ #:first-sep first-sep))
                            (?? (?@ #:then-sep then-sep))
@@ -696,21 +707,23 @@ EOCSS
 (define nl @cond-element[[latex "\\csname @arraycr\\endcsname"] [else "\\\\"]])
 
 (define-runtime-path tikztag.sty "../tikztag.sty")
-(define ((tag** starred?) . txt)
+(define ((tag** starred?) #:phantom? [phantom? #f] . txt)
   (cond-element
-   [html (list "\\hphantom{"
+   [html (list* "\\hphantom{"
                (text (if starred? "" "(")
                      txt
                      (if starred? "" ")"))
                "}"
-               "\\tag*{"
-               (mathtext
-                ($ "\\llap{"
-                   (text (if starred? "" "(")
-                         txt
-                         (if starred? "" ")"))
-                   "}"))
-               "}")]
+               (if phantom?
+                   '()
+                   (list "\\tag*{"
+                         (mathtext
+                          ($ "\\llap{"
+                             (text (if starred? "" "(")
+                                   txt
+                                   (if starred? "" ")"))
+                             "}"))
+                         "}")))]
    [latex (elem #:style (style #f (list (tex-addition
                                          ;; The \n are important in case the
                                          ;; file does not end with a newline
@@ -720,9 +733,13 @@ EOCSS
                                          (bytes-append #"\n\\makeatletter\n"
                                                        (file->bytes tikztag.sty)
                                                        #"\n\\makeatother\n"))))
-                (list "\\hphantom{\\text{" @mathtext[txt] "}}"
-                      "\\tikztag" (if starred? "*" "") "{" @mathtext[txt] "}"))]
-   [else (list " (" txt ")")]))
+                (list* "\\hphantom{\\text{" @mathtext[txt] "}}"
+                       (if phantom?
+                           '()
+                           (list "\\tikztag" (if starred? "*" "") "{"
+                                 @mathtext[txt]
+                                 "}"))))]
+   [else (if phantom? '() (list " (" txt ")"))]))
 
 (define tag (tag** #f))
 (define tag* (tag** #t))

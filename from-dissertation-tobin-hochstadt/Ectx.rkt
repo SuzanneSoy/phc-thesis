@@ -12,5 +12,5 @@
        @acase{@ifop[E e e]@tag*{conditional}}
        @acase{@eq?op[E e]@tag*{symbol equality}}
        @acase{@eq?op[v E]}
-       @acase{@mapop[E e]}
+       @acase{@mapop[E e]@tag*{map function over list}}
        @acase{@mapop[v E]}]

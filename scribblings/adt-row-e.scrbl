@@ -44,8 +44,8 @@ the value stored in an instance of a constructor.
  @acase{(@record-pred*[@repeatset{@|ɐ|ᵢ} @repeatset{-@|ɐ|ⱼ}]\ e)
   @tag*{row-record predicate}}@;added
  @acase{e.@|ɐ|@tag*{record field access}}
- @acase{@opwith[e @|ɐ| e]@tag*{record update (new/changed field)}}
- @acase{@opwithout[e @|ɐ|]@tag*{record update (removed field)}}
+ @acase{@opwith[e @|ɐ| e]@tag*{record update (new/change field)}}
+ @acase{@opwithout[e @|ɐ|]@tag*{record update (remove field)}}
  @interpar{
   Finally, we define the row-polymorphic abstractions
   @Λce[(@repeated{@ρc}) e] and @Λfe[(@repeated{@ρf}) e] which bind row

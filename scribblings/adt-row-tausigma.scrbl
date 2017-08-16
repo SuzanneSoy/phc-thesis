@@ -10,10 +10,10 @@
 
 @cases["σ,τ" #:first-sep "⩴"
        @acase{…}
-       @acase{@ctor[@κof[τ]]} @; same
-       @acase{@record[@ςf]} @; changed
-       @acase{@∀c[(@repeated{@ρc}) τ]} @; new
-       @acase{@∀f[(@repeated{@ρf}) τ]}] @; new
+       @acase{@ctor[@κof[τ]]@tag*{constructor}} @; same
+       @acase{@record[@ςf]@tag*{possibly row-polymorphic record}} @; changed
+       @acase{@∀c[(@repeated{@ρc}) τ]@tag*{row-polymorphic abstraction (constructors)}} @; new
+       @acase{@∀f[(@repeated{@ρf}) τ]@tag*{row-polymorphic abstraction (fields)}}] @; new
 
 @; new↓
 
@@ -28,14 +28,12 @@ constructors in the row type can be specified on variants.
 
 @cases["σ,τ" #:first-sep "⩴"
        @acase{…}
-       @acase{@variant[@ςf]}] @; new/changed
+       @acase{@variant[@ςf]@tag*{possibly row-polymorphic variant}}] @; new/changed
 
-@; TODO: what about adding some fields to the ρ used to instantiate another function?
-@; new
 @cases[@ςc #:first-sep "⩴"
-       @acase{@repeatset{@κof[τ]}}
-       @acase{@|ρc|\ @repeatset{-@|κ|ᵢ}\ @repeatset{+@κof[ⱼ τⱼ]}}]
+       @acase{@repeatset{@κof[τ]}@tag*{fixed constructors}}
+       @acase{@|ρc|\ @repeatset{-@|κ|ᵢ}\ @repeatset{+@κof[ⱼ τⱼ]} @tag*{row without some ctors, with extra ctors}}]
 
 @cases[@ςf #:first-sep "⩴"
-       @acase{@repeatset{@|ɐ|:τ}}
-       @acase{@|ρf|\ @repeatset{-@|ɐ|ᵢ}\ @repeatset{+@|ɐ|ⱼ:τⱼ}}]
+       @acase{@repeatset{@|ɐ|:τ}@tag*{fixed fields}}
+       @acase{@|ρf|\ @repeatset{-@|ɐ|ᵢ}\ @repeatset{+@|ɐ|ⱼ:τⱼ}@tag*{row without some fields, with extra fields}}]

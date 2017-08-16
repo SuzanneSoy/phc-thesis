@@ -8,6 +8,7 @@
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Values (with ρ)}
 
-@$${v ⩴ …
- @P @ctor[@κ v]
- @P @record[@repeated{@|ɐ|ᵢ = vᵢ}]}
+@cases["v" #:first-sep "⩴"
+       @acase{…}
+       @acase{@ctor[@κ v]@tag*{constructor instance}}
+       @acase{@record[@repeated{@|ɐ|ᵢ = vᵢ}]@tag*{record instance}}]

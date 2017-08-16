@@ -138,6 +138,7 @@
   @list{@(stringify rec) @textbf[" with "] @(stringify a) = @(stringify v)})
 (define-syntax-rule (opwithout rec a)
   @list{@(stringify rec) @textbf[" without "] @(stringify a)})
+(define pe @${\mathit{pe}})
 (define πctor-val @${@textbf{getval}})
 (define (πɐ . ɐ) @${\mathbf{@ɐ}})
 ;; Associates a variable name or record field name with a value, type or
