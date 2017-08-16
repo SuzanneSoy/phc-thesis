@@ -33,11 +33,19 @@
 
 @(begin-for-syntax
    (require (for-syntax racket/base))
+   
    (define-syntax (defop stx)
      (syntax-case stx ()
        [(_ op)
         (with-syntax ([s (datum->syntax #'op 'syntax)])
-          #'(defop* (s op)))])))
+          #'(defop* (s op)))]))
+
+   (define-syntax (defvop stx)
+     (syntax-case stx ()
+       [(_ op)
+        (with-syntax ([s (datum->syntax #'op
+                                        `@${\mathord{@textbfit{@,#'op}}})])
+          #'(defop s))])))
 
 @(define-syntax stringify
    (syntax-parser
@@ -51,6 +59,18 @@
 
 (define-syntax ctor (defop "ctor"))
 (define κ @${κ})
+(define-syntax κof
+  (syntax-rules ()
+    [(_ τ) @${@|κ|\ \mathbf{of}\ @(stringify τ)}]
+    [(_ i τ) @${@|κ|@(stringify i)\ \mathbf{of}\ @(stringify τ)}]))
+(define-syntax κe
+  (syntax-rules ()
+    [(_ e) @${@|κ|\ @(stringify e)}]
+    [(_ i e) @${@|κ|@(stringify i)\ @(stringify e)}]))
+(define-syntax κv
+  (syntax-rules ()
+    [(_ v) @${@|κ|\ @(stringify v)}]
+    [(_ i v) @${@|κ|@(stringify i)\ @(stringify v)}]))
 (define ɐ @${a})
 (define-syntax ctorTop (defop "CtorTop"))
 (define-syntax-rule (ctor-val κ)
@@ -60,13 +80,13 @@
 (define-syntax ifop (defop "if"))
 (define-syntax mapop (defop "map"))
 (define-syntax-rule (λv (arg ...) expr)
-  @${λ(@(list (stringify arg) ...)).@(stringify expr)})
+  @${@mathbfit{λ}(@(list (stringify arg) ...)).@(stringify expr)})
 (define-syntax-rule (λe (arg ...) expr)
-  @${λ(@(spaces (stringify arg) ...)).@(stringify expr)})
+  @${\mathbf{λ}(@(spaces (stringify arg) ...)).@(stringify expr)})
 (define-syntax-rule (Λe (arg ...) expr)
-  @${Λ(@(spaces (stringify arg) ...)).@(stringify expr)})
+  @${\mathbf{Λ}(@(spaces (stringify arg) ...)).@(stringify expr)})
 (define-syntax-rule (Λv (arg ...) expr)
-  @${Λ(@(spaces (stringify arg) ...)).@(stringify expr)}) ;; TODO: is the env necessary here? It's a type env, right?
+  @${@mathbfit{Λ}(@(spaces (stringify arg) ...)).@(stringify expr)}) ;; TODO: is the env necessary here? It's a type env, right?
 (define (repeated #:n [n #f] . l)
   (if n
       @${\overrightarrow{@l}\overset{\scriptscriptstyle\,\ifmathjax{\raise1mu{@|n|}}\iflatex{@|n|}}{\vphantom{@l}}}
@@ -82,8 +102,10 @@
 (define (repeatSet . l)
   @${\{@(apply repeatset l)\}})
 (define |P| @${\ |\ })
-(define ρc @${\rho_{c}})
-(define ρf @${\rho_{f}})
+(define ρc @${ρ_{c}})
+(define ρf @${ρ_{f}})
+(define ςc @${ς_{c}})
+(define ςf @${ς_{f}})
 (define-syntax at (defop "@"))
 (define-syntax atc (defop (list "@" @${{}_{@textbf{c}}})))
 (define-syntax atf (defop (list "@" @${{}_{@textbf{f}}})))
@@ -103,7 +125,7 @@
 (define-syntax ∀c (defop @${\mathbf{∀}_{@textbf{c}}}))
 (define-syntax ∀f (defop @${\mathbf{∀}_{@textbf{f}}}))
 (define-syntax-rule (ctor-pred c)
-  @${@(stringify c)\mathbf{?}})
+  @${@(stringify c)@textbf{?}})
 (define-syntax-rule (record-pred . f*)
   @${(@textbf{record?}\ @(stringify . f*))})
 (define-syntax-rule (record-pred* . f*)
@@ -122,11 +144,11 @@
 (define-syntax-rule (↦E name val) @${@(stringify name)↦@(stringify val)})
 (define-syntax-rule (↦τ name val) @${@(stringify name)↦@(stringify val)})
 (define-syntax-rule (app f+args ...)
-  @${(@(add-between (list (stringify f+args) ...) "\\ "))})
+  @${\mathbf{(}@(add-between (list (stringify f+args) ...) "\\ ")\mathbf{)}})
 
 (define-syntax num-e* (defop "num"))
-(define-syntax num-v* (defop "num"))
-(define-syntax num-τ* (defop "num"))
+(define-syntax num-v* (defvop "num"))
+(define-syntax num-τ* (defop "Num"))
 (define num-e @num-e*[n])
 (define num-v @num-v*[n])
 (define-syntax num-τ
@@ -134,48 +156,46 @@
     [(_ n) #'@num-τ*[n]]
     [self:id #'@num-τ*[n]])) ;; n by default
 
-(define-syntax null-v (defop @${@textit{null}}))
+(define-syntax null-v (defvop "null"))
 (define-syntax null-e (defop "null"))
-(define-syntax null-τ (defop "null"))
+(define-syntax null-τ (defop "Null"))
 
 (define-syntax true-e (defop "true"))
-(define-syntax true-v (defop @${@textit{true}}))
-(define-syntax true-τ (defop "true"))
+(define-syntax true-v (defvop "true"))
+(define-syntax true-τ (defop "True"))
 
 (define-syntax false-e (defop "false"))
-(define-syntax false-v (defop @${@textit{false}}))
-(define-syntax false-τ (defop "false"))
+(define-syntax false-v (defvop "false"))
+(define-syntax false-τ (defop "False"))
 
 (define-syntax un (defop "∪"))
 (define-syntax ∩τ (defop "∩"))
 
 (define-syntax-rule (f→ (from ...) R)
-  @${(@(add-between (list @(stringify from) ...) "\\ ") → @(stringify R))})
+  @${(@(add-between (list @(stringify from) ...) "\\ ") \mathbf{→} @(stringify R))})
 (define-syntax-rule (f* (from ... rest*) R)
-  (f→ (from ... @${\ .\ } rest*) R))
+  (f→ (from ... @${\ \mathbf{.}\ } rest*) R))
 (define-syntax-rule (f… (from ... polydot) R)
-  (f→ (from ... @${\ .\ } polydot) R))
+  (f→ (from ... @${\ \mathbf{.}\ } polydot) R))
 (define-syntax (R stx)
   (syntax-case stx ()
     [(_ to φ⁺ φ⁻ o)
-     #'@${❲@(stringify to)
-      \;;\; @(stringify φ⁺) {/} @(stringify φ⁻)
-      \;;\; @(stringify o)❳}]
+     #'@${\mathbf{❲}@(stringify to)
+      \;\mathbf{;}\; @(stringify φ⁺) \mathbf{{/}} @(stringify φ⁻)
+      \;\mathbf{;}\; @(stringify o)❳}]
     [self (identifier? #'self)
      #'@${\mathrm{R}}]))
-#;(define-syntax-rule (f→ (from ...) to φ O)
-    @${
- (@list[@(stringify from) ...]
- \xrightarrow[@(stringify O)]{@(stringify φ)}
- @(stringify to))
- })
 
 (define primop "p")
 
-(define-syntax consp (defop "cons"))
+(define-syntax (consp stx)
+  (syntax-case stx ()
+    [(_ a b) #'@${(\mathit{cons}\ @(stringify a)\ @(stringify b)}]
+    [self (identifier? #'self) #'@${\mathit{cons}}])) ;; cons primop
 (define-syntax-rule (consv a b) @${⟨@(stringify a), @(stringify b)⟩})
-(define-syntax listv (defop "list"))
-(define-syntax-rule (consτ a b) @${⟨@(stringify a), @(stringify b)⟩})
+(define-syntax listv (defvop "list"))
+(define-syntax-rule (consτ a b)
+  @${❬@(stringify a)@mathbm{,} @(stringify b)❭})
 (define-syntax-rule (polydot τ α)
   @${@(stringify τ) \mathbf{…}_{@(stringify α)}})
 (define-syntax-rule (polydotα α)
@@ -190,13 +210,13 @@
 (define @emptypath @${ϵ})
 (define-syntax-rule (<: a b)
   @${⊢ @(stringify a) \mathrel{≤:} @(stringify b)})
-@define[<:*]{{\mathrel{≤:}}}
+@define[<:*]{@${{\mathrel{≤:}}}}
 (define-syntax-rule (=: a b)
   @${⊢ @(stringify a) \mathrel{=:} @(stringify b)})
 (define-syntax-rule (≠: a b)
   @${⊢ @(stringify a) \mathrel{≠:} @(stringify b)})
 (define-syntax-rule (=:def a b)
-  @${⊢ @(stringify a) \mathrel{≝} @(stringify b)})
+  @${@(stringify a) \mathrel{≝} @(stringify b)})
 
 (define-syntax-rule (<:R a b)
   @${⊢ @(stringify a) \mathrel{{≤:}_R} @(stringify b)})
@@ -256,11 +276,11 @@
 (define Numberτ @${\mathbf{Number}})
 (define-syntax promisee (defop "delay"))
 (define-syntax forcee (defop "force"))
-(define-syntax promiseτ (defop "promise"))
-(define-syntax promisev (defop "promise"))
+(define-syntax promiseτ (defop "Promise"))
+(define-syntax promisev (defvop "promise"))
 (define-syntax syme (defop "symbol"))
-(define-syntax symτ (defop "symbol"))
-(define-syntax symv (defop "symbol"))
+(define-syntax symτ (defop "Symbol"))
+(define-syntax symv (defvop "symbol"))
 (define Symbolτ @${\mathbf{Symbol}})
 (define-syntax gensyme (defop "gensym"))
 (define-syntax eq?op (defop "eq?"))
@@ -291,3 +311,4 @@
        tmp)]))
 
 (define δe @${δ_{\mathrm{e}}})
+(define alldifferent @${\operatorname{alldifferent}})

@@ -21,7 +21,7 @@
 #:loc
 
 @cases[@loc #:first-sep "⩴"
-       @acase{•@tag*{function's first argument}}
+       @acase{•@tag*{first argument of the function}}
        @acase{x@tag*{variable}}]
 
 #:o

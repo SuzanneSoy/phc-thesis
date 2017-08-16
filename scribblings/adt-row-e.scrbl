@@ -9,8 +9,11 @@
        #:version (version-text)]{Expressions (with ρ)}
 
 We extend the syntax of expressions in typed racket as defined
-by@~cite[#:precision "pp. 62, 72 and 92" "tobin-hochstadt_typed_2010"] by
-adding expressions related to constructors. The first syntax builds an
+by@~cite[#:precision "pp. 62, 72 and 92" "tobin-hochstadt_typed_2010"] and
+presented in
+@secref["from-dissertation-tobin-hochstadt"
+        #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")]
+by adding expressions related to constructors. The first syntax builds an
 instance of the constructor with label @|κ| and the value of @${e}. The
 expression @${(@ctor-pred[@κ] e)} determines whether @${e} is an instance of
 the constructor with label @|κ|. The expression @${(@ctor-val[@κ] e)} extracts
@@ -46,14 +49,13 @@ the value stored in an instance of a constructor.
   Finally, we define the row-polymorphic abstractions
   @Λce[(@repeated{@ρc}) e] and @Λfe[(@repeated{@ρf}) e] which bind row
   type variables hiding constructors and fields respectively. The corresponding
-  instantiation operators are @atc[e @repeated{@ρc}] and @atf[e @repeated{@ρf}].
+  instantiation operators are @atc[e @repeated{@ςc}] and @atf[e @repeated{@ςf}].
  }
  @acase{…}
  @acase{@Λce[(@repeated{@ρc}) e]}@; new
  @acase{@Λfe[(@repeated{@ρf}) e]}@; new
- @acase{@atc[e @repeated{@ρc}]}@; new
- @acase{@atf[e @repeated{@ρf}]}]@; new
-
+ @acase{@atc[e @repeated{@ςc}]}@; new
+ @acase{@atf[e @repeated{@ςf}]}]@; new
 
 @;{
  Note: In the @${@record[@repeated{@|ɐ|ᵢ = eᵢ}]} expression, which builds a

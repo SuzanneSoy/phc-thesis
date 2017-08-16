@@ -34,6 +34,16 @@
  ]
 }
 
+@; TODO: instantiation rules. ∀ rules. Etc.
+@$${
+ @$inferrule[
+ @${@repeated{⊢ τⱼ <: τ'ⱼ}}
+ @${⊢ @record[@repeated{@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}}]
+   <: @record[@repeated{@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τ'ⱼ}}]}
+ @${@textsc{S-Record-Row}}
+ ]
+}
+
 Permutation of the fields of a record type produces an equivalent type:
 
 @$${

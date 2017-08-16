@@ -48,6 +48,9 @@
          quad
          mathtext
          textbf
+         textbfit
+         mathbfit
+         mathbm
          textit
          textrm
          text
@@ -175,6 +178,9 @@
       $\scriptscriptstyle{\}}$}}{\vphantom{#1}%
     }%
   }%
+  \usepackage{bm}
+% Newline necessary here:
+
 EOTEX
                                          )
         (elem #:style (style #f (list (css-addition
@@ -661,6 +667,18 @@ EOCSS
 (define otherwise @mathtext{\text{ otherwise }})
 (define quad @${\quad})
 (define (textbf . l) ($ (mathtext "\\textbf{" l "}")))
+(define (textbfit . l)
+  (cond-element
+   [html ($ (mathtext "{\\bfit \\text{" l "}}"))]
+   [else ($ (mathtext "\\textbf{\\textit{" l "}}"))]))
+(define (mathbfit . l)
+  (cond-element
+   [html ($ "{\\bfit " l "}")]
+   [else ($ "\\bm{\\mathit{" l "}}")]))
+(define (mathbm . l)
+  (cond-element
+   [html ($ "{\\mathbf " l "}")]
+   [else ($ "\\bm{\\mathrm{" l "}}")]))
 (define (textit . l) ($ (mathtext "\\textit{" l "}")))
 (define (textrm . l) ($ (mathtext "\\textrm{" l "}")))
 (define (text . l) ($ (mathtext "\\text{" l "}")))

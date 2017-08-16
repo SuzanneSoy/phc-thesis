@@ -9,17 +9,16 @@
        #:version (version-text)]{Operational Semantics (with ρ)}
 
 @list{
-
  Instantiation of the new sorts of polymorphic abstractions is a no-op at
  run-time, similarly to those of @|typedracket|.
  
  @;; New:
  @$p[@$inferrule[-
-                 @${@atc[@Λcv[(@repeated{@ρc}) e] @repeated{@ρc}] ↪ e}
+                 @${@atc[@Λcv[(@repeated{@ρc}) e] @repeated{@ςc}] ↪ e}
                  @${@textsc{E-Inst-C}}]
 
      @$inferrule[-
-                 @${@atf[@Λfv[(@repeated{@ρc}) e] @repeated{@ρf}] ↪ e}
+                 @${@atf[@Λfv[(@repeated{@ρc}) e] @repeated{@ςf}] ↪ e}
                  @${@textsc{E-Inst-F}}]]
 }
 

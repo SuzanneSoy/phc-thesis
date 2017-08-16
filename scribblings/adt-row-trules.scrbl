@@ -13,13 +13,10 @@
 @todo{Should the filter be something else than @${ϵ|ϵ} or is the filter inferred
  via other rules when the ``function'' does not do anything special?}
 
-@$${
- @$inferrule[
- @${Γ ⊢ e : τ ; φ ; o}
- @${Γ ⊢ @ctor[@κ e] : @ctor[@κ τ] ; ϵ|⊥ ; ∅}
- @${@textsc{T-Ctor-Build}}
- ]
-}
+@$inferrule[
+ @${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]]}
+ @${@Γ[⊢ @ctor[@κe[e]] @R[@ctor[@κof[τ]] ϵ ⊥ ∅]]}
+ @${@textsc{T-Ctor-Build}}]
 
 @${@applyfilter} is defined
 in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
@@ -30,15 +27,15 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
  therefore τ_ϵ matches τ). So that's how Number|\overline{Number} gets processed
  with the updated applyfilter.}
 
-@$${
- @$inferrule[
- @${Γ ⊢ e : τ ; φ ; o \\
-   φ_r
-   = @applyfilter(@ctor[@κ ⊤]|\overline{@ctor[@κ ⊤]}, τ, o)}
- @${Γ ⊢ (@ctor-pred[@κ] e) : Boolean ; φ_r ; ∅}
+@todo{Copy the definition of applyfilter.}
+
+@$inferrule[
+ @${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]] \\
+  φ⁺_r / φ⁻_r
+  = @applyfilter(@ctor[@κof[⊤]]/\overline{@ctor[@κof[⊤]]}, τ, o)}
+ @${@Γ[⊢ @${(@ctor-pred[@κ]\ e)} @R[Boolean φ⁺_r φ⁻_r ∅]]}
  @${@textsc{T-Ctor-Pred}}
  ]
-}
 
 @(define & @cond-element[[latex "\\savedamp"] [else "&"]])
 @(define nl @cond-element[[latex "\\csname @arraycr\\endcsname"] [else "\\\\"]])

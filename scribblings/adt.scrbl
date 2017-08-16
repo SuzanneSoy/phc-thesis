@@ -26,30 +26,9 @@ constants, i.e. they are written literally in the program source.
 
 @include-asection["adt-row-e.scrbl"]
 @include-asection["adt-row-v.scrbl"]
-@include-asection["adt-row-ectx.scrbl"]
-@include-asection["adt-row-ty.scrbl"]
-
-We further define variants as a subset of the unions allowed by @|typedracket|
-(including unions of the constructors defined above). Variants are equivalent
-to the union of their cases, but guarantee that pattern matching can always be
-performed (for example, it is not possible in @|typedracket| to distinguish
-the values of two function types present in the same union, and it is
-therefore impossible to write a pattern matching expression which handles the
-two cases differently).
-
-@$${
- \begin{gathered}
- σ,τ ⩴ …
- @P @variant[
- @repeated{@ctor[@|κ|ᵢ τᵢ]}
- @;@repeated{@record[@repeated{@|ɐ|ⱼₗ : τⱼₗ}]}
- @;@${τ_{last}}
- ]@;\\
- @;@where \{@repeated{@|ɐ|ⱼₗ}\} ≠ \{@repeated{@|ɐ|ₖₗ}\} ∀ j ≠ k
- \end{gathered}
-}
-
-
+@include-asection["adt-row-Ectx.scrbl"]
+@include-asection["adt-row-tausigma.scrbl"]
+@include-asection["adt-row-te.scrbl"]
 @include-asection["adt-row-sub.scrbl"]
 @include-asection["adt-row-pe.scrbl"]
 @include-asection["adt-row-trules.scrbl"]

@@ -80,6 +80,7 @@ jobs:
       - nvm install v8.1 # works with v8.1.4
       - npm install mathjax-node
       - patch -p1 < qaligned.patch
+      - patch -p1 < MathJax-bfit.patch
       - node < run-mathjax-offline.node.js
       - mv doc/phc-thesis/index2.html doc/phc-thesis/index.html
       - mv doc "${zipfile_folder_name}"

@@ -63,19 +63,106 @@ sequence involved in a rule or equation, we may use the notation
 @repeated[#:n "n"]{y} to indicate that there are @${n} elements in the
 sequence. Two sequences can be forced to have the same number of elements in
 that way. We represent a set of elements (an “unordered” sequence) with the
-notation @repeatset{y}. The use of ellipses in @polydotα{α} does not
-indicate the repetition of @${α}. Instead, it indicates that @${α} is a @emph{
+notation @repeatset{y}. The use of ellipses in @polydotα{α} does not indicate
+the repetition of @${α}. Instead, it indicates that @${α} is a @emph{
  variadic} polymorphic type variable: a placeholder for zero or more types
 which will be substituted for occurrences of @${α} when the polymorphic type
 is instantiated. These ellipses appear as such in the @typedracket source
 code, and are the reason we use the notation @repeated{y} to indicate
-repetition, instead of the ellipses commonly used for that purpose.
+repetition, instead of the ellipses commonly used for that purpose. FInally,
+an empty sequence of repeated elements is sometimes noted @${ϵ}
+
+The judgements are written following the usual convention, where @${Γ} is the
+environment which associates variables to their type. The @${Δ} environment
+contains the type variables within scope, and is mostly used to determine the
+validity of types.
+
+@$${@Γ[⊢ e R]}
+
+The environments can be extended as follows:
+
+@$${@Γ[@${x : τ} Δ @${\{α\}} ⊢ e R]}
+
+The typing information @R associated with an expression contains the type of
+the expression, as well as aliasing information and other propositions which
+are known to be conditionally true depending on the value of the expression at
+run-time. These pieces of information are described in more detail
+@tech[#:key "R-typing-info"]{below}. Since the typing information @R is often
+inlined in the typing judgement, a typing judgement will generally have the
+following form:
+
+@$${@Γ[⊢ e @R[τ φ⁺ φ⁻ o]]}
+
+In this notation, the @${+} and @${-} signs in @${φ⁺} and @${φ⁻} are purely
+syntactical, and serve to distinguish the positive and negative filters, which
+are instances of the nonterminal @${φ}.
+
+The various nonterminals used throughout the language are written in italics
+and are defined using the notation:
+
+@cases[@textit{nonterminal} #:first-sep "⩴"
+       @acase{@textit{first case}}
+       @acase{@textit{second case}}
+       @acase{@textit{and so on}}]
+
+Additionally, a symbol assigned to a nonterminal may be used as a placeholder
+in rules and definitions, implicitly indicating that the element used to fill
+in that placeholder should be an instance of the corresponding nonterminal.
+When multiple such placeholders are present in a rule, they will be
+subscripted to distinguish between the different occurrences. The subscripts
+@${i}, @${j}, @${k} and @${l} are often used for repeated sequences.
+
+In later chapters, we extend already-defined non-terminals using the notation:
+ 
+@cases[@textit{nonterminal} #:first-sep "⩴"
+       @acase{…}
+       @acase{@textit{new case}}
+       @acase{@textit{other new case}}]
+
+Typing rules and other rules are described following the usual natural
+deduction notation.
+
+@$inferrule[@${@textit{hypothesis}\\ @textit{other hypothesis}}
+            @${@textit{deduction}}
+            @${@textsc{Rule-Name}}]
+
+Metafunctions (i.e. functions which operate on types as syntactical elements,
+or on other terms of the language) are written in a roman font. The meta-values
+@|metatrue| and @|metafalse| indicate logical truth and falsehood respectively.
+
+@$${\mathrm{metafunction}(x,y) = \begin{cases}
+ @metatrue &@textif x = y + 1\\
+ @metafalse &@otherwise
+ \end{cases}}
+
+Language operators are written in bold face:
+
+@cases["e" #:first-sep "⩴"
+       @acase{@num-e}
+       @acase{…}]
+
+Values are written using a bold italic font:
+
+@cases["v" #:first-sep "⩴"
+       @acase{@num-v}
+       @acase{…}]
+
+Type names start with a capital letter, and are written using a bold font:
+
+@cases["τ,σ" #:first-sep "⩴"
+       @acase{@num-τ}
+       @acase{…}]
 
 We indicate the syntactical substitution of @${y} with @${z} in @${w} using
 the notation @${w@subst[y ↦ z]}. When given several elements to replace, the
-substitution operator performs a parallel substitution (that is, @${
- w@subst[x ↦ y y ↦ z]} will not replace the occurrences of @${y} introduced by
+substitution operator performs a parallel substitution (that is,
+@${w@subst[x ↦ y y ↦ z]} will not replace the occurrences of @${y} introduced by
 the first substitution).
+
+@todo{Succinctly describe the other conventions used in the thesis, if any
+ were omitted above.}
+
+@todo{Define the meta substitution and equality operators precisely.}
 
 @subsubsub*section{Expressions}
 
@@ -167,6 +254,7 @@ contexts:
 
 @include-equation["GammaR.rkt" Γ]
 
+@deftech[#:key "R-typing-info"]{}
 @include-equation["GammaR.rkt" R]
 
 The @Γ[⊢ e R] typing judgement indicates that the expression @${e} has type
