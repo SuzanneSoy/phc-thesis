@@ -1,15 +1,15 @@
 #lang at-exp racket
-@(provide (except-out (all-defined-out)
-                      num-e*
-                      num-τ*
-                      List…τ*
-                      Λc*
-                      Λf*))
+(provide (except-out (all-defined-out)
+                     num-e*
+                     num-τ*
+                     List…τ*
+                     Λc*
+                     Λf*))
+
 @require["util.rkt"
          (only-in scribble/base emph)
          scriblib/render-cond
          (for-label (only-meta-in 0 typed/racket))]
-
 
 @(require racket/list
           (for-syntax racket/base syntax/parse racket/list))
@@ -122,8 +122,12 @@
 (define-syntax ∀r* (defop @${\mathbf{∀}}))
 (define-syntax-rule (∀r (α ...) τ)
   (∀r* @${(@(add-between (list (stringify α) ...) "\\ "))} τ))
-(define-syntax ∀c (defop @${\mathbf{∀}_{@textbf{c}}}))
-(define-syntax ∀f (defop @${\mathbf{∀}_{@textbf{f}}}))
+(define-syntax ∀c* (defop @${\mathbf{∀}_{@textbf{c}}}))
+(define-syntax ∀f* (defop @${\mathbf{∀}_{@textbf{f}}}))
+(define-syntax-rule (∀c (ρ ...) τ)
+  (∀c* @${(@(add-between (list (stringify ρ) ...) "\\ "))} τ))
+(define-syntax-rule (∀f (ρ ...) τ)
+  (∀f* @${(@(add-between (list (stringify ρ) ...) "\\ "))} τ))
 (define-syntax-rule (ctor-pred c)
   @${@(stringify c)@textbf{?}})
 (define-syntax-rule (record-pred . f*)
@@ -174,7 +178,7 @@
 (define-syntax-rule (f→ (from ...) R)
   @${(@(add-between (list @(stringify from) ...) "\\ ") \mathbf{→} @(stringify R))})
 (define-syntax-rule (f* (from ... rest*) R)
-  (f→ (from ... @${\ \mathbf{.}\ } rest*) R))
+  (f→ (from ... @${\ \mathbf{.}\ } @${@(stringify rest*)@mathbm{*}}) R))
 (define-syntax-rule (f… (from ... polydot) R)
   (f→ (from ... @${\ \mathbf{.}\ } polydot) R))
 (define-syntax (R stx)

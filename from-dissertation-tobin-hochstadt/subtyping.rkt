@@ -123,8 +123,8 @@
   @repeated{@<:[σ_a τ_a]} \\
   @<:[σ τ] \\
   @<:R[R @${@R'}]}
- @${@<:[@f*[(@repeated{τ_a} τ*) R]
-        @f*[(@repeated{σ_a} σ*) @${@R'}]]}
+ @${@<:[@f*[(@repeated{τ_a} τ) R]
+        @f*[(@repeated{σ_a} σ) @${@R'}]]}
  @${@textsc{S-Fun*}}]
 
 #:S-Fun*-Fixed
@@ -134,7 +134,7 @@
   @repeated{@<:[σ_a τ_a]} \\
   @repeated{@<:[σᵢ τ]} \\
   @<:R[R @${@R'}]}
- @${@<:[@f*[(@repeated{τ_a} τ*) R]
+ @${@<:[@f*[(@repeated{τ_a} τ) R]
         @f→[(@repeated{σ_a} @repeated{σᵢ}) @${@R'}]]}
  @${@textsc{S-Fun*-Fixed}}]
 
@@ -146,8 +146,8 @@
   @repeated{@<:[σᵢ τ]} \\
   @<:[σ τ] \\
   @<:R[R @${@R'}]}
- @${@<:[@f*[(@repeated{τ_a} τ*) R]
-        @f*[(@repeated{σ_a} @repeated{σᵢ} σ*) @${@R'}]]}
+ @${@<:[@f*[(@repeated{τ_a} τ) R]
+        @f*[(@repeated{σ_a} @repeated{σᵢ} σ) @${@R'}]]}
  @${@textsc{S-Fun*-Fixed*}}]
 
 #:S-DFun
@@ -185,7 +185,7 @@
   @<:[σ @${τ[α ↦ ⊤]}] \\
   @<:R[R @${@R'}]}
  @${@<:[@∀r[(@polydotα[α]) @f…[(@repeated{τ_a} @polydot[τ α]) R]]
-        @f*[(@repeated{σ_a} σ*) @${@R'}]]}
+        @f*[(@repeated{σ_a} σ) @${@R'}]]}
  @${@textsc{S-DFun-Fun*}}]
 
 #:S-UnionSuper

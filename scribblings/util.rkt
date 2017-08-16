@@ -12,6 +12,7 @@
          citet
          generate-bibliography-section
          (rename-out [note* note])
+         note.
          define-footnote ;; TODO: does not use the (superscript …)
          (all-from-out "abbreviations.rkt")
          (all-from-out scribble-math)
@@ -214,6 +215,11 @@ html .MathJax_Display, html div.MathJax_Preview {
                         (list (superscript c) ~ content))))]
    [latex (apply note content)]
    [else (apply note content)]))
+
+(define (note. . content)
+  ;; TODO: move the . a bit to the left, or place the footnote number
+  ;; after it, also shifted a bit to the left.
+  (list (apply note* content) "."))
 
 (define-runtime-path bib-path "bibliography.bib")
 (define-bibtex-cite bib-path

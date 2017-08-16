@@ -116,7 +116,7 @@
 
 @$inferrule[@${@Γ[@repeated{x:σ} @${x_r:@Listofτ[σ_r]} ⊢ e @R[τ φ⁺ φ⁻ o]]}
             @${@Γ[⊢ @λe[(@repeated{x:σ} @${\ .\ } @${x_r:σ_r*}) e]
-                  @R[(f→ (@repeated{σ})
+                  @R[(f* (@repeated{σ} σ_r)
                          @R[τ
                             ϵ
                             ϵ

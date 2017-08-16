@@ -8,14 +8,12 @@
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Types (with ρ)}
 
-@$${
- @cases["σ,τ" #:first-sep "⩴"
-        @acase{…}
-        @acase{@ctor[@κof[τ]]} @; same
-        @acase{@record[@ςf]} @; changed
-        @acase{@∀c[@${(@repeated{@ρc})} τ]} @; new
-        @acase{@∀f[@${(@repeated{@ρf})} τ]}] @; new
-}
+@cases["σ,τ" #:first-sep "⩴"
+       @acase{…}
+       @acase{@ctor[@κof[τ]]} @; same
+       @acase{@record[@ςf]} @; changed
+       @acase{@∀c[(@repeated{@ρc}) τ]} @; new
+       @acase{@∀f[(@repeated{@ρf}) τ]}] @; new
 
 @; new↓
 
@@ -36,16 +34,8 @@ constructors in the row type can be specified on variants.
 @; new
 @cases[@ςc #:first-sep "⩴"
        @acase{@repeatset{@κof[τ]}}
-       @acase{@ρc @repeatset{-@|κ|ᵢ} @repeatset{+@κof[ⱼ τⱼ]}
-        @;@where \{@repeated{@|κ|ᵢ}\} ≠ \{@repeated{@|κ|ⱼ}\} ∀ i ≠ j
-        }]
-
-@todo{Notation to indicate that all present and absent fields (resp.
- constructors) are different, including between the two (present vs absent)
- sets.}
+       @acase{@|ρc|\ @repeatset{-@|κ|ᵢ}\ @repeatset{+@κof[ⱼ τⱼ]}}]
 
 @cases[@ςf #:first-sep "⩴"
        @acase{@repeatset{@|ɐ|:τ}}
-       @acase{@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}
-        @;@where \{@repeated{@|ɐ|ᵢ}\} ≠ \{@repeated{@|ɐ|ⱼ}\} ∀ i ≠ j
-        }]
+       @acase{@|ρf|\ @repeatset{-@|ɐ|ᵢ}\ @repeatset{+@|ɐ|ⱼ:τⱼ}}]

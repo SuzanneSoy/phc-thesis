@@ -14,7 +14,7 @@
        @acase{@symτ[@sym*] @tag*{symbol singleton}}
        @acase{@Symbolτ @tag*{any symbol}}
        @acase{@f→[(@repeated{τ}) R] @tag*{function}}
-       @acase{@f*[(@repeated{τ} @${τ*}) R] @tag*{variadic function}}
+       @acase{@f*[(@repeated{τ} τ) R] @tag*{variadic function}}
        @acase{@f…[(@repeated{τ} @polydot[τ α]) R]
         @tag*{variadic polymorphic function}}
        @acase{@∀r[(@repeated{α}) τ]@tag*{polymorphic type}}

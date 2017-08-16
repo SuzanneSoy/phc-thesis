@@ -8,29 +8,22 @@
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Type validity rules (with ρ)}
 
-@$${
- @$inferrule[
- @${Δ ∪ \{ @repeated{@ρc} \} ⊢ τ}
- @${Δ ⊢ (∀_c (@repeated{@ρc}) τ)}
- @${@textsc{TE-CAll}}
- ]
-}
+@$inferrule[@${Δ ∪ \{ @repeated{@ρc} \} ⊢ τ}
+            @${Δ ⊢ @∀c[(@repeated{@ρc}) τ]}
+            @${@textsc{TE-CAll}}]
 
-@$${
- @$inferrule[
- @${Δ ∪ \{ @repeated{@ρf} \} ⊢ τ}
- @${Δ ⊢ (∀_f (@repeated{@ρf}) τ)}
- @${@textsc{TE-FAll}}
- ]
-}
+@$inferrule[@${Δ ∪ \{ @repeated{@ρf} \} ⊢ τ}
+            @${Δ ⊢ @∀f[(@repeated{@ρf}) τ]}
+            @${@textsc{TE-FAll}}]
 
-@$${
- @$inferrule[
- @${@ρf ∈ Δ \\ \{@repeated{@|ɐ|ᵢ}\} n \{@repeated{@|ɐ|ⱼ}\} = ∅ \\ @alldifferent(@repeated{@|ɐ|ᵢ}) \\ @alldifferent(@repeated{@|ɐ|ⱼ})}
+
+@$inferrule[
+ @${@ρc ∈ Δ \\
+  \{@repeated{@|ɐ|ᵢ}\} ∩ \{@repeated{@|ɐ|ⱼ}\} = ∅ \\
+  @alldifferent(@repeated{@|ɐ|ᵢ}) \\
+  @alldifferent(@repeated{@|ɐ|ⱼ})}
  @${Δ ⊢ @record[@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}]}
- @${@textsc{TE-FXYZ}}
- ]
-}
+ @${@textsc{TE-FAllDifferent}}]
 
 where
 
@@ -40,6 +33,14 @@ where
  @alldifferent(@repeated{y}) &= @metafalse @otherwise
  \end{aligned}
 }
+
+@$inferrule[
+ @${@ρf ∈ Δ \\
+  \{@repeated{@|ɐ|ᵢ}\} ∩ \{@repeated{@|ɐ|ⱼ}\} = ∅ \\
+  @alldifferent(@repeated{@|ɐ|ᵢ}) \\
+  @alldifferent(@repeated{@|ɐ|ⱼ})}
+ @${Δ ⊢ @record[@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}]}
+ @${@textsc{TE-FAllDifferent}}]
 
 @;{TODO: if we extend rows with subtraction, we may need to allow it either in
  function types or within bodies too.

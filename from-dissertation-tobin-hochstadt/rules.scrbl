@@ -164,6 +164,23 @@ the first substitution).
 
 @todo{Define the meta substitution and equality operators precisely.}
 
+@subsubsub*section{Names and bindings}
+
+In the following sections, we assume that all type variable names which occur
+in binding positions are unique. This assumption could be made irrelevant by
+explicitly renaming in the rules below all type variables to fresh unique
+ones. Performing this substitution would be a way of encoding a notion of
+scope and the possibility for one identifier to hide another. However, the
+Racket language features macros which routinely produce new binding forms. The
+macro system in Racket is a hygienic one, and relies on a powerful model of
+the notion of scope@~cite["flatt2016binding"]. Extending the rules below with
+a simplistic model of Racket's notion of scope would not do justice to the
+actual system, and would needlessly complicate the rules. Furthermore,
+@typedracket only typechecks fully-expanded programs. In these programs, the
+binding of each identifier has normally been determined@note.{@Typedracket
+ actually still determines the binding for type variables by itself, but we
+ consider this is an implementation detail.}
+
 @subsubsub*section{Expressions}
 
 The following expressions are available in the subset of @typedracket which we

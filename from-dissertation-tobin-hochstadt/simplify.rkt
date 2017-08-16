@@ -30,8 +30,8 @@
  \begin{aligned}
  @simplify[@f→[(@repeated{τ}) R]]
  &= @f→[(@repeated{@simplify[τ]}) @simplify[R]] \\
- @simplify[@f*[(@repeated{τ} @${τ*}) R]]
- &= @f*[(@repeated{@simplify[τ]} @simplify[τ*]) @simplify[R]]\\
+ @simplify[@f*[(@repeated{τ} τ) R]]
+ &= @f*[(@repeated{@simplify[τ]} @simplify[τ]) @simplify[R]]\\
  @simplify[@f…[(@repeated{τ} @polydot[τ α]) R]]
  &= @f…[(@repeated{@simplify[τ]} @polydot[@simplify[τ] α]) @simplify[R]]\\
  @simplify[@∀r[(@repeated{α}) τ]]
