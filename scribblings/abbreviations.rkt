@@ -1,7 +1,7 @@
 #lang at-exp racket
-(provide typedracket Typedracket csharp CAML CLOS NIT CPP DeBruijn HOAS PHOAS
-         monocecil dotnet DLL nanopass nanopass-c-f haskell haskell98 Hackett
-         turnstile Turnstile cur Cur LaTeX C-language java lisp)
+(provide typedracket Typedracket csharp CAML OCAML CLOS NIT CPP DeBruijn HOAS
+         PHOAS monocecil dotnet DLL nanopass nanopass-c-f haskell haskell98
+         Hackett turnstile Turnstile cur Cur LaTeX C-language java lisp)
 
 (require scribble/base
          scribble/core
@@ -26,6 +26,7 @@
 (define nanopass "Nanopass")
 (define nanopass-c-f "Nanopass Compiler Framework")
 (define CAML "CAML")
+(define OCAML "CAML")
 (define CLOS "CLOS")
 (define NIT "NIT")
 (define CPP "C++")
@@ -36,7 +37,7 @@
 (define monocecil @tt{"Mono.Cecil"})
 (define dotnet ".NET")
 (define DLL "DLL")
-(define haskell "haskell")
+(define haskell "Haskell")
 (define haskell98 "Haskell 98")
 (define Hackett "Hackett")
 (define turnstile "Turnstile")
