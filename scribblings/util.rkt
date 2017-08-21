@@ -694,7 +694,7 @@ EOCSS
    [else ($ "\\bm{\\mathit{" l "}}")]))
 (define (mathbm . l)
   (cond-element
-   [html ($ "{\\mathbf " l "}")]
+   [html ($ "{\\mathbf{" l "}}")]
    [else ($ "\\bm{\\mathrm{" l "}}")]))
 (define (textit . l) ($ (mathtext "\\textit{" l "}")))
 (define (textrm . l) ($ (mathtext "\\textrm{" l "}")))

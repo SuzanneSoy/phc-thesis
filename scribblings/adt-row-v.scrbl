@@ -10,5 +10,5 @@
 
 @cases["v" #:first-sep "⩴"
        @acase{…}
-       @acase{@ctor[@κ v]@tag*{constructor instance}}
-       @acase{@record[@repeated{@|ɐ|ᵢ = vᵢ}]@tag*{record instance}}]
+       @acase{@ctorv[@κ v]@tag*{constructor instance}}
+       @acase{@recordv[@repeated{@|ɐ|ᵢ = vᵢ}]@tag*{record instance}}]

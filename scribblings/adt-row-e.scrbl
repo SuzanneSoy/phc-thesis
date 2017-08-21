@@ -22,7 +22,7 @@ the value stored in an instance of a constructor.
 @cases*[
  "e" #:first-sep "⩴"
  @acase{…}
- @acase{@ctor[@κ e]@tag*{constructor instance}}
+ @acase{@ctore[@κ e]@tag*{constructor instance}}
  @acase{(@ctor-pred[@κ]\ e)@tag*{constructor predicate}}
  @acase{(@ctor-val[@κ]\ e)@tag*{constructor value access}}
  @interpar{
@@ -39,11 +39,11 @@ the value stored in an instance of a constructor.
   the @ɐ field.
  }
  @acase{…}
- @acase{@record[@repeated{@↦e[@${@|ɐ|ᵢ} eᵢ]}]@tag*{record instance}}
+ @acase{@recorde[@repeated{@↦e[@${@|ɐ|ᵢ} eᵢ]}]@tag*{record instance}}
  @acase{(@record-pred[@repeatset{@|ɐ|ᵢ}]\ e)@tag*{record predicate}}
  @acase{(@record-pred*[@repeatset{@|ɐ|ᵢ} @repeatset{-@|ɐ|ⱼ}]\ e)
   @tag*{row-record predicate}}@;added
- @acase{e.@|ɐ|@tag*{record field access}}
+ @acase{@record-gete[e @|ɐ|]@tag*{record field access}}
  @acase{@opwith[e @|ɐ| e]@tag*{record update (new/change field)}}
  @acase{@opwithout[e @|ɐ|]@tag*{record update (remove field)}}
  @interpar{

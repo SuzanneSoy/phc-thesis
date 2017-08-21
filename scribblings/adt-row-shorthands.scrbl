@@ -9,20 +9,20 @@
        #:version (version-text)]{Shorthands (with ρ)}
 
 The polymorphic builder function for the @κ constructor which
-intuitively corresponds to @ctor[κ] can be written as the η-expansion of the
-@ctor[κ e] operator:
+intuitively corresponds to @ctore[κ] can be written as the η-expansion of the
+@ctore[κ e] operator:
 
-@$${(Λ (α) (λ ([x : α]) @ctor[κ x]))}
+@$${@Λe[(α) @λe[(@${x : α}) @ctore[κ x]]]}
 
 The same applies to the predicate form of constructors:
 
-@$${(λ ([x : ⊤]) (@ctor-pred[κ] x))}
+@$${@λe[(@${x : ⊤}) @app[@ctor-pred[κ] x]]}
 
 The same applies to the accessor for a constructor's encapsulated value:
 
-@$${(Λ (α) (λ ([x : @ctor[κ α]]) (@ctor-val[κ] α))}
+@$${@Λe[(α) @λe[(@${x : @ctorτ[κ α]}) @app[@ctor-val[κ] x]]]}
 
-As a convenience, we will write @ctor[κ], @ctor-pred[κ] and @ctor-val[κ] as a
+As a convenience, we will write @ctore[κ], @ctor-pred[κ] and @ctor-val[κ] as a
 shorthand for the above lambda functions.
 
 As per the typing rules given in @secref{adt-row-trules}, these functions have
@@ -31,25 +31,21 @@ the following types:
 @htodo{The rules below are the same??? Probably an unfinished copy-paste}
 
 @$inferrule[-
-            @${Γ ⊢ @ctor[κ] : (∀ (α) (α → @ctor[κ α])) ; ϵ|⊥ ; ∅}
-            @${@textsc{T-Abs}}]
-
-@$inferrule[-
-            @${Γ ⊢ @ctor[κ] : (∀ (α) (α → @ctor[κ α])) ; ϵ|⊥ ; ∅}
-            @${…}]
+            @${Γ ⊢ @ctorτ[κ] : @∀r[(α) @f→[(α) @R[@ctorτ[κ α] ϵ ⊥ ∅]]]}
+            @${@textsc{T-Shorthand-Ctor}}]
 
 @todo{Write their types here too.}
 
 
 The polymorphic builder function for a record which
-intuitively corresponds to @record[@repeated{@ɐ}] can be written as the
-η-expansion of the @record[@repeated{@ɐ = e}] operator:
+intuitively corresponds to @recorde[@repeated{@ɐ}] can be written as the
+η-expansion of the @recorde[@repeated{@ɐ = e}] operator:
 
 @$${
- (Λ (@repeated{αᵢ}) (λ (@repeated{[xᵢ : αᵢ]}) @record[@repeated{@|ɐ|ᵢ = xᵢ}]))
+ @Λe[(@repeated{αᵢ}) @λe[(@repeated{xᵢ : αᵢ}) @recorde[@repeated{@|ɐ|ᵢ = xᵢ}]]]
 }
 
-The same applies to the predicate form of records:
+The same applies to the predicate forms of record types:
 
 @;{
  @$${
@@ -57,22 +53,25 @@ The same applies to the predicate form of records:
    &(λ ([x : ⊤])\\
    &\quad(Λ (@repeated{αᵢ})\\
    &\qquad(λ (@repeated{[pᵢ : (⊤ \xrightarrow[∅]{αᵢ|\overline{αᵢ}} Boolean)]})\\
-   &\qquad\quad(@record-pred[@repeated{@|ɐ|ᵢ ? pᵢ}] x))}\\
+   &\qquad\quad(@record-pred[@repeatset{@|ɐ|ᵢ ? pᵢ}] x))}\\
  }
 }
 
 @$${
- @aligned{
-  &(λ ([x : ⊤])\\
-  &\quad(@record-pred[@repeated{@|ɐ|ᵢ}] x))}\\
+ \begin{gathered}
+ @λe[(@${x : ⊤}) @app[@record-pred[@repeatset{@|ɐ|ᵢ}] x]] \\
+ @λe[(@${x : ⊤}) @app[@record-pred*[@repeatset{@|ɐ|ᵢ} @repeatset{-@|ɐ|ⱼ}] x]]
+ \end{gathered}
 }
 
-The same applies to the accessor for a constructor's encapsulated value:
+The same applies to the accessor for a field of a record:
 
-@$${(Λ (α) (λ ([x : @ctor[κ α]]) (@ctor-val[κ] α))}
+@$${@Λe[(α) @Λfe[(@ρf) @λe[(@${x : @recorde[@ρf @${+@|ɐ|:τ}]})
+                           @record-gete[x @ɐ]]]]}
 
 @todo{Write their types here too.}
 
-As a convenience, we will write @ctor[κ], @ctor-pred[κ] and @ctor-val[κ] as a
-shorthand for the above lambda functions.
-
+As a convenience, we will write @recorde[@repeated{@ɐ}],
+@record-pred[@repeatset{@|ɐ|ᵢ}],
+@record-pred[@repeatset{@|ɐ|ᵢ} @repeatset{-@|ɐ|ⱼ}] and @record-gete[ɐ] as
+shorthands for the above lambda functions.

@@ -289,7 +289,7 @@
 
 @aligned{
  @restrict(τ, σ) &= ⊥ &@textif @no-overlap(τ,σ)\\
- @restrict((⋃ @repeatset{τ}), σ) &= (⋃ @repeatset{@restrict(τ,σ)}) &\\
+ @restrict(@un[@repeatset{τ}], σ) &= @un[@repeatset{@restrict(τ,σ)}] &\\
  @restrict(τ, σ) &= τ &@textif @<:[τ σ]\\
  @restrict(τ, σ) &= σ &@otherwise
 }
@@ -298,7 +298,7 @@
 
 @aligned{
  @remove(τ, σ) &= ⊥ &@textif @<:[τ σ] \\
- @remove((⋃ @repeatset{τ}), σ) &= (⋃ @repeatset{@remove(τ,σ)}) &\\
+ @remove(@un[@repeatset{τ}], σ) &= @un[@repeatset{@remove(τ,σ)}] &\\
  @remove(τ, σ) &= τ &@otherwise
 }
 
@@ -306,11 +306,11 @@
 
 @aligned{
  @no-overlap(τ, τ′) &= @metatrue
- &&@textif ∄ σ .
- \quad @<:[σ τ]\quad
- ∧ \quad@<:[σ τ′]\quad
- ∧ \quadΔ ⊢ σ\quad
- ∧ \quad@≠:[σ ⊥]\\
+ &&@textif ∄ σ .\begin{aligned}[t]
+  &@<:[σ τ]\\
+  {}\mathbin{∧}{} &@<:[σ τ′]\\
+  {}\mathbin{∧}{} &Δ ⊢ σ\\
+  {}\mathbin{∧}{} &@≠:[σ ⊥]\end{aligned}\\
  @no-overlap(τ, σ) &= @metafalse
  &&@otherwise
 }

@@ -17,13 +17,12 @@
             @${@textsc{TE-FAll}}]
 
 
-@$inferrule[
- @${@ρc ∈ Δ \\
-  \{@repeated{@|ɐ|ᵢ}\} ∩ \{@repeated{@|ɐ|ⱼ}\} = ∅ \\
-  @alldifferent(@repeated{@|ɐ|ᵢ}) \\
-  @alldifferent(@repeated{@|ɐ|ⱼ})}
- @${Δ ⊢ @record[@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}]}
- @${@textsc{TE-FAllDifferent}}]
+@$inferrule[@${@ρc ∈ Δ \\
+             \{@repeated{@|κ|ᵢ}\} ∩ \{@repeated{@|κ|ⱼ}\} = ∅ \\
+             @alldifferent(@repeated{@|κ|ᵢ}) \\
+             @alldifferent(@repeated{@|κ|ⱼ})}
+            @${Δ ⊢ @variantτ[@ρc @repeatset{-@|κ|ᵢ} @repeatset{+@κof[ⱼ τⱼ]}]}
+            @${@textsc{TE-CVariant}}]
 
 where
 
@@ -34,47 +33,24 @@ where
  \end{aligned}
 }
 
-@$inferrule[
- @${@ρf ∈ Δ \\
-  \{@repeated{@|ɐ|ᵢ}\} ∩ \{@repeated{@|ɐ|ⱼ}\} = ∅ \\
-  @alldifferent(@repeated{@|ɐ|ᵢ}) \\
-  @alldifferent(@repeated{@|ɐ|ⱼ})}
- @${Δ ⊢ @record[@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}]}
- @${@textsc{TE-FAllDifferent}}]
+@$inferrule[@${@ρf ∈ Δ \\
+             \{@repeated{@|ɐ|ᵢ}\} ∩ \{@repeated{@|ɐ|ⱼ}\} = ∅ \\
+             @alldifferent(@repeated{@|ɐ|ᵢ}) \\
+             @alldifferent(@repeated{@|ɐ|ⱼ}) \\
+             @repeated{Δ ⊢ τⱼ}}
+            @${Δ ⊢ @recordτ[@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}]}
+            @${@textsc{TE-FRecord}}]
 
-@;{TODO: if we extend rows with subtraction, we may need to allow it either in
- function types or within bodies too.
-   
- @$${
-  @$inferrule[
- @${Δ ∪ \{ @ρc \} ⊢ τ}
- @${Δ ⊢ ???}
- @${@textsc{TE-CFun}}
- ]
- }
+@$inferrule[@${@alldifferent(@repeated{@|κ|ᵢ}) \\
+             @repeated{Δ ⊢ τᵢ}}
+            @${Δ ⊢ @variantτ[@repeated{@ctorτ[@κof[ᵢ τᵢ]]}]}
+            @${@textsc{TE-Variant}}]
 
- @$${
-  @$inferrule[
- @${Δ ∪ \{ @ρf \} ⊢ τ}
- @${Δ ⊢ ???}
- @${@textsc{TE-FFun}}
- ]
- }
-}
+@$inferrule[@${@alldifferent(@repeated{@|ɐ|ᵢ}) \\
+             @repeated{Δ ⊢ τᵢ}}
+            @${Δ ⊢ @recordτ[@repeated{@|ɐ|ᵢ : τᵢ}]}
+            @${@textsc{TE-Record}}]
 
-@$${
- @$inferrule[
- @${@ρc ∈ Δ \\ @repeated{Δ ⊢ τᵢ}}
- @${Δ ⊢ @variant[@repeated{@ctor[@|κ|ᵢ τᵢ]} @ρc]}
- @${@textsc{TE-CVariant}}
- ]
-}
-
-@$${
- @$inferrule[
- @${@ρf ∈ Δ \\ @repeated{Δ ⊢ τᵢ}}
- @${Δ ⊢ @record[@repeated{@|ɐ|ᵢ : τᵢ} @ρf]}
- @${@textsc{TE-FRecord}}
- ]
-}
-
+@$inferrule[@${@repeated{Δ ⊢ τ}}
+            @${Δ ⊢ @ctorτ[@κof[τ]]}
+            @${@textsc{TE-Ctor}}]

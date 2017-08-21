@@ -14,6 +14,17 @@ from@~cite[#:precision "pp. 62, 72 and 92" "tobin-hochstadt_typed_2010"].
 
 @require["adt-utils.rkt"]
 
+@subsubsub*section{Notations}
+
+We use the same notations as in
+@secref["from-dissertation-tobin-hochstadt"
+        #:doc '(lib "phc-thesis/scribblings/phc-thesis.scrbl")]. Additionally,
+we use @ρc to denote a row type variable abstracting over a set of constructors,
+and we use @ρf to denote a row type variable abstracting over a set of fields.
+The occurrences of @${c} and @${f} in this context are purely syntactical, and
+only serve the purpose of distinguishing between the two notations — the one for
+constructors, and the one for fields.
+
 We define the universe of constructor names @${𝒞} as being equivalent to the
 set of strings of unicode characters@htodo{Check in the implementation that
  this is not equivalent to the set of symbols, as these cannot be serialised.},

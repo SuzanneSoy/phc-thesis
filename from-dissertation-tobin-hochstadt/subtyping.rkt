@@ -192,14 +192,14 @@
 
 @$inferrule[
  @${∃ i . @<:[τ @${σᵢ}]}
- @${@<:[τ @${⋃ @repeated{σᵢ}}]}
+ @${@<:[τ @un[@repeated{σᵢ}]]}
  @${@textsc{S-UnionSuper}}]
 
 #:S-UnionSub
 
 @$inferrule[
  @${@repeated[@<:[τᵢ @${σ}]]}
- @${@<:[@${⋃ @repeated{τᵢ}} σ]}
+ @${@<:[@un[@repeated{τᵢ}] σ]}
  @${@textsc{S-UnionSub}}]
 
 #:S-Pair

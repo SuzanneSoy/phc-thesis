@@ -701,6 +701,8 @@ The @update operator can then apply @restrict to perform the intersection of
 the type indicated by the @|ifop|'s condition and the currently-known type for
 the subpart of the considered variable.
 
+@todo{How do @restrict and @remove behave on intersections?}
+
 @include-equation["trules.rkt" restrict]
 
 The @update operator can also apply

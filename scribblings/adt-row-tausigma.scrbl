@@ -24,8 +24,8 @@ constructors or fields.
 
 @cases["σ,τ" #:first-sep "⩴"
        @acase{…}
-       @acase{@ctor[@κof[τ]]@tag*{constructor}} @; same
-       @acase{@record[@ςf]@tag*{possibly row-polymorphic record}} @; changed
+       @acase{@ctorτ[@κof[τ]]@tag*{constructor}} @; same
+       @acase{@recordτ[@ςf]@tag*{possibly row-polymorphic record}} @; changed
        @acase{@∀c[(@repeated{@ρc}) τ]
         @tag*{row-polymorphic abstraction (constructors)}} @; new
        @acase{@∀f[(@repeated{@ρf}) τ]
@@ -44,7 +44,7 @@ constructors in the row type can be specified on variants.
 
 @cases["σ,τ" #:first-sep "⩴"
        @acase{…}
-       @acase{@variant[@ςf]
+       @acase{@variantτ[@ςf]
         @tag*{possibly row-polymorphic variant}}] @; new/changed
 
 A variant acts as the union of multiple constructor types. The variant type

@@ -57,7 +57,9 @@
 (define (spaces . l)
   (add-between l "\\ "))
 
-(define-syntax ctor (defop "ctor"))
+(define-syntax ctorτ (defop "Ctor"))
+(define-syntax ctorv (defvop "ctor"))
+(define-syntax ctore (defop "ctor"))
 (define κ @${κ})
 (define-syntax κof
   (syntax-rules ()
@@ -75,8 +77,10 @@
 (define-syntax ctorTop (defop "CtorTop"))
 (define-syntax-rule (ctor-val κ)
   @${\mathbf{getval}_@κ})
-(define-syntax record (defop "record"))
-(define-syntax variant (defop "V"))
+(define-syntax recordτ (defop "Record"))
+(define-syntax recordv (defvop "record"))
+(define-syntax recorde (defop "record"))
+(define-syntax variantτ (defop "V"))
 (define-syntax ifop (defop "if"))
 (define-syntax mapop (defop "map"))
 (define-syntax-rule (λv (arg ...) expr)
@@ -103,7 +107,7 @@
   @${\{@(apply repeatset l)\}})
 (define |P| @${\ |\ })
 (define ρc @${ρ_{c}})
-(define ρf @${ρ_{f}})
+(define ρf @${ϱ_{f}})
 (define ςc @${ς_{c}})
 (define ςf @${ς_{f}})
 (define-syntax at (defop "@"))
@@ -130,6 +134,10 @@
   (∀f* @${(@(add-between (list (stringify ρ) ...) "\\ "))} τ))
 (define-syntax-rule (ctor-pred c)
   @${@(stringify c)@textbf{?}})
+(define-syntax record-gete
+  (syntax-rules ()
+    [(_ e ɐ) @${@(stringify e).@(stringify ɐ)}]
+    [(_ ɐ) @${.@(stringify ɐ)}]))
 (define-syntax-rule (record-pred . f*)
   @${(@textbf{record?}\ @(stringify . f*))})
 (define-syntax-rule (record-pred* . f*)
@@ -185,9 +193,9 @@
 (define-syntax (R stx)
   (syntax-case stx ()
     [(_ to φ⁺ φ⁻ o)
-     #'@${\mathbf{❲}@(stringify to)
-      \;\mathbf{;}\; @(stringify φ⁺) \mathbf{{/}} @(stringify φ⁻)
-      \;\mathbf{;}\; @(stringify o)❳}]
+     #'@${@mathbm{❲}@(stringify to)
+      \;@mathbm{;}\; @(stringify φ⁺) @mathbm{{/}} @(stringify φ⁻)
+      \;@mathbm{;}\; @(stringify o)@mathbm{❳}}]
     [self (identifier? #'self)
      #'@${\mathrm{R}}]))
 
@@ -316,4 +324,5 @@
        tmp)]))
 
 (define δe @${δ_{\mathrm{e}}})
-(define alldifferent @${\operatorname{alldifferent}})
+(define alldifferent @${\operatorname{AllDifferent}})
+(define disjoint-sets @${\operatorname{DisjointSets}})
