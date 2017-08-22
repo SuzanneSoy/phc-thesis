@@ -37,11 +37,17 @@
      @recordτ[@|ρf| @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τ'ⱼ}]]
  @${@textsc{S-RecordF}}]
 
-@$inferrule[
- @${@repeated{@<:[τₖ τ′ₖ]}}
- @<:[@recordτ[@|ρf| @repeatset{-@|ɐ|ᵢ} @repeatset{-@|ɐ|ⱼ} @repeatset{+@|ɐ|ₖ:τₖ}]
-     @recordτ[@|ρf| @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ₖ:τ'ₖ}]]
- @${@textsc{S-FRecordF}}]
+@$inferrule[@${@repeated{@<:[τₖ τ′ₖ]}}
+            @<:[@recordτ[@|ρf|
+                         @repeatset{-@|ɐ|ᵢ}
+                         @repeatset{-@|ɐ|ⱼ}
+                         @repeatset{+@|ɐ|ₖ:τₖ}
+                         @repeatset{+@|ɐ|ₗ:τₗ}]
+                @recordτ[@|ρf|
+                         @repeatset{-@|ɐ|ᵢ}
+                         @repeatset{+@|ɐ|ₖ:τ'ₖ}]]
+            #:wide #t
+            @${@textsc{S-FRecordF}}]
 
 @$inferrule[@${@<:[@${τ[@repeated{@|ρf|ᵢ ↦ @|ρf|′ᵢ}]} σ]}
             @${@<:[@∀f[(@repeated{@|ρf|ᵢ}) τ]

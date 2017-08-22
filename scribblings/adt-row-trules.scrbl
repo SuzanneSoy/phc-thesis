@@ -50,28 +50,21 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    = @applyfilter(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val},
    τ, o)}
  @${Γ ⊢ (@ctor-val[@κ]\ e) : τ' ; φ_r ; o_r}
- @${@textsc{T-Ctor-Val}}
- ]
+ @${@textsc{T-Ctor-Val}}]
 }
 
-@$${
- @$inferrule[
+@$inferrule[
  @${@repeated{Γ ⊢ eᵢ : τᵢ ; φᵢ ; oᵢ}}
  @${Γ ⊢ @recorde[@repeated{@|ɐ|ᵢ = eᵢ}]
-   : @recordτ[@repeated{@|ɐ|ᵢ : τᵢ}]; ϵ|⊥ ; ∅}
- @${@textsc{T-Record-Build}}
- ]
-}
+  : @recordτ[@repeated{@|ɐ|ᵢ : τᵢ}]; ϵ|⊥ ; ∅}
+ @${@textsc{T-Record-Build}}]
 
-@$${
- @$inferrule[
+@$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\
-   φ_r = @applyfilter(@recordτ[@repeated{@|ɐ|ᵢ : ⊤}]
-   |\overline{@recordτ[@repeated{@|ɐ|ᵢ : ⊤}]}, τ, o)}
+  φ_r = @applyfilter(@recordτ[@repeated{@|ɐ|ᵢ : ⊤}]
+  |\overline{@recordτ[@repeated{@|ɐ|ᵢ : ⊤}]}, τ, o)}
  @${Γ ⊢ (@record-pred[@repeated{@|ɐ|ᵢ}] e) : Boolean ; φ_r ; ∅}
- @${@textsc{T-Record-Pred}}
- ]
-}
+ @${@textsc{T-Record-Pred}}]
 
 @$${
  @cond-element[[latex @list{\let\savedamp&}] [else ""]]
@@ -85,61 +78,52 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    = @applyfilter(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}},
    τ, o)}
  @${Γ ⊢ e.@|ɐ|ⱼ : τ' ; φ_r ; o_r}
- @${@textsc{T-Record-GetField}}
- ]
+ @${@textsc{T-Record-GetField}}]
 }
 
-@$${
- @$inferrule[
+@$inferrule[
  @${
-   Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
-   τ_{r} <: @recordτ[@repeated{@|ɐ|ᵢ : τ'ᵢ}
-                     @${@ρf - \{@repeated{@|ɐ|'ⱼ}\}}]\\@;c
-   Γ ⊢ e_{v} : τ_{v} ; φ_{v} ; o_{v} \\
-   @|ɐ| ∉ \{@|ɐ|ᵢ\} \\
-   @|ɐ| ∈ \{@repeated{@|ɐ|'ⱼ}\}
-  }
+  Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
+  τ_{r} <: @recordτ[@repeated{@|ɐ|ᵢ : τ'ᵢ}
+                    @${@ρf - \{@repeated{@|ɐ|'ⱼ}\}}]\\@;c
+  Γ ⊢ e_{v} : τ_{v} ; φ_{v} ; o_{v} \\
+  @|ɐ| ∉ \{@|ɐ|ᵢ\} \\
+  @|ɐ| ∈ \{@repeated{@|ɐ|'ⱼ}\}
+ }
  @${Γ ⊢ @opwith[@${e_{r}} @|ɐ| @${e_{v}}]
-   : @recordτ[@repeated{@|ɐ|ᵢ : τ'ᵢ}
-              @${@|ɐ| : τ_{v}}
-              @${@ρf - \{@repeated{@|ɐ|'ⱼ}\}}]@;changed
-   ; ϵ|⊥ ; ∅}
+  : @recordτ[@repeated{@|ɐ|ᵢ : τ'ᵢ}
+             @${@|ɐ| : τ_{v}}
+             @${@ρf - \{@repeated{@|ɐ|'ⱼ}\}}]@;changed
+  ; ϵ|⊥ ; ∅}
  @${@textsc{T-Record-With}_1}
  ]
-}
 
 TODO: removing fields on the ρ should not matter if the fields are present in
 the main part of the record (as they are implicitly not in the ρ, because they
 are in the main part).
 
-@$${
- @$inferrule[
- @${
-   Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
-   τ_{r} <: @recordτ[@repeated{@|ɐ|ᵢ : τ'ᵢ} @ρf] \\@;changed
-   Γ ⊢ e_{v} : τ_{v} ; φ_{v} ; o_{v} \\
-   @|ɐ|ⱼ : τ'ⱼ ∈ @repeatset{@|ɐ|ᵢ : τ'ᵢ}
-  }
- @${Γ ⊢ @opwith[@${e_{r}} @${@|ɐ|ⱼ} @${e_{v}}]
-   : @recordτ[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}}
-              @${@|ɐ|ⱼ : τ_{v}}
-              @ρf]@;changed
-   ; ϵ|⊥ ; ∅}
- @${@textsc{T-Record-With}_2}
- ]
-}
+@$inferrule[@${
+             Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
+             τ_{r} <: @recordτ[@repeated{@|ɐ|ᵢ : τ'ᵢ} @ρf] \\@;changed
+             Γ ⊢ e_{v} : τ_{v} ; φ_{v} ; o_{v} \\
+             @|ɐ|ⱼ : τ'ⱼ ∈ @repeatset{@|ɐ|ᵢ : τ'ᵢ}
+            }
+            @${Γ ⊢ @opwith[@${e_{r}} @${@|ɐ|ⱼ} @${e_{v}}]
+             : @recordτ[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}}
+                        @${@|ɐ|ⱼ : τ_{v}}
+                        @ρf]@;changed
+             ; ϵ|⊥ ; ∅}
+            #:wide #t
+            @${@textsc{T-Record-With}_2}]
 
-@$${
- @$inferrule[
- @${
-   Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
-   τ_{r} <: @recordτ[@repeated{@|ɐ|ᵢ : τ'ᵢ} @ρf] \\
-   @|ɐ|ⱼ : τ'ⱼ ∈ @repeatset{@|ɐ|ᵢ : τ'ᵢ}
-  }
- @${Γ ⊢ @opwithout[@${e_{r}} @|ɐ|]
-   : @recordτ[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}}
-              @${@ρf - @|ɐ|}]
-   ; ϵ|⊥ ; ∅}
- @${@textsc{T-Record-Without}}
- ]
-}
+@$inferrule[@${
+             Γ ⊢ e_{r} : τ_{r} ; φ_{r} ; o_{r} \\
+             τ_{r} <: @recordτ[@repeated{@|ɐ|ᵢ : τ'ᵢ} @ρf] \\
+             @|ɐ|ⱼ : τ'ⱼ ∈ @repeatset{@|ɐ|ᵢ : τ'ᵢ}
+            }
+            @${Γ ⊢ @opwithout[@${e_{r}} @|ɐ|]
+             : @recordτ[@${@repeatset{@|ɐ|ᵢ : τ'ᵢ} ∖ \{@|ɐ|ⱼ : τ'ⱼ\}}
+                        @${@ρf - @|ɐ|}]
+             ; ϵ|⊥ ; ∅}
+            #:wide #t
+            @${@textsc{T-Record-Without}}]

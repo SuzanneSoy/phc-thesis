@@ -507,23 +507,30 @@ EOTEX
 (define tr≤: ($ "\\mathrel{≤:_\\mathit{tr}}"))
 (define $ooo ($ (mathtext "\\textit{ooo}")))
 
-(define ($inferrule from* to* [label '()])
+(define ($inferrule #:wide [wide? #f] from* to* [label '()])
   @$$[
  (elem #:style
        (style #f (list (tex-addition
                         (string->bytes/utf-8
                          "\\usepackage{mathpartir}"))))
-       ($ (cond-element [html "\\frac{\\begin{gathered}"]
-                        [else (string-append "\\ifcsname savedamp\\endcsname"
-                                             "\\else\\let\\savedamp&\\fi"
-                                             "\\inferrule{")])
+       ($ (cond-element
+           [html ""]
+           [else (string-append "\\ifcsname savedamp\\endcsname"
+                                "\\else\\global\\let\\savedamp&\\fi")])
+          (if wide?
+              @${\begin{aligned}\vphantom{x}&@|label|\\ \vphantom{x}&}
+              '())
+          (cond-element [html "\\frac{\\begin{gathered}"]
+                        [else "\\inferrule{"])
           (if (eq? from* -) "\\vphantom{x}" from*)
           (cond-element [html "\\end{gathered}}{\\begin{gathered}"]
                         [else "}{"])
           (if (eq? to* -) "\\vphantom{x}" to*)
           (cond-element [html "\\end{gathered}}"]
                         [else "}"])
-          "\\ " label))])
+          (if wide?
+              "\\end{aligned}"
+              (list @${\ } label))))])
 
 (define htmldiff-css-experiment #<<EOCSS
 .version:after {

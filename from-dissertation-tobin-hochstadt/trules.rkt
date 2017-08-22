@@ -80,9 +80,9 @@
                          φ⁻_f
                          o_f]]}
             @${@Γ[⊢ @mapop[e_f e_r] @R[@polydot[@${τ@subst[β ↦ α]} α]
-                                         ϵ
-                                         ⊥
-                                         ∅]]}
+                                       ϵ
+                                       ⊥
+                                       ∅]]}
             @${@textsc{T-DMap}}]
 
 #:T-AbsPred
@@ -136,6 +136,7 @@
                             ϵ
                             ∅])
                      ϵ ⊥ ∅]]}
+            #:wide #t
             @${@textsc{T-DAbs}}]
 
 #:T-TAbs
@@ -221,7 +222,7 @@
 @$inferrule[@${@repeated[#:n "n"]{Δ ⊢ τⱼ} \\
              @repeated[#:n "m"]{Δ ⊢ τₖ} \\
              @Γ[⊢ @${e@_op} @R[@∀r[(@repeated[#:n "n"]{αⱼ} @polydotα[β]) τ]
-                                 φ⁺ φ⁻ o]]}
+                               φ⁺ φ⁻ o]]}
             @Γ[⊢ @at[@${e@_op} @repeated[#:n "n"]{τⱼ} @repeated[#:n "m"]{τₖ}]
                @R[@transdots[@${τ@subst[@repeated[#:n "n"]{aⱼ ↦ τⱼ}]}
                              @${β}
@@ -234,7 +235,7 @@
 @$inferrule[@${@repeated{Δ ⊢ τₖ} \\
              Δ ▷ @polydot[τ_r β] \\
              @Γ[⊢ @${e@_op} @R[@∀r[(@repeated{αₖ} @polydotα[α_r]) τ]
-                                 φ⁺ φ⁻ o]]}
+                               φ⁺ φ⁻ o]]}
             @Γ[⊢ @at[@${e@_op} @repeated{τₖ} @polydot[τ_r β]]
                @R[@substdots[@${τ@subst[@repeated{aₖ ↦ τₖ}]}
                              @${α_r}
@@ -307,10 +308,10 @@
 @aligned{
  @no-overlap(τ, τ′) &= @metatrue
  &&@textif ∄ σ .\begin{aligned}[t]
-  &@<:[σ τ]\\
-  {}\mathbin{∧}{} &@<:[σ τ′]\\
-  {}\mathbin{∧}{} &Δ ⊢ σ\\
-  {}\mathbin{∧}{} &@≠:[σ ⊥]\end{aligned}\\
+ &@<:[σ τ]\\
+ {}\mathbin{∧}{} &@<:[σ τ′]\\
+ {}\mathbin{∧}{} &Δ ⊢ σ\\
+ {}\mathbin{∧}{} &@≠:[σ ⊥]\end{aligned}\\
  @no-overlap(τ, σ) &= @metafalse
  &&@otherwise
 }

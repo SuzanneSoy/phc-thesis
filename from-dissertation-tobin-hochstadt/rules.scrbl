@@ -774,7 +774,7 @@ Finally, the type and semantics of primitive functions are expressed using the
 
 @include-equation["deltarules.rkt"]
 
-@subsubsub*section{Soundness proof}
+@subsubsub*section{Soundness}
 
 Since @typedracket is an existing language which we use for our
 implementation, and not a new language, we do not provide here a full proof of

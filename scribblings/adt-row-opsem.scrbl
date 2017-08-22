@@ -91,6 +91,7 @@ indexed by a constructor label or a field label, like @${@ctor-pred[@κ]},
              ↪ @recordv[@${@repeatset{@|ɐ|ᵢ = vᵢ} ∖ \{@|ɐ|ⱼ = vⱼ\}}
                         @${\quad @|ɐ|ⱼ = v'}] \\
              (@|ɐ|ⱼ = vⱼ) ∈ @repeatset{@|ɐ|ᵢ = vᵢ}}
+            #:wide #t
             @${@textsc{E-Record-With}_1}]
 
 @todo{what to do with the = sign? The a = v sign is syntactical, but could
@@ -106,4 +107,5 @@ indexed by a constructor label or a field label, like @${@ctor-pred[@κ]},
             @${@opwithout[@recordv[@repeated{@|ɐ|ᵢ = vᵢ}] @${@|ɐ|ⱼ}]
              ↪ @recordv[@${@repeatset{@|ɐ|ᵢ = vᵢ} ∖ \{@|ɐ|ⱼ = vⱼ\}}] \\
              (@|ɐ|ⱼ = vⱼ) ∈ @repeatset{@|ɐ|ᵢ = vᵢ}}
+            #:wide #t
             @${@textsc{E-Record-Without}}]

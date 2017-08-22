@@ -2,6 +2,7 @@
 
 @require["util.rkt"
          "adt-utils.rkt"
+         scriblib/render-cond
          (for-label (only-meta-in 0 typed/racket))]
 @(use-mathjax)
 
@@ -43,26 +44,39 @@ a conditional.
  &= @ctorτ[@κ @${@update(τ, σ_π)}]\\@;TODO: update rule when the π is ɐ or getval
 }
 
-@aligned{
+@$${
  @restrict(@variantτ[@repeatset{τ}], σ)
- &= @variantτ[@repeatset{@restrict(τ,σ)}]\\
- @restrict(
- @recordτ[@ρf
-          @repeatset{-@|ɐ|ᵢ}
-          @repeatset{-@|ɐ|ⱼ}
-          @repeatset{+@|ɐ|ₗ : τₗ}
-          @repeatset{+@|ɐ|ₘ : τₘ}],@; TODO: this does not handle the regular per-field update like above?
- @recordτ[@ρf
-          @repeatset{-@|ɐ|ᵢ}
-          @repeatset{-@|ɐ|ₖ}
-          @repeatset{+@|ɐ|ₗ : σₗ}
-          @repeatset{+@|ɐ|ₙ : σₙ}])
- &= @recordτ[@repeatset{-@|ɐ|ᵢ}
-             @repeatset{-@|ɐ|ⱼ}
-             @repeatset{-@|ɐ|ₖ}
-             @repeatset{+@|ɐ|ₗ : @update(τₗ, σₗ)}
-             @repeatset{+@|ɐ|ₘ : τₘ}
-             @repeatset{+@|ɐ|ₙ : σₙ}]\\
+ = @variantτ[@repeatset{@restrict(τ,σ)}]
+}
+@$${
+ @cond-element[
+ [html @${\begin{multline}}]
+ [else @${\begin{multlined}}]]
+ @|restrict|\left(\begin{aligned}
+ &@recordτ[@ρf
+            @repeatset{-@|ɐ|ᵢ}
+            @repeatset{-@|ɐ|ⱼ}
+            @repeatset{+@|ɐ|ₗ : τₗ}
+            @repeatset{+@|ɐ|ₘ : τₘ}],
+ \\@; TODO: this does not handle the regular per-field update like above?
+ &@recordτ[@ρf
+            @repeatset{-@|ɐ|ᵢ}
+            @repeatset{-@|ɐ|ₖ}
+            @repeatset{+@|ɐ|ₗ : σₗ}
+            @repeatset{+@|ɐ|ₙ : σₙ}]\end{aligned}\right)
+ \\
+ = @recordτ[@repeatset{-@|ɐ|ᵢ}
+            @repeatset{-@|ɐ|ⱼ}
+            @repeatset{-@|ɐ|ₖ}
+            @repeatset{+@|ɐ|ₗ : @update(τₗ, σₗ)}
+            @repeatset{+@|ɐ|ₘ : τₘ}
+            @repeatset{+@|ɐ|ₙ : σₙ}]
+ @cond-element[
+ [html @${\end{multline}}]
+ [else @${\end{multlined}}]]
+}
+  
+@$${
  @where @disjoint-sets(
  @repeatSet{@|ɐ|ᵢ},
  @repeatSet{@|ɐ|ⱼ},

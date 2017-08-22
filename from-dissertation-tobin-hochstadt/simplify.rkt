@@ -14,12 +14,12 @@
  @simplify[@∩τ[@un[@repeatset{τ}] @repeatset{σ}]]
  &= @propagate⊥(@un[@repeatset{@simplify[@∩τ[τ @repeatset{σ}]]}])\\
  @simplify[@∩τ[@consτ[τ τ′] @consτ[σ σ′]]]
- &= @(∩τ @${@propagate⊥(@(consτ @simplify[@∩τ[τ σ]]
-                                @simplify[@∩τ[τ′ σ′]]))})\\
+ &= @${@propagate⊥(@(consτ @simplify[@∩τ[τ σ]]
+                           @simplify[@∩τ[τ′ σ′]]))}\\
  @simplify[@∩τ[@repeatset{σ}]]
  &= \begin{cases}
- ⊥ & @textif ∃ τ, τ′ ∈ \{@repeatset{σ}\} . @no-overlap(τ, τ′) \\
- @∩τ[@repeatset{@simplify[σ]}] &@otherwise
+ ⊥ & \hspace{-1.5em}@textif ∃ τ, τ′ ∈ \{@repeatset{σ}\} . @no-overlap(τ, τ′) \\
+ @∩τ[@repeatset{@simplify[σ]}] &\hspace{-1em}@otherwise
  \end{cases}
  \end{aligned}
 }

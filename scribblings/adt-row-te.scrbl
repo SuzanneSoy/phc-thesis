@@ -17,12 +17,20 @@
             @${@textsc{TE-FAll}}]
 
 
-@$inferrule[@${@ρc ∈ Δ \\
-             \{@repeated{@|κ|ᵢ}\} ∩ \{@repeated{@|κ|ⱼ}\} = ∅ \\
-             @alldifferent(@repeated{@|κ|ᵢ}) \\
-             @alldifferent(@repeated{@|κ|ⱼ})}
-            @${Δ ⊢ @variantτ[@ρc @repeatset{-@|κ|ᵢ} @repeatset{+@κof[ⱼ τⱼ]}]}
-            @${@textsc{TE-CVariant}}]
+@$p[
+ @$inferrule[@${@ρc ∈ Δ \\
+               \{@repeated{@|κ|ᵢ}\} ∩ \{@repeated{@|κ|ⱼ}\} = ∅ \\
+               @alldifferent(@repeated{@|κ|ᵢ}) \\
+               @alldifferent(@repeated{@|κ|ⱼ})}
+             @${Δ ⊢ @variantτ[@ρc @repeatset{-@ctorτ[@|κ|ᵢ]}
+                              @repeatset{+@ctorτ[@κof[ⱼ τⱼ]]}]}
+             @${@textsc{TE-CVariant}}]
+  
+ @$inferrule[@${@ρf ∈ Δ \\
+               @alldifferent(@repeated{@|ɐ|ᵢ} @repeated{@|ɐ|ⱼ}) \\
+               @repeated{Δ ⊢ τⱼ}}
+             @${Δ ⊢ @recordτ[@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}]}
+             @${@textsc{TE-FRecord}}]]
 
 where
 
@@ -33,13 +41,7 @@ where
  \end{aligned}
 }
 
-@$inferrule[@${@ρf ∈ Δ \\
-             \{@repeated{@|ɐ|ᵢ}\} ∩ \{@repeated{@|ɐ|ⱼ}\} = ∅ \\
-             @alldifferent(@repeated{@|ɐ|ᵢ}) \\
-             @alldifferent(@repeated{@|ɐ|ⱼ}) \\
-             @repeated{Δ ⊢ τⱼ}}
-            @${Δ ⊢ @recordτ[@ρf @repeatset{-@|ɐ|ᵢ} @repeatset{+@|ɐ|ⱼ:τⱼ}]}
-            @${@textsc{TE-FRecord}}]
+
 
 @$inferrule[@${@alldifferent(@repeated{@|κ|ᵢ}) \\
              @repeated{Δ ⊢ τᵢ}}
