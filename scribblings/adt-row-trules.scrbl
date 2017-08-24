@@ -38,21 +38,18 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
 @(define & @cond-element[[latex "\\savedamp"] [else "&"]])
 @(define nl @cond-element[[latex "\\csname @arraycr\\endcsname"] [else "\\\\"]])
 
-@$${
- @cond-element[[latex @list{\let\savedamp&}] [else ""]]
- @$inferrule[
+@$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\ τ <: @ctorτ[@κ @${τ'}] \\
-   o_r = @"\\left\\{" \begin{array}{rl}
-   @πctor-val(π(x)) @& @textif o = π(x) @nl
-   ∅ @& @otherwise
-   \end{array}\right. \\
-   φ_r
-   = @applyfilter(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val},
-   τ, o)}
+  o_r = @"\\left\\{" \begin{array}{rl}
+  @πctor-val(π(x)) @& @textif o = π(x) @nl
+  ∅ @& @otherwise
+  \end{array}\right. \\
+  φ_r
+  = @applyfilter(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val},
+  τ, o)}
  @${Γ ⊢ (@ctor-val[@κ]\ e) : τ' ; φ_r ; o_r}
  #:wide 'latex
  @${@textsc{T-Ctor-Val}}]
-}
 
 @$inferrule[
  @${@repeated{Γ ⊢ eᵢ : τᵢ ; φᵢ ; oᵢ}}
@@ -68,21 +65,18 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
  #:wide 'latex
  @${@textsc{T-Record-Pred}}]
 
-@$${
- @cond-element[[latex @list{\let\savedamp&}] [else ""]]
- @$inferrule[
+@$inferrule[
  @${Γ ⊢ e : τ ; φ ; o \\ τ <: @recordτ[@repeated{@|ɐ|ᵢ : τᵢ} @ρf] \\ @; changed
-   o_r = @"\\left\\{" \begin{array}{rl}
-   @πɐ{@|ɐ|ⱼ}(π(x)) @& @textif o = π(x) @nl
-   ∅ @& @otherwise
-   \end{array}\right. \\
-   φ_r
-   = @applyfilter(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}},
-   τ, o)}
+  o_r = @"\\left\\{" \begin{array}{rl}
+  @πɐ{@|ɐ|ⱼ}(π(x)) @& @textif o = π(x) @nl
+  ∅ @& @otherwise
+  \end{array}\right. \\
+  φ_r
+  = @applyfilter(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}},
+  τ, o)}
  @${Γ ⊢ e.@|ɐ|ⱼ : τ' ; φ_r ; o_r}
  #:wide 'latex
  @${@textsc{T-Record-GetField}}]
-}
 
 @$inferrule[
  @${

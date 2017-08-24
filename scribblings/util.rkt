@@ -35,6 +35,8 @@
          tr≤:
          $ooo
          $inferrule
+         $infertree
+         refrule
          textsc
          aligned
          acase
@@ -511,7 +513,7 @@ EOTEX
 (define tr≤: ($ "\\mathrel{≤:_\\mathit{tr}}"))
 (define $ooo ($ (mathtext "\\textit{ooo}")))
 
-(define ($inferrule #:wide [wide? #f] from* to* [label '()])
+(define ($inferrule from* to* #:wide [wide? #f] [label '()] #:* [*? #f])
   (define-syntax-rule (if-wide wide not-wide)
     (cond
       [(eq? wide? #t)
@@ -526,16 +528,14 @@ EOTEX
  (elem #:style
        (style #f (list (tex-addition
                         (string->bytes/utf-8
-                         "\\usepackage{mathpartir}"))))
-       ($ (cond-element
-           [html ""]
-           [else (string-append "\\ifcsname savedamp\\endcsname"
-                                "\\else\\global\\let\\savedamp&\\fi")])
-          (if-wide
+                         (string-append
+                          "\\usepackage{mathpartir}"
+                          "\\AtBeginDocument{\\global\\let\\savedamp&}")))))
+       ($ (if-wide
            @${\begin{aligned}\vphantom{x}&@|label|\\ \vphantom{x}&}
            '())
           (cond-element [html "\\frac{\\begin{gathered}"]
-                        [else "\\inferrule{"])
+                        [else (list "\\inferrule" (if *? "*" "") "{")])
           (if (eq? from* -) "\\vphantom{x}" from*)
           (cond-element [html "\\end{gathered}}{\\begin{gathered}"]
                         [else "}{"])
@@ -545,6 +545,44 @@ EOTEX
           (if-wide
            "\\end{aligned}"
            (list @${\ } label))))])
+
+;; Temporary placeholder, will add linking and propper names later.
+(define-syntax-rule (refrule name) name)
+
+(begin-for-syntax
+  (define-syntax-class inferimpl
+    #:attributes (x)
+    (pattern {~and x ({~literal refrule} _rule)})
+    (pattern {~and x ({~literal $} . _)})
+    (pattern (from:inferimpl ...
+              {~literal ⇒}
+              to:expr
+              {~optional label:expr})
+             #:with x #`(cond-element
+                         [html
+                          @${\begin{array}[b]{c}
+                           @(add-between (list from.x ...) "\\quad{}")
+                           \\\hline
+                           @to
+                           \end{array}
+                           @#,@(if (attribute label)
+                                   #'{@list{\ \smash{
+                              \begin{array}[c]{c}
+                              @label
+                              \\[1ex]
+                              \vphantom{@to}
+                              \end{array}}}}
+                                   #'{})}]
+                         [else @$inferrule[(add-between (list from.x ...) "\\ ")
+                                           to
+                                           #,@(if (attribute label)
+                                                  #'{@list{\ @label}}
+                                                  #'{})
+                                           #:* #t]]))))
+(define-syntax $infertree
+  (syntax-parser
+    [(_ . :inferimpl)
+     #'@$${@x}]))
 
 (define htmldiff-css-experiment #<<EOCSS
 .version:after {

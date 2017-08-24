@@ -10,8 +10,8 @@
 
 @;@tex-header{\usepackage{morewrites}}
 @tex-header{
-  \let\realtableofcontents\tableofcontents
-  \def\tableofcontents{\realtableofcontents\let\tableofcontents\relax}
+ \let\realtableofcontents\tableofcontents
+ \def\tableofcontents{\realtableofcontents\let\tableofcontents\relax}
 }
 
 @title[#:style (struct-update style
@@ -96,7 +96,7 @@
   @include-asection[(submod (lib "multi-id/multi-id.hl.rkt") doc)]
   @include-asection[
  (lib "type-expander/scribblings/type-expander-implementation.scrbl")]
- }]
+  }]
 
 @;{
  Notes concerning tikz → SVG conversion:
@@ -118,7 +118,7 @@
 
  See also:
  http://tex.stackexchange.com/questions/51757/
-   how-can-i-use-tikz-to-make-standalone-svg-graphics
+ how-can-i-use-tikz-to-make-standalone-svg-graphics
 
 
  To get real, selectable text (must not contain formatting, otherwise some

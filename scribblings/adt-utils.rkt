@@ -326,6 +326,3 @@
 (define δe @${δ_{\mathrm{e}}})
 (define alldifferent @${\operatorname{AllDifferent}})
 (define disjoint-sets @${\operatorname{DisjointSets}})
-
-;; Temporary placeholder, will add linking and propper names later.
-(define-syntax-rule (refrule name) name)

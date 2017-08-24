@@ -445,7 +445,10 @@ their inclusion in the following semantics would needlessly complicate things.
  indicates that @${τ} and @${σ} are not mutually subtypes of each other (but
  one can be a strict subtype of the other).
 
- @$p[@include-equation["subtyping.rkt" S-Reflexive]
+ @$p[@include-equation["subtyping.rkt" S-Eq₁]
+     @include-equation["subtyping.rkt" S-Eq₂]
+     @include-equation["subtyping.rkt" S-Eq₃]
+     @include-equation["subtyping.rkt" S-Reflexive]
      @include-equation["subtyping.rkt" S-Transitive]]
 
  The @${⊥} type is a shorthand for the empty union @${(∪)}. It is a subtype of

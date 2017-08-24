@@ -17,22 +17,38 @@ present in the union, as specified by the type validity rule
             @=:[@variantτ[@repeated{τ}] @un[@repeated{τ}]]
             @${@textsc{S-Variant-Union}}]
 
-From @refrule[@textsc{S-Variant-Union}], we can derive that the empty variant is
-equivalent to the bottom type.
+From @refrule[@textsc{S-Variant-Union}], we can derive that the empty variant
+is equivalent to the bottom type.
 
-@$inferrule[@${@textsc{S-Variant-Union} \\
-             @textsc{S-Bot}}
-            @=:[@variantτ[] ⊥]
-            @${@textsc{S-Variant-Empty}}]
+@$p[@$infertree[(@refrule[@textsc{S-Variant-Union}]
+                  @refrule[@textsc{S-Bot}]
+                  ⇒
+                  @refrule[@textsc{S-Eq-Transitive}])
+                ⇒
+                @=:[@variantτ[] ⊥]
+                @${@textsc{S-Variant-Empty}}]
+    @$infertree[(((@${@=:[τ τ′]} ⇒ @refrule[@${@textsc{S-Eq}_1}])
+                  (@${@=:[τ′ τ″]} ⇒ @refrule[@${@textsc{S-Eq}_1}])
+                  ⇒
+                  @refrule[@textsc{S-Eq-Transitive}])
+                 ((@${@=:[τ′ τ″]} ⇒ @refrule[@${@textsc{S-Eq}_2}])
+                  (@${@=:[τ τ′]} ⇒ @refrule[@${@textsc{S-Eq}_2}])
+                  ⇒
+                  @refrule[@textsc{S-Eq-Transitive}])
+                 ⇒
+                 @refrule[@${@textsc{S-Eq}_3}])
+                ⇒
+                @=:[τ τ″]
+                @${@textsc{S-Eq-Transitive}}]]
 
 
-@$inferrule[@${∃ i . @<:[τ @${σᵢ}]}
-            @${@<:[τ @variantτ[@repeated{σᵢ}]]}
-            @${@textsc{S-VariantSuper}}]
+@$p[@$inferrule[@${∃ i . @<:[τ @${σᵢ}]}
+                @${@<:[τ @variantτ[@repeated{σᵢ}]]}
+                @${@textsc{S-VariantSuper}}]
 
-@$inferrule[@${@repeated[@<:[τᵢ @${σ}]]}
-            @${@<:[@variantτ[@repeated{τᵢ}] σ]}
-            @${@textsc{S-VariantSub}}]
+    @$inferrule[@${@repeated[@<:[τᵢ @${σ}]]}
+                @${@<:[@variantτ[@repeated{τᵢ}] σ]}
+                @${@textsc{S-VariantSub}}]]
 
 
 

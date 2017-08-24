@@ -5,6 +5,27 @@
 @; permission to copy these rules, but did not ask for a relicensing under the
 @; CC0 license.
 
+#:S-Eq₁
+
+@$inferrule[
+ @=:[τ σ]
+ @<:[τ σ]
+ @${@textsc{S-Eq}_1}]
+
+#:S-Eq₂
+
+@$inferrule[
+ @=:[τ σ]
+ @<:[σ τ]
+ @${@textsc{S-Eq}_2}]
+
+#:S-Eq₃
+
+@$inferrule[
+ @${@<:[τ σ] \\ @<:[σ τ]}
+ @=:[τ σ]
+ @${@textsc{S-Eq}_3}]
+
 #:S-Reflexive
 
 @$inferrule[
@@ -33,8 +54,11 @@
 
 #:S-Bot-Sub
 
-@$inferrule[@${@refrule[@textsc{S-Bot}] \\
-             @refrule[@textsc{S-UnionSub}]}
+@$infertree[((@refrule[@textsc{S-Bot}] ⇒ @refrule[@textsc{S-Eq₁}])
+             @refrule[@textsc{S-UnionSub}]
+             ⇒
+             @refrule[@textsc{S-Transitive}])
+            ⇒
             @${@<:[⊥ τ]}
             @${@textsc{S-Bot-Sub}}]
 
