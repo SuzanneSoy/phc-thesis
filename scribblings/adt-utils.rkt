@@ -185,11 +185,11 @@
 (define-syntax ∩τ (defop "∩"))
 
 (define-syntax-rule (f→ (from ...) R)
-  @${(@(add-between (list @(stringify from) ...) "\\ ") \mathbf{→} @(stringify R))})
+  @${(@(add-between (list @(stringify from) ...) "\\ ")\ @mathbm{→}\ @(stringify R))})
 (define-syntax-rule (f* (from ... rest*) R)
-  (f→ (from ... @${\ \mathbf{.}\ } @${@(stringify rest*)@mathbm{*}}) R))
+  (f→ (from ... @${\ @mathbm{.}\ } @${@(stringify rest*)@mathbm{*}}) R))
 (define-syntax-rule (f… (from ... polydot) R)
-  (f→ (from ... @${\ \mathbf{.}\ } polydot) R))
+  (f→ (from ... @${\ @mathbm{.}\ } polydot) R))
 (define-syntax (R stx)
   (syntax-case stx ()
     [(_ to φ⁺ φ⁻ o)
@@ -326,3 +326,6 @@
 (define δe @${δ_{\mathrm{e}}})
 (define alldifferent @${\operatorname{AllDifferent}})
 (define disjoint-sets @${\operatorname{DisjointSets}})
+
+;; Temporary placeholder, will add linking and propper names later.
+(define-syntax-rule (refrule name) name)

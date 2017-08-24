@@ -8,6 +8,24 @@
 @title[#:style (with-html5 manual-doc-style)
        #:version (version-text)]{Subtyping (with ρ)}
 
+Variants which do not involve a row type are nothing more than a syntactic
+restriction on a union of types. The variant only allows constructors to be
+present in the union, as specified by the type validity rule
+@refrule[@textsc{TE-Variant}].
+
+@$inferrule[-
+            @=:[@variantτ[@repeated{τ}] @un[@repeated{τ}]]
+            @${@textsc{S-Variant-Union}}]
+
+From @refrule[@textsc{S-Variant-Union}], we can derive that the empty variant is
+equivalent to the bottom type.
+
+@$inferrule[@${@textsc{S-Variant-Union} \\
+             @textsc{S-Bot}}
+            @=:[@variantτ[] ⊥]
+            @${@textsc{S-Variant-Empty}}]
+
+
 @$inferrule[@${∃ i . @<:[τ @${σᵢ}]}
             @${@<:[τ @variantτ[@repeated{σᵢ}]]}
             @${@textsc{S-VariantSuper}}]
@@ -15,6 +33,11 @@
 @$inferrule[@${@repeated[@<:[τᵢ @${σ}]]}
             @${@<:[@variantτ[@repeated{τᵢ}] σ]}
             @${@textsc{S-VariantSub}}]
+
+
+
+
+
 
 
 @;{@$inferrule[-
@@ -58,10 +81,6 @@
             @${@<:[@∀c[(@repeated{@|ρc|ᵢ}) τ]
                    @∀c[(@repeated{@|ρc|′ᵢ}) σ]]}
             @${@textsc{S-PolyC-}α@textsc{-Equiv}}]
-
-@$inferrule[-
-            @=:[@variantτ[] ⊥]
-            @${@textsc{S-Variant-Empty}}]
 
 @; TODO: can these rules be used to combine a record type and a record*?
 @; predicate to make sure some fields are absent, without checking anything

@@ -21,17 +21,22 @@
 
 #:S-Top
 
-@$inferrule[
- -
- @${@<:[τ ⊤]}
- @${@textsc{S-Top}}]
+@$inferrule[-
+            @${@<:[τ ⊤]}
+            @${@textsc{S-Top}}]
 
 #:S-Bot
 
-@$inferrule[
- -
- @${@<:[⊥ τ]}
- @${@textsc{S-Bot}}]
+@$inferrule[-
+            @${@=:[⊥ @un[]]}
+            @${@textsc{S-Bot}}]
+
+#:S-Bot-Sub
+
+@$inferrule[@${@refrule[@textsc{S-Bot}] \\
+             @refrule[@textsc{S-UnionSub}]}
+            @${@<:[⊥ τ]}
+            @${@textsc{S-Bot-Sub}}]
 
 #:S-Number
 

@@ -445,15 +445,17 @@ their inclusion in the following semantics would needlessly complicate things.
  indicates that @${τ} and @${σ} are not mutually subtypes of each other (but
  one can be a strict subtype of the other).
 
- @include-equation["subtyping.rkt" S-Reflexive]
- @include-equation["subtyping.rkt" S-Transitive]
+ @$p[@include-equation["subtyping.rkt" S-Reflexive]
+     @include-equation["subtyping.rkt" S-Transitive]]
 
  The @${⊥} type is a shorthand for the empty union @${(∪)}. It is a subtype of
- every other type, and is not inhabited by any value. @textsc{S-Bot} can be
- derived from @textsc{S-UnionSub}, by constructing an empty union.
+ every other type, and is not inhabited by any value.
+ @refrule[@textsc{S-Bot-Sub}] can be derived from @refrule[@textsc{S-Bot}]
+ and @refrule[@textsc{S-UnionSub}], by constructing an empty union.
 
  @$p[@include-equation["subtyping.rkt" S-Top]
-     @include-equation["subtyping.rkt" S-Bot]]
+     @include-equation["subtyping.rkt" S-Bot]
+     @include-equation["subtyping.rkt" S-Bot-Sub]]
 
  The singleton types @num-τ and @symτ[s] which are only inhabited by their
  literal counterpart are subtypes of the more general @Numberτ or @Symbolτ
@@ -484,16 +486,17 @@ their inclusion in the following semantics would needlessly complicate things.
   If it works.}
 
  The following rules are concerned with recursive types built with the
- @racket[Rec] combinator. The @textsc{S-RecWrap} rule allows considering
- @Numberτ a subtype of @recτ[r Numberτ] for example (i.e. applying the
- recursive type combinator to a type which does not refer to @${r} is a no-op),
- but it also allows deriving
- @<:[@recτ[r @un[@consτ[τ r] @null-τ]] @un[@consτ[τ ⊤] @null-τ]]. The @textsc{
-  S-RecElim} rule has the opposite effect, and is mainly useful to “upcast”
- members of an union containing @${r}. It allows the deriving
- @<:[@null-τ @recτ[r @un[@consτ[τ r] @null-τ]]]. The rules @textsc{S-RecStep}
- and @textsc{S-RecUnStep} allow unraveling a single step of the recursion, or
- assimilating an such an unraveled step as part of the recursive type.
+ @racket[Rec] combinator. The @refrule[@textsc{S-RecWrap}] rule allows
+ considering @Numberτ a subtype of @recτ[r Numberτ] for example (i.e. applying
+ the recursive type combinator to a type which does not refer to @${r} is a
+ no-op), but it also allows deriving
+ @<:[@recτ[r @un[@consτ[τ r] @null-τ]] @un[@consτ[τ ⊤] @null-τ]]. The
+ @refrule[@textsc{ S-RecElim}] rule has the opposite effect, and is mainly
+ useful to “upcast” members of an union containing @${r}. It allows the
+ deriving @<:[@null-τ @recτ[r @un[@consτ[τ r] @null-τ]]]. The rules
+ @refrule[@textsc{ S-RecStep}] and @refrule[@textsc{S-RecUnStep}] allow
+ unraveling a single step of the recursion, or assimilating an such an
+ unraveled step as part of the recursive type.
 
  @todo{TODO: renamings}
 
@@ -534,12 +537,12 @@ their inclusion in the following semantics would needlessly complicate things.
 
  @include-equation["operational-semantics.rkt" δe-rules]
 
- The @textsc{E-Context} rule indicates that when the expression has the shape
- @${E[L]}, the subpart @${L} can be evaluated and replaced by its result. The
- syntax @${E[L]} indicates the replacement of the only occurrence of @${[⋅]}
- within an evaluation context @${E}. The evaluation context can then match an
- expression with the same shape, thereby separating the @${L} part from its
- context.
+ The @refrule[@textsc{E-Context}] rule indicates that when the expression has
+ the shape @${E[L]}, the subpart @${L} can be evaluated and replaced by its
+ result. The syntax @${E[L]} indicates the replacement of the only occurrence
+ of @${[⋅]} within an evaluation context @${E}. The evaluation context can then
+ match an expression with the same shape, thereby separating the @${L} part
+ from its context.
 
  @include-equation["operational-semantics.rkt" E-Context]
 
@@ -673,7 +676,8 @@ their inclusion in the following semantics would needlessly complicate things.
   information concerning outer variables (those not declared within the lambda,
   and therefore still available after it finishes executing).}
 
- @todo{Should the φ⁺ φ⁻ o be preserved in T-TAbs and T-DTAbs?}
+ @todo{Should the φ⁺ φ⁻ o be preserved in @refrule[@textsc{T-TAbs}] and
+  @refrule[@textsc{T-DTAbs?}]}
 
  @$p[@include-equation["trules.rkt" T-AbsPred]
      @include-equation["trules.rkt" T-Abs]

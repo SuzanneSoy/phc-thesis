@@ -163,6 +163,10 @@
 (define m
   (list setup-math
         (tex-header #<<EOTEX
+% DRAFT ONLY
+\overfullrule=1cm\relax
+
+
  \def\ifmathjax#1{}\def\iflatex#1{#1}
  \renewcommand{\rmdefault}{cmr}
  \newenvironment{qaligned}{%
@@ -508,6 +512,16 @@ EOTEX
 (define $ooo ($ (mathtext "\\textit{ooo}")))
 
 (define ($inferrule #:wide [wide? #f] from* to* [label '()])
+  (define-syntax-rule (if-wide wide not-wide)
+    (cond
+      [(eq? wide? #t)
+       wide]
+      [(eq? wide? #f)
+       not-wide]
+      [else
+       (cond-element
+        [html (if (eq? wide? 'html) wide not-wide)]
+        [else (if (eq? wide? 'latex) wide not-wide)])]))
   @$$[
  (elem #:style
        (style #f (list (tex-addition
@@ -517,9 +531,9 @@ EOTEX
            [html ""]
            [else (string-append "\\ifcsname savedamp\\endcsname"
                                 "\\else\\global\\let\\savedamp&\\fi")])
-          (if wide?
-              @${\begin{aligned}\vphantom{x}&@|label|\\ \vphantom{x}&}
-              '())
+          (if-wide
+           @${\begin{aligned}\vphantom{x}&@|label|\\ \vphantom{x}&}
+           '())
           (cond-element [html "\\frac{\\begin{gathered}"]
                         [else "\\inferrule{"])
           (if (eq? from* -) "\\vphantom{x}" from*)
@@ -528,9 +542,9 @@ EOTEX
           (if (eq? to* -) "\\vphantom{x}" to*)
           (cond-element [html "\\end{gathered}}"]
                         [else "}"])
-          (if wide?
-              "\\end{aligned}"
-              (list @${\ } label))))])
+          (if-wide
+           "\\end{aligned}"
+           (list @${\ } label))))])
 
 (define htmldiff-css-experiment #<<EOCSS
 .version:after {

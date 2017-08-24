@@ -19,11 +19,11 @@
 
 @$p[
  @$inferrule[@${@ρc ∈ Δ \\
-               \{@repeated{@|κ|ᵢ}\} ∩ \{@repeated{@|κ|ⱼ}\} = ∅ \\
-               @alldifferent(@repeated{@|κ|ᵢ}) \\
-               @alldifferent(@repeated{@|κ|ⱼ})}
+               @repeated{Δ ⊢ τᵢ} \\
+               @alldifferent(@repeated{@|κ|ᵢ} @repeated{@|κ|ⱼ})}
              @${Δ ⊢ @variantτ[@ρc @repeatset{-@ctorτ[@|κ|ᵢ]}
                               @repeatset{+@ctorτ[@κof[ⱼ τⱼ]]}]}
+             #:wide 'latex
              @${@textsc{TE-CVariant}}]
   
  @$inferrule[@${@ρf ∈ Δ \\
@@ -43,8 +43,8 @@ where
 
 
 
-@$inferrule[@${@alldifferent(@repeated{@|κ|ᵢ}) \\
-             @repeated{Δ ⊢ τᵢ}}
+@$inferrule[@${@repeated{Δ ⊢ τᵢ} \\
+             @alldifferent(@repeated{@|κ|ᵢ})}
             @${Δ ⊢ @variantτ[@repeated{@ctorτ[@κof[ᵢ τᵢ]]}]}
             @${@textsc{TE-Variant}}]
 

@@ -52,18 +52,21 @@ a conditional.
  @cond-element[
  [html @${\begin{multline}}]
  [else @${\begin{multlined}}]]
- @|restrict|\left(\begin{aligned}
- &@recordτ[@ρf
-            @repeatset{-@|ɐ|ᵢ}
-            @repeatset{-@|ɐ|ⱼ}
-            @repeatset{+@|ɐ|ₗ : τₗ}
-            @repeatset{+@|ɐ|ₘ : τₘ}],
+ @|restrict|\left(
+ @cond-element[
+ [html @${\begin{array}{l}}]
+ [else @$|{\begin{array}{@{}l@{}}}|]]
+ @recordτ[@ρf
+          @repeatset{-@|ɐ|ᵢ}
+          @repeatset{-@|ɐ|ⱼ}
+          @repeatset{+@|ɐ|ₗ : τₗ}
+          @repeatset{+@|ɐ|ₘ : τₘ}],
  \\@; TODO: this does not handle the regular per-field update like above?
- &@recordτ[@ρf
-            @repeatset{-@|ɐ|ᵢ}
-            @repeatset{-@|ɐ|ₖ}
-            @repeatset{+@|ɐ|ₗ : σₗ}
-            @repeatset{+@|ɐ|ₙ : σₙ}]\end{aligned}\right)
+ @recordτ[@ρf
+          @repeatset{-@|ɐ|ᵢ}
+          @repeatset{-@|ɐ|ₖ}
+          @repeatset{+@|ɐ|ₗ : σₗ}
+          @repeatset{+@|ɐ|ₙ : σₙ}]\end{array}\right)
  \\
  = @recordτ[@repeatset{-@|ɐ|ᵢ}
             @repeatset{-@|ɐ|ⱼ}

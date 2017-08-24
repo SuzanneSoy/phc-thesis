@@ -206,6 +206,7 @@
                             @${φ⁻'}
                             @${o'}])
                      ϵ ⊥ ∅]]}
+            #:wide 'latex
             @${@textsc{T-App}}]
 
 #:T-Inst
@@ -257,6 +258,7 @@
              @nl ∅ @& @otherwise
              \end{cases}}
             @${@Γ[⊢ @ifop[e₁ e₂ e₃] @R[τ_r φ_r⁺ φ_r⁻ o_r]]}
+            #:wide 'latex
             @${@textsc{T-If}}]
 
 #:Γ+

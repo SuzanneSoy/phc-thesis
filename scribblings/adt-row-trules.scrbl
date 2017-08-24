@@ -50,6 +50,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    = @applyfilter(\overline{\#f}_{@πctor-val}|\#f_{@πctor-val},
    τ, o)}
  @${Γ ⊢ (@ctor-val[@κ]\ e) : τ' ; φ_r ; o_r}
+ #:wide 'latex
  @${@textsc{T-Ctor-Val}}]
 }
 
@@ -64,6 +65,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
   φ_r = @applyfilter(@recordτ[@repeated{@|ɐ|ᵢ : ⊤}]
   |\overline{@recordτ[@repeated{@|ɐ|ᵢ : ⊤}]}, τ, o)}
  @${Γ ⊢ (@record-pred[@repeated{@|ɐ|ᵢ}] e) : Boolean ; φ_r ; ∅}
+ #:wide 'latex
  @${@textsc{T-Record-Pred}}]
 
 @$${
@@ -78,6 +80,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
    = @applyfilter(\overline{\#f}_{@πɐ{@|ɐ|ⱼ}}|\#f_{@πɐ{@|ɐ|ⱼ}},
    τ, o)}
  @${Γ ⊢ e.@|ɐ|ⱼ : τ' ; φ_r ; o_r}
+ #:wide 'latex
  @${@textsc{T-Record-GetField}}]
 }
 
@@ -95,6 +98,7 @@ in@~cite[#:precision "p. 75" "tobin-hochstadt_typed_2010"].
              @${@|ɐ| : τ_{v}}
              @${@ρf - \{@repeated{@|ɐ|'ⱼ}\}}]@;changed
   ; ϵ|⊥ ; ∅}
+ #:wide 'latex
  @${@textsc{T-Record-With}_1}
  ]
 
