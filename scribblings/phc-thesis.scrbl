@@ -18,7 +18,7 @@
                               (with-html5 manual-doc-style)
                               [properties (λ (p) (cons 'toc p))])
        #:version (version-text)]{Thesis}
-@author[@author+email["Georges Dupéron" "georges.duperon@gmail.com"]]
+@author[@author+email["Suzanne Soy" "racket@suzanne.soy"]]
 
 @;@(version-text "Document version: " ".")
 
