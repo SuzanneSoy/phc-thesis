@@ -23,7 +23,6 @@ jobs:
             racket_cs: 1
     env:
       # RACKET_DIR is an argument to install-racket.sh
-      RACKET_DIR: ${{ env.HOME }}/racket
       RACKET_VERSION: ${{ matrix.racket }}
       RACKET_CS: ${{ matrix.racket_cs }}
       DEPLOY: true
@@ -35,10 +34,9 @@ jobs:
         run: sudo apt install texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended
       - name: Add to $PATH
         run: |
-          printf %s "$RACKET_DIR/bin" >> "$GITHUB_PATH"
+          printf %s "$HOME/racket/bin" >> "$GITHUB_PATH"
       - name: Print environment variables
         run: |
-          echo "$RACKET_DIR"
           echo "$PATH"
           echo "$RACKET_VERSION"
           echo "$RACKET_CS"
