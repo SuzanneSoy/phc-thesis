@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        racket: ["6.9", "6.10", "6.10.1", "6.11", "6.12", "7.0", "7.1", "7.2", "7.3", "7.4", "7.5", "7.6", "7.7", "7.8", "7.9", "8.0"]
+        racket: ['6.9', '6.10', '6.10.1', '6.11', '6.12', '7.0', '7.1', '7.2', '7.3', '7.4', '7.5', '7.6', '7.7', '7.8', '7.9', '8.0']
         racket_cs: [0]
         include:
           - racket: 8.0
@@ -39,12 +39,14 @@ jobs:
           printf %s\\n "/usr/racket/bin" >> "$GITHUB_PATH"
       - name: Print environment variables
         run: |
-          echo "$HOME"
-          echo "$PATH"
-          echo "$RACKET_VERSION"
-          echo "$RACKET_CS"
-          echo "$DEPLOY"
-          echo "GITHUB_WORKSPACE"
+          echo "matrix.racket ${{ matrix.racket }}"
+          echo "matrix.racket_cs ${{ matrix.racket_cs }}"
+          echo HOME="$HOME"
+          echo PATH="$PATH"
+          echo RACKET_VERSION="$RACKET_VERSION"
+          echo RACKET_CS="$RACKET_CS"
+          echo DEPLOY="$DEPLOY"
+          echo GITHUB_WORSPACE="GITHUB_WORKSPACE"
       - name: Install Racket
         run: |
           export RACKET_HOME="$HOME/.racket"
