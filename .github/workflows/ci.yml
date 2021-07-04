@@ -1,0 +1,78 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        racket: [6.9, 6.10, 6.10.1, 6.11, 6.12, 7.0, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 8.0]
+        racket_cs: [0]
+        include:
+          - racket: 8.0
+            racket_cs: 1
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install LaTeX
+        # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
+        run: sudo apt install texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex3 texlive-latex-recommended pgf latex-xcolor
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        # RACKET_DIR is an argument to install-racket.sh
+        env:
+          RACKET_DIR: ~/racket
+          PATH: "$RACKET_DIR/bin:$PATH"
+          RACKET_VERSION: ${{ matrix.racket }}
+          DEPLOY: true
+          RACKET_CS: ${{ matrix.racket_cs }}
+        run: |
+          env
+          curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
+          # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
+          raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
+          raco pkg install --deps search-auto -j 2 type-expander # Start installing stuff, continue later to avoid timeout.
+          raco pkg install --deps search-auto -j 2 phc-adt # Start installing stuff, continue later to avoid timeout.
+          echo "LaTeX extra packages:"
+          latex_home=$(kpsewhich -var-value=TEXMFHOME)
+          curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
+          curl -L -o newunicodechar.dtx http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.dtx
+          latex newunicodechar.ins
+          mkdir -p "$latex_home/tex/latex/newunicodechar"
+          mv newunicodechar.sty "$latex_home/tex/latex/newunicodechar"
+          curl -L -o mathpartir.dtx http://mirrors.ctan.org/macros/latex/contrib/mathpartir/mathpartir.dtx
+          curl -L -o mathpartir.ins http://mirrors.ctan.org/macros/latex/contrib/mathpartir/mathpartir.ins
+          latex mathpartir.ins
+          mkdir -p "$latex_home/tex/latex/mathpartir"
+          mv mathpartir.sty "$latex_home/tex/latex/mathpartir"
+          echo "Finished installing extra latex packages."
+          raco pkg install --deps search-auto -j 2
+          zipfile_folder_name="$(racket -e '(begin (require phc-thesis/scribblings/util) (display (version-text "phc-thesis-" "")))')"
+          raco test -x -p "$(basename "$TRAVIS_BUILD_DIR")"
+          raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$TRAVIS_BUILD_DIR")"
+          raco scribble --dest doc/phc-thesis --html --dest-name index --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl > html.log 2>&1 || (cat html.log && exit 1)
+          make
+          find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
+          find doc -name '*.html' -type f -print0 | xargs -0 sed -i -e 's|https://download\.racket-lang\.org/docs/6\.9/html/|https://docs.racket-lang.org/|g'
+          find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
+          nvm install v8.1 # works with v8.1.4
+          npm install mathjax-node
+          patch -p1 < qaligned.patch
+          patch -p1 < MathJax-bfit.patch
+          node < run-mathjax-offline.node.js
+          mv doc/phc-thesis/index2.html doc/phc-thesis/index.html
+          mv doc "${zipfile_folder_name}"
+          zip -r "${zipfile_folder_name}.zip" "${zipfile_folder_name}"
+          mv "${zipfile_folder_name}" doc
+          mv "${zipfile_folder_name}.zip" doc/
+          if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
+
