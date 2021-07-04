@@ -49,7 +49,7 @@ jobs:
           echo GITHUB_WORSPACE="GITHUB_WORKSPACE"
       - name: Install Racket
         run: |
-          export RACKET_HOME="$HOME/.racket"
+          export RACKET_DIR="$HOME/.racket"
           curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
           find /home/runner/ -maxdepth 3 || true
           find /usr/racket -maxdepth 3 || true
