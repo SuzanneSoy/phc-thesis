@@ -22,14 +22,14 @@ jobs:
           - racket: 8.0
             racket_cs: 1
     steps:
+      env:
+        # RACKET_DIR is an argument to install-racket.sh
+        RACKET_DIR: ~/racket
+        PATH: "$RACKET_DIR/bin:$PATH"
+        RACKET_VERSION: ${{ matrix.racket }}
+        RACKET_CS: ${{ matrix.racket_cs }}
+        DEPLOY: true
       - uses: actions/checkout@v2
-      - env:
-          # RACKET_DIR is an argument to install-racket.sh
-          RACKET_DIR: ~/racket
-          PATH: "$RACKET_DIR/bin:$PATH"
-          RACKET_VERSION: ${{ matrix.racket }}
-          RACKET_CS: ${{ matrix.racket_cs }}
-          DEPLOY: true
       - name: Install LaTeX
         # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
         # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
