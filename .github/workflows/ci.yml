@@ -23,7 +23,7 @@ jobs:
             racket_cs: 1
     env:
       # RACKET_DIR is an argument to install-racket.sh
-      RACKET_DIR: ${{ env.home }}/racket
+      RACKET_DIR: ${{ env.HOME }}/racket
       RACKET_VERSION: ${{ matrix.racket }}
       RACKET_CS: ${{ matrix.racket_cs }}
       DEPLOY: true
