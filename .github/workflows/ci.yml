@@ -33,6 +33,9 @@ jobs:
         # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
         # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
         run: sudo apt install texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended
+      - name: Add to $PATH
+        run: |
+          printf %s "$RACKET_DIR/bin" >> "$GITHUB_PATH"
       - name: Print environment variables
         run: |
           echo "$RACKET_DIR"
@@ -44,7 +47,6 @@ jobs:
       - name: Install Racket
         run: |
           curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
-          printf %s "$RACKET_DIR/bin:$PATH" >> "$GITHUB_PATH"
       - name: Install Scribble
         # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
         run: raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
