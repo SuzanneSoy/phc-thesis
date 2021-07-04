@@ -23,11 +23,6 @@ jobs:
             racket_cs: 1
     steps:
       - uses: actions/checkout@v2
-      - name: Install LaTeX
-        # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
-        # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
-        run: sudo apt install texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended
-      # Runs a set of commands using the runners shell
       - env:
           # RACKET_DIR is an argument to install-racket.sh
           RACKET_DIR: ~/racket
@@ -35,6 +30,10 @@ jobs:
           RACKET_VERSION: ${{ matrix.racket }}
           RACKET_CS: ${{ matrix.racket_cs }}
           DEPLOY: true
+      - name: Install LaTeX
+        # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
+        # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
+        run: sudo apt install texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended
       - name: Print environment variables
         run: |
           echo "$RACKET_DIR"
