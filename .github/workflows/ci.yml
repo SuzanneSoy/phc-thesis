@@ -36,7 +36,6 @@ jobs:
       - name: Add to $PATH
         run: |
           printf %s\\n "$HOME/.racket/bin" >> "$GITHUB_PATH"
-          printf %s\\n "/usr/racket/bin" >> "$GITHUB_PATH"
       - name: Print environment variables
         run: |
           echo "matrix.racket ${{ matrix.racket }}"
@@ -51,8 +50,6 @@ jobs:
         run: |
           export RACKET_DIR="$HOME/.racket"
           curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
-          find /home/runner/ -maxdepth 3 || true
-          find /usr/racket -maxdepth 3 || true
       - name: Install Scribble
         # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
         run: raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
