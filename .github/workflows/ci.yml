@@ -28,22 +28,32 @@ jobs:
         # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
         run: sudo apt install texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        # RACKET_DIR is an argument to install-racket.sh
-        env:
+      - env:
+          # RACKET_DIR is an argument to install-racket.sh
           RACKET_DIR: ~/racket
           PATH: "$RACKET_DIR/bin:$PATH"
           RACKET_VERSION: ${{ matrix.racket }}
-          DEPLOY: true
           RACKET_CS: ${{ matrix.racket_cs }}
+          DEPLOY: true
+      - name: Print environment variables
         run: |
-          env
-          curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
-          # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
-          raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
+          echo "$RACKET_DIR"
+          echo "$PATH"
+          echo "$RACKET_VERSION"
+          echo "$RACKET_CS"
+          echo "$DEPLOY"
+          echo "GITHUB_WORKSPACE"
+      - name: Install Racket
+        run: curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
+      - name: Install Scribble
+        # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
+        run: raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
+      - name: Install some of the other dependencies (might not be necessary)
+        run: |
           raco pkg install --deps search-auto -j 2 type-expander # Start installing stuff, continue later to avoid timeout.
           raco pkg install --deps search-auto -j 2 phc-adt # Start installing stuff, continue later to avoid timeout.
-          echo "LaTeX extra packages:"
+      - name: Install extra Latex packages
+        run: |
           latex_home=$(kpsewhich -var-value=TEXMFHOME)
           curl -L -o newunicodechar.ins http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.ins
           curl -L -o newunicodechar.dtx http://mirrors.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.dtx
@@ -55,25 +65,36 @@ jobs:
           latex mathpartir.ins
           mkdir -p "$latex_home/tex/latex/mathpartir"
           mv mathpartir.sty "$latex_home/tex/latex/mathpartir"
-          echo "Finished installing extra latex packages."
-          raco pkg install --deps search-auto -j 2
-          zipfile_folder_name="$(racket -e '(begin (require phc-thesis/scribblings/util) (display (version-text "phc-thesis-" "")))')"
-          raco test -x -p "$(basename "$TRAVIS_BUILD_DIR")"
-          raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$TRAVIS_BUILD_DIR")"
-          raco scribble --dest doc/phc-thesis --html --dest-name index --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl > html.log 2>&1 || (cat html.log && exit 1)
-          make
+      - name: Install the Racket package
+        run: raco pkg install --deps search-auto -j 2
+      - name: Test the Racket package
+        run: raco test -x -p "$(basename "$GITHUB_WORKSPACE")"
+      - name: (Re?)Build the Racket package
+        run: raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$GITHUB_WORKSPACE")"
+      - name: Generate docs
+        run: raco scribble --dest doc/phc-thesis --html --dest-name index --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl > html.log 2>&1 || (cat html.log && exit 1)
+      - name: Generate PDF
+        run: make
+      - name: Patch docs
+        run: |
           find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
           find doc -name '*.html' -type f -print0 | xargs -0 sed -i -e 's|https://download\.racket-lang\.org/docs/6\.9/html/|https://docs.racket-lang.org/|g'
           find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
+      - name: Render MathJax offline
+        run: |
           nvm install v8.1 # works with v8.1.4
           npm install mathjax-node
           patch -p1 < qaligned.patch
           patch -p1 < MathJax-bfit.patch
           node < run-mathjax-offline.node.js
           mv doc/phc-thesis/index2.html doc/phc-thesis/index.html
+      - name: Create .zip archive
+        run: |
+          zipfile_folder_name="$(racket -e '(begin (require phc-thesis/scribblings/util) (display (version-text "phc-thesis-" "")))')"
           mv doc "${zipfile_folder_name}"
           zip -r "${zipfile_folder_name}.zip" "${zipfile_folder_name}"
           mv "${zipfile_folder_name}" doc
           mv "${zipfile_folder_name}.zip" doc/
-          if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
+      - name: Deploy
+        run: if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
 
