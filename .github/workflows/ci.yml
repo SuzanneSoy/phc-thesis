@@ -55,9 +55,9 @@ jobs:
         run: |
           if test "$RACKET_VERSION" = "6.9"; then
             raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
-          else if test "$RACKET_VERSION" = "6.10" || test "$RACKET_VERSION" = "6.10.1"; then
+          elif test "$RACKET_VERSION" = "6.10" || test "$RACKET_VERSION" = "6.10.1"; then
             raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-6.10
-          else if test "$RACKET_VERSION" = "6.11" || test "$RACKET_VERSION" = "6.12" || test "$RACKET_VERSION" = "7.0"; then
+          elif test "$RACKET_VERSION" = "6.11" || test "$RACKET_VERSION" = "6.12" || test "$RACKET_VERSION" = "7.0"; then
             raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-"$RACKET_VERSION"
           else
             raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-7.0
