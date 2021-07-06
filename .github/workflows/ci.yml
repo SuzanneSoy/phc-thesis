@@ -80,10 +80,11 @@ jobs:
           if test "$RACKET_VERSION" = "6.9" || test "$RACKET_VERSION" = "6.10"; then
             raco pkg install 'https://github.com/samth/fancy-app.git#d137c55d5d29f4bc0dd2c8f316dc30521c1cb592'
           fi
-      - name: Install older version of fancy-app for Racket < 7.0
+      - name: Install older version of turnstile (macrotypes) for Racket < 7.0
         run: |
           if test "$RACKET_VERSION" = "6.9" || test "$RACKET_VERSION" = "6.10" || test "$RACKET_VERSION" = "6.10.1" || test "$RACKET_VERSION" = "6.11" || test "$RACKET_VERSION" = "6.12"; then
             raco pkg install 'https://github.com/stchang/macrotypes.git#e81f9abc5b88a7c30d14d8591038679c1db013c0'
+            sed -i -e '/###REMOVE_BEFORE_7_0###/d' info.rkt
           fi
       - name: Install some of the other dependencies (might not be necessary)
         run: |

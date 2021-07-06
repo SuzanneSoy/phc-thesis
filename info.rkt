@@ -20,6 +20,7 @@
                      "r6rs-doc"
                      "redex-doc"
                      "turnstile"
+                     "turnstile-doc" ;; was split into a separate package starting from ~racket 7.0 ###REMOVE_BEFORE_7_0###
                      "extensible-functions"
                      "zippers"
                      ;; Literate programming dependencies:
