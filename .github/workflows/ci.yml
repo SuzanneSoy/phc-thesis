@@ -53,6 +53,11 @@ jobs:
       - name: Install Scribble
         # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
         run: raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
+      - name: Install older version of fancy-app for Racket 6.9 and 6.10
+        run: |
+          if test "$RACKET_VERSION" = "6.9" || test "$RACKET_VERSION" = "6.10"; then
+            raco pkg install 'https://github.com/samth/fancy-app.git#d137c55d5d29f4bc0dd2c8f316dc30521c1cb592'
+          fi
       - name: Install some of the other dependencies (might not be necessary)
         run: |
           raco pkg install --deps search-auto -j 2 type-expander # Start installing stuff, continue later to avoid timeout.
