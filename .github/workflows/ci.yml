@@ -45,7 +45,7 @@ jobs:
           echo RACKET_VERSION="$RACKET_VERSION"
           echo RACKET_CS="$RACKET_CS"
           echo DEPLOY="$DEPLOY"
-          echo GITHUB_WORSPACE="GITHUB_WORKSPACE"
+          echo GITHUB_WORSPACE="$GITHUB_WORKSPACE"
       - name: Install Racket
         run: |
           export RACKET_DIR="$HOME/.racket"
