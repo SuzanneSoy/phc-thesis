@@ -56,11 +56,19 @@ jobs:
           if test "$RACKET_VERSION" = "6.9"; then
             raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
           elif test "$RACKET_VERSION" = "6.10" || test "$RACKET_VERSION" = "6.10.1"; then
-            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-6.10
-          elif test "$RACKET_VERSION" = "6.11" || test "$RACKET_VERSION" = "6.12" || test "$RACKET_VERSION" = "7.0"; then
-            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-"$RACKET_VERSION"
+            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v6.10
+          elif test "$RACKET_VERSION" = "6.11" \
+            || test "$RACKET_VERSION" = "6.12" \
+            || test "$RACKET_VERSION" = "7.0"  \
+            || test "$RACKET_VERSION" = "7.1"  \
+            || test "$RACKET_VERSION" = "7.2"  \
+            || test "$RACKET_VERSION" = "7.3"  \
+            || test "$RACKET_VERSION" = "7.4"  \
+            || test "$RACKET_VERSION" = "7.5"  \
+          ; then
+            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v"$RACKET_VERSION"
           else
-            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-7.0
+            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v7.5
           fi
       - name: Install older version of fancy-app for Racket 6.9 and 6.10
         run: |
