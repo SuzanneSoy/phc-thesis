@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+echo "=== pdflatex $@ ==="
+pwd
+ls
+mkdir /tmp/ltx
+for arg in "$@"; do if test -e "$arg"; then cp "$arg" /tmp/ltx/
+echo "=== starting pdflatex ==="
+exec PLACEHOLDER "$@"
