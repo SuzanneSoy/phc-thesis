@@ -27,7 +27,7 @@
                      "aful"
                      "delay-pure"
                      "phc-adt-doc"
-                     "https://github.com/jsmaniac/phc-graph.git" ;; "phc-graph"
+                     "https://github.com/jsmaniac/phc-graph.git#main" ;; "phc-graph"
                      "stxparse-info"
                      "subtemplate"
                      "type-expander"
