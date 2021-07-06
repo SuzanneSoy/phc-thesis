@@ -20,9 +20,9 @@ jobs:
 #        racket: ['6.9', '6.10', '6.10.1', '6.11', '6.12', '7.0', '7.1', '7.2', '7.3', '7.4', '7.5', '7.6', '7.7', '7.8', '7.9', '8.0']
         racket: ['7.3']
         racket_cs: [0]
-        include:
-          - racket: '8.0'
-            racket_cs: 1
+#        include:
+#          - racket: '8.0'
+#            racket_cs: 1
     env:
       # RACKET_DIR is an argument to install-racket.sh
       RACKET_VERSION: "${{ matrix.racket }}"
