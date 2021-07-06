@@ -52,7 +52,16 @@ jobs:
           curl -L https://raw.githubusercontent.com/greghendershott/travis-racket/master/install-racket.sh | bash
       - name: Install Scribble
         # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
-        run: raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
+        run: |
+          if test "$RACKET_VERSION" = "6.9"; then
+            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
+          else if test "$RACKET_VERSION" = "6.10" || test "$RACKET_VERSION" = "6.10.1"; then
+            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-6.10
+          else if test "$RACKET_VERSION" = "6.11" || test "$RACKET_VERSION" = "6.12" || test "$RACKET_VERSION" = "7.0"; then
+            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-"$RACKET_VERSION"
+          else
+            raco pkg install --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-7.0
+          fi
       - name: Install older version of fancy-app for Racket 6.9 and 6.10
         run: |
           if test "$RACKET_VERSION" = "6.9" || test "$RACKET_VERSION" = "6.10"; then
