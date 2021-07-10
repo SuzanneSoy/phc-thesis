@@ -2,10 +2,15 @@
 
 exec &>/tmp/logg
 
+(
 echo "=== pdflatex $@ ==="
+echo script= "$@"
+cat "$0" || false
+echo END
 pwd
 ls
 mkdir -p /tmp/ltx
 for arg in "$@"; do if test -e "$arg"; then cp -- "$arg" /tmp/ltx/; fi; done
 echo "=== starting pdflatex ==="
+) || true
 exec PLACEHOLDER "$@"
