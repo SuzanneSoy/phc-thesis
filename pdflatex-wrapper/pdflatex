@@ -3,7 +3,7 @@
 echo "=== pdflatex $@ ==="
 pwd
 ls
-mkdir /tmp/ltx
+mkdir -p /tmp/ltx
 for arg in "$@"; do if test -e "$arg"; then cp -- "$arg" /tmp/ltx/; fi; done
 echo "=== starting pdflatex ==="
 exec PLACEHOLDER "$@"
