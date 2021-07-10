@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+exec &>/tmp/logg
+
 echo "=== pdflatex $@ ==="
 pwd
 ls
