@@ -469,6 +469,7 @@ EOCSS
 \NewEnviron{epigraphStyle}{\global\let\lastepigraph\BODY}
 \NewEnviron{epigraphAuthorStyle}{%
   \global\let\lastepigraphauthor\BODY%
+
   \epigraph{\emph{\lastepigraph}}{\lastepigraphauthor}%
 }
 EOTEX
