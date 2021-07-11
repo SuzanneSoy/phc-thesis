@@ -34,6 +34,10 @@ jobs:
         # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
         # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
         run: sudo apt install texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended ghostscript
+      - name: Install Zip
+        # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
+        # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
+        run: sudo apt install zip
       - name: Add to $PATH
         run: |
           printf %s\\n "$HOME/.racket/bin" >> "$GITHUB_PATH"
