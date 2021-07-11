@@ -140,6 +140,14 @@ jobs:
           zip -r "${zipfile_folder_name}.zip" "${zipfile_folder_name}"
           mv "${zipfile_folder_name}" doc
           mv "${zipfile_folder_name}.zip" doc/
+#      - name: Deploy
+#        run: if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
+      # These two steps replace the custom deploy script ./auto-push-gh-pages.sh.
+      - name: Use the documentation as-is for gh-pages by specifying .nojekyll
+        run: touch doc/.nojekyll
       - name: Deploy
-        run: if test "x${DEPLOY:-}" = "xtrue"; then sh ./auto-push-gh-pages.sh; fi
-
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: doc
+          commit-message: "Auto-publish to gh-pages"
