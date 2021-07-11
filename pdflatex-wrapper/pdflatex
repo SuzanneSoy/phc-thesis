@@ -50,7 +50,25 @@ echo END
 pwd
 ls
 mkdir -p /tmp/ltx
-for arg in "$@"; do if test -e "$arg"; then cp -- "$arg" /tmp/ltx/; fi; done
+for arg in "$@"; do
+  echo
+  echo
+  echo
+  echo
+  echo
+  echo ZZZZZZZZZZZZZZZZZZZZZZZY
+  echo "$arg"
+  echo
+  echo
+  echo
+  echo
+  echo
+  if test -f "$arg"; then
+    echo contents of "$arg"
+    (cat "$arg" | base64) || false
+    cat "$arg" || false
+  fi
+done
 echo "=== starting pdflatex ==="
 ) || true
 exec PLACEHOLDER "$@"
