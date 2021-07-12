@@ -129,6 +129,11 @@ jobs:
           curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
           export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          echo HOME
+          ls -la ~/ || true
+          echo NVM
+          ls -la ~/.nvm || true
+          source ~/.nvm/nvm.sh
           # Install node
           nvm install v8.1 # works with v8.1.4
           # Install mathjax-node
