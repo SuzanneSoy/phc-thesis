@@ -137,7 +137,7 @@ jobs:
           # Install node
           nvm install v8.1 # works with v8.1.4
           # Install mathjax-node
-          npm install mathjax-node
+          npm install mathjax-node@1.2.0
           # Patch mathjax-node
           patch -p1 < qaligned.patch
           patch -p1 < MathJax-bfit.patch
