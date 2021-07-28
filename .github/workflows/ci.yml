@@ -115,7 +115,9 @@ jobs:
       - name: (Re?)Build the Racket package
         run: raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$GITHUB_WORKSPACE")"
       - name: Generate docs
-        run: raco scribble ++main-xref-in --dest doc/phc-thesis --html --dest-name index --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl > html.log 2>&1 || (cat html.log && exit 1)
+        run: |
+          raco scribble ++main-xref-in --dest doc/phc-thesis --html --dest-name index --redirect-main http://download.racket-lang.org/releases/7.3/doc/ --redirect https://docs.racket-lang.org/local-redirect/index.html scribblings/phc-thesis.scrbl > html.log 2>&1 || (cat html.log && exit 1)
+          ./fixlinks.sh
       - name: Generate PDF
         run: make
       - name: Patch docs
