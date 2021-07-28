@@ -56,11 +56,13 @@ jobs:
       - name: Install Scribble
         # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
         run: |
-          raco pkg remove --force scribble-lib || true
+          #raco pkg remove --force scribble-lib || true
+          #SCOPE='--scope installation'
+          SCOPE='--scope user'
           if test "$RACKET_VERSION" = "6.9"; then
-            raco pkg install --scope installation --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
+            raco pkg install $SCOPE --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
           elif test "$RACKET_VERSION" = "6.10" || test "$RACKET_VERSION" = "6.10.1"; then
-            raco pkg install --scope installation --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v6.10
+            raco pkg install $SCOPE --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v6.10
           elif test "$RACKET_VERSION" = "6.11" \
             || test "$RACKET_VERSION" = "6.12" \
             || test "$RACKET_VERSION" = "7.0"  \
@@ -75,9 +77,9 @@ jobs:
             || test "$RACKET_VERSION" = "7.9"  \
             || test "$RACKET_VERSION" = "8.0"  \
           ; then
-            raco pkg install --scope installation --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v"$RACKET_VERSION"
+            raco pkg install $SCOPE --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v"$RACKET_VERSION"
           else
-            raco pkg install --scope installation --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v8.0
+            raco pkg install $SCOPE --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes-v8.0
           fi
       - name: Install older version of fancy-app for Racket 6.9 and 6.10
         run: |
