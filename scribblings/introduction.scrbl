@@ -170,7 +170,7 @@
 
   In principle, new information gained by the static analysis may be added to
   the existing representation via mutation, or the optimiser could directly
-  alter the @tech{ IR}. This means that the @tech{IR} will initially contain
+  alter the @tech{IR}. This means that the @tech{IR} will initially contain
   holes (e.g. represented by @racketid[null] values), which will get filled in
   gradually. Manipulating these parts is then risky, as it is easy to
   accidentally attempt to retrieve a value before it was actually computed.
