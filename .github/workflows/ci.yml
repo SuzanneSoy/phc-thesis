@@ -58,6 +58,7 @@ jobs:
       - name: Install Scribble
         # Install custom version of scribble-lib which includes fixes for bibted-related problems which have not merged upstream yet. Also includes extended support for highlighting Racket code.
         run: |
+          raco pkg remove --force scribble-lib || true
           if test "$RACKET_VERSION" = "6.9"; then
             raco pkg install --scope installation --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
           elif test "$RACKET_VERSION" = "6.10" || test "$RACKET_VERSION" = "6.10.1"; then
