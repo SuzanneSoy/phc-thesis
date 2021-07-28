@@ -33,11 +33,11 @@ jobs:
       - name: Install LaTeX
         # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
         # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
-        run: sudo apt install texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended ghostscript
+        run: sudo apt install -y texlive-latex-base texlive-fonts-extra texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended ghostscript
       - name: Install Zip
         # texlive-latex3 on 12.04, texlive-latex-recommended on more recent versions of Ubuntu.
         # Some version (16.04?) needed these packages: pgf texlive-latex3 latex-xcolor
-        run: sudo apt install zip
+        run: sudo apt install -y zip
       - name: Add to $PATH
         run: |
           printf %s\\n "$HOME/.racket/bin" >> "$GITHUB_PATH"
@@ -115,7 +115,7 @@ jobs:
       - name: (Re?)Build the Racket package
         run: raco setup --check-pkg-deps --no-zo --no-launcher --no-install --no-post-install --no-docs --pkgs "$(basename "$GITHUB_WORKSPACE")"
       - name: Generate docs
-        run: raco scribble --dest doc/phc-thesis --html --dest-name index --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl > html.log 2>&1 || (cat html.log && exit 1)
+        run: raco scribble ++main-xref-in --dest doc/phc-thesis --html --dest-name index --redirect-main https://docs.racket-lang.org/ --redirect https://docs.racket-lang.org/ scribblings/phc-thesis.scrbl > html.log 2>&1 || (cat html.log && exit 1)
       - name: Generate PDF
         run: make
       - name: Patch docs
