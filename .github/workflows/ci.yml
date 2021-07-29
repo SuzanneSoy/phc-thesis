@@ -118,7 +118,7 @@ jobs:
       - name: Generate docs
         #run: raco scribble ++main-xref-in --dest doc/phc-thesis --html --dest-name index --redirect-main http://download.racket-lang.org/releases/7.3/doc/ --redirect https://docs.racket-lang.org/local-redirect/index.html scribblings/phc-thesis.scrbl > html.log 2>&1 || (cat html.log && exit 1)
         run: |
-          while sleep 5; do (df -h; free -m; ls doc) || true; done &
+          for i in `seq 100`; do (df -h; free -m; find doc) || true; sleep 3; done &
           raco scribble --dest doc/phc-thesis --html --dest-name index --redirect-main http://download.racket-lang.org/releases/7.3/doc/ --redirect https://docs.racket-lang.org/local-redirect/index.html scribblings/phc-thesis.scrbl
           echo DONE
       - name: Generate PDF
