@@ -58,7 +58,8 @@ jobs:
         run: |
           #raco pkg remove --force scribble-lib || true
           #SCOPE='--scope installation'
-          SCOPE='--scope user'
+          #SCOPE='--scope user'
+          SCOPE=''
           if test "$RACKET_VERSION" = "6.9"; then
             raco pkg install $SCOPE --force --name scribble-lib https://github.com/jsmaniac/hyper-literate.git?path=scribble-lib#my-changes
           elif test "$RACKET_VERSION" = "6.10" || test "$RACKET_VERSION" = "6.10.1"; then
