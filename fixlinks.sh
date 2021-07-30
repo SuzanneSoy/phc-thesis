@@ -33,4 +33,11 @@ sed -i -e 's/href="index.html#/href="#/g' doc/phc-thesis/index.html
 cp doc/phc-thesis/index.html doc/index.html
 sed -i -e 's~"../pdf/~"pdf/~' doc/index.html
 sed -i -e 's~"../phc-thesis-/~"phc-thesis-/~' doc/index.html
+set +x
+for i in doc/phc-thesis/*; do
+  escaped_name="$(basename "$i" | sed -e 's~[]$.*/[\^]~\\&~g' )"
+  sed -i -e 's/\(href\|src\)="'"\($escaped_name\)"'"/\1="phc-thesis\/\2"/g' doc/index.html
+done
+set -x
+
 sed -i -e '1i<!-- This file is a copy of ../index.html with the relative URLs adjusted, it is kept here so that the old URL …/phc-theis/index.html keeps working but the new URL …/index.html should be used. -->' doc/phc-thesis/index.html
