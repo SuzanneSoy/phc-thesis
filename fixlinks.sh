@@ -26,3 +26,11 @@ sed -i -e 's~XD~%~g' doc/phc-thesis/index.html
 sed -i -e 's~XC~~g' doc/phc-thesis/index.html
 sed -i -e 's~XB~Y~g' doc/phc-thesis/index.html
 sed -i -e 's~XA~X~g' doc/phc-thesis/index.html
+
+# Transform 'href="index.html#…' to 'href="#…' so that links within the page don't cause a reload if the URL was …/phc-thesis/ vs. …/phc-thesis/index.html
+sed -i -e 's/href="index.html#/href="#/g' doc/phc-thesis/index.html
+
+cp doc/phc-thesis/index.html doc/index.html
+sed -i -e 's~"../pdf/~"pdf/~' doc/index.html
+sed -i -e 's~"../phc-thesis-/~"phc-thesis-/~' doc/index.html
+sed -i -e '1i<!-- This file is a copy of ../index.html with the relative URLs adjusted, it is kept here so that the old URL …/phc-theis/index.html keeps working but the new URL …/index.html should be used. -->' doc/phc-thesis/index.html

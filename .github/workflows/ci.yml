@@ -128,9 +128,9 @@ jobs:
       - name: Patch docs
         run: |
           ./fixlinks.sh
-          find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
-          find doc -name '*.html' -type f -print0 | xargs -0 sed -i -e 's|https://download\.racket-lang\.org/docs/6\.9/html/|https://docs.racket-lang.org/|g'
-          find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
+          #find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
+          #find doc -name '*.html' -type f -print0 | xargs -0 sed -i -e 's|https://download\.racket-lang\.org/docs/6\.9/html/|https://docs.racket-lang.org/|g'
+          #find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
       - name: Render MathJax offline
         run: |
           # Install nvm and node:
