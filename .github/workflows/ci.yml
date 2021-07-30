@@ -125,12 +125,6 @@ jobs:
           echo DONE
       - name: Generate PDF
         run: make
-      - name: Patch docs
-        run: |
-          ./fixlinks.sh
-          #find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
-          #find doc -name '*.html' -type f -print0 | xargs -0 sed -i -e 's|https://download\.racket-lang\.org/docs/6\.9/html/|https://docs.racket-lang.org/|g'
-          #find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
       - name: Render MathJax offline
         run: |
           # Install nvm and node:
@@ -152,6 +146,12 @@ jobs:
           # Run mathjax offline
           node < run-mathjax-offline.node.js
           mv doc/phc-thesis/index2.html doc/phc-thesis/index.html
+      - name: Patch docs
+        run: |
+          ./fixlinks.sh
+          #find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
+          #find doc -name '*.html' -type f -print0 | xargs -0 sed -i -e 's|https://download\.racket-lang\.org/docs/6\.9/html/|https://docs.racket-lang.org/|g'
+          #find doc -name '*.html' -type f -print0 | xargs -0 ls -ld
       - name: Create .zip archive
         run: |
           zipfile_folder_name="$(racket -e '(begin (require phc-thesis/scribblings/util) (display (version-text "phc-thesis-" "")))')"
